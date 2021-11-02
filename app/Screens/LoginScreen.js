@@ -5,25 +5,31 @@ import {
 	useFonts,
 } from "@expo-google-fonts/oxygen";
 import AppLoading from "expo-app-loading";
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
-	Button,
-	Font,
 	Image,
-	ImageBackground,
 	Platform,
 	SafeAreaView,
+	StatusBar,
 	StyleSheet,
 	Text,
-	TextBase,
 	TextInput,
+	TouchableOpacity,
+	useWindowDimensions,
 	View,
 } from "react-native";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import colours from "../assets/colours";
 
+TouchableOpacity.defaultProps = { activeOpacity: 0.8 };
+
+const AppButton = ({ onPress, title, style }) => (
+	<TouchableOpacity onPress={onPress} style={style}>
+		<Text style={styles.buttonText}>{title}</Text>
+	</TouchableOpacity>
+);
+
 export default function LoginScreen(props) {
+	const windowHeight = useWindowDimensions().height;
 	const titleText = "Wilderness\nVital Tracking";
 
 	let [fontsLoaded] = useFonts({
@@ -36,14 +42,16 @@ export default function LoginScreen(props) {
 		return <AppLoading />;
 	} else {
 		return (
-			<SafeAreaView style={styles.container}>
-				<View style={styles.registerButton}>
-					<Button
-						title="Register"
-						color={colours.primary}
-						onPress={() => console.log("Register pressed")}
-					/>
-				</View>
+			<SafeAreaView
+				behavior={"padding"}
+				style={styles.container}
+				minHeight={windowHeight}
+			>
+				<AppButton
+					title="Register"
+					style={styles.registerButton}
+					onPress={() => console.log("Register Pressed")}
+				/>
 				<Text style={styles.titleText}>{titleText}</Text>
 				<View style={styles.separator} />
 				<TextInput
@@ -53,7 +61,6 @@ export default function LoginScreen(props) {
 					returnKeyType="next"
 					textContentType="username"
 					placeholder="Username"
-					value={value}
 				/>
 				<TextInput
 					style={styles.credentialInput}
@@ -61,16 +68,14 @@ export default function LoginScreen(props) {
 					secureTextEntry={true}
 					textContentType="password"
 					placeholder="Password"
-					value={value}
 				/>
 				<View style={styles.separator} />
-				<View style={styles.loginButton}>
-					<Button
-						title="Login"
-						color={colours.primary}
-						onPress={() => console.log("Login pressed")}
-					/>
-				</View>
+				<AppButton
+					title="Login"
+					style={styles.loginButton}
+					onPress={() => console.log("Login pressed")}
+				/>
+				<View style={styles.separator} />
 				<View style={styles.baseline}>
 					<Image
 						style={styles.baselineImage}
@@ -112,6 +117,11 @@ export default function LoginScreen(props) {
 }
 
 const styles = StyleSheet.create({
+	buttonText: {
+		fontSize: 18,
+		color: colours.primary,
+		alignSelf: "center",
+	},
 	baseline: {
 		width: "100%",
 		height: 100,
@@ -119,7 +129,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		position: "absolute",
 		resizeMode: "repeat",
-		bottom: 20,
+		bottom: Platform.OS === "ios" ? "5%" : 0,
 	},
 	baselineImage: {
 		margin: -15,
@@ -166,17 +176,17 @@ const styles = StyleSheet.create({
 		alignContent: "center",
 		justifyContent: "center",
 		position: "absolute",
-		top: Platform.OS === "android" ? StatusBar.currentHeight : 40,
+		top: Platform.OS === "android" ? StatusBar.currentHeight - 20 : 40,
 		right: 10,
 	},
 	separator: {
-		marginVertical: 40,
+		marginVertical: "5%",
 		borderBottomColor: "#737373",
 		borderBottomWidth: StyleSheet.hairlineWidth,
 	},
 	titleText: {
 		fontSize: 50,
-		fontWeight: "bold",
+		fontWeight: "100",
 		textAlign: "center",
 		fontFamily: "Oxygen_700Bold",
 	},
