@@ -28,7 +28,7 @@ const AppButton = ({ onPress, title, style }) => (
 	</TouchableOpacity>
 );
 
-export default function LoginScreen(props) {
+export default function LoginScreen({ navigation }) {
 	const windowHeight = useWindowDimensions().height;
 	const titleText = "Wilderness\nVital Tracking";
 
@@ -73,41 +73,41 @@ export default function LoginScreen(props) {
 				<AppButton
 					title="Login"
 					style={styles.loginButton}
-					onPress={() => console.log("Login pressed")}
+					onPress={() => navigation.navigate("Landing")}
 				/>
 				<View style={styles.separator} />
 				<View style={styles.baseline}>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 					<Image
 						style={styles.baselineImage}
-						source={require("../assets/grass.png")}
+						source={require("../assets/images/grass.png")}
 					/>
 				</View>
 				<StatusBar style="auto" />
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		flex: 1,
-		backgroundColor: colours.background,
+		backgroundColor: colours.pinkBackground,
 		alignItems: "center",
 		justifyContent: "center",
 	},
