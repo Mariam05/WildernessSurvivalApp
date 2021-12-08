@@ -20,6 +20,15 @@ import {
 import colours from "../assets/colours";
 import afro from "../assets/humaaans/Single_Pieces/Head/Front/Afro.png";
 import curly from "../assets/humaaans/Single_Pieces/Head/Front/Curly.png";
+import airy from "../assets/humaaans/Single_Pieces/Head/Front/Airy.png";
+import caesar from "../assets/humaaans/Single_Pieces/Head/Front/Caesar.png";
+import chongo from "../assets/humaaans/Single_Pieces/Head/Front/Chongo.png";
+import hijab from "../assets/humaaans/Single_Pieces/Head/Front/Hijab1.png";
+import short1 from "../assets/humaaans/Single_Pieces/Head/Front/Short1.png";
+import wavy from "../assets/humaaans/Single_Pieces/Head/Front/Wavy.png";
+import short2 from "../assets/humaaans/Single_Pieces/Head/Front/Short2.png";
+import rad from "../assets/humaaans/Single_Pieces/Head/Front/Rad.png";
+import beard from "../assets/humaaans/Single_Pieces/Head/Front/ShortBeard.png";
 
 TouchableOpacity.defaultProps = { activeOpacity: 0.4 };
 
@@ -27,21 +36,21 @@ const DATA = [
 	{
 		title: "D",
 		data: [
-			{ name: "Devin", sex: "F", age: 20 },
-			{ name: "Dan", sex: "M", age: 50 },
-			{ name: "Dominic", sex: "M", age: 15 },
+			{ image: airy, name: "Devin", sex: "F", age: 20 },
+			{ image: curly, name: "Dan", sex: "M", age: 50 },
+			{ image: chongo, name: "Dominic", sex: "M", age: 15 },
 		],
 	},
 	{
 		title: "J",
 		data: [
-			{ name: "Jackson", sex: "M", age: 10 },
-			{ name: "James", sex: "M", age: 26 },
-			{ name: "Jillian", sex: "F", age: 32 },
-			{ name: "Jimmy", sex: "M", age: 24 },
-			{ name: "Joel", sex: "M", age: 35 },
-			{ name: "John", sex: "M", age: 65 },
-			{ name: "Julie", sex: "F", age: 94 },
+			{ image: caesar, name: "Jackson", sex: "M", age: 10 },
+			{ image: short1, name: "James", sex: "M", age: 26 },
+			{ image: hijab, name: "Jillian", sex: "F", age: 32 },
+			{ image: short2, name: "Jimmy", sex: "M", age: 24 },
+			{ image: rad, name: "Joel", sex: "M", age: 35 },
+			{ image: beard, name: "John", sex: "M", age: 65 },
+			{ image: wavy, name: "Julie", sex: "F", age: 94 },
 		],
 	},
 ];
@@ -66,7 +75,13 @@ const PatientItem = ({
 		<View margin={0} />
 		<View style={styles.patientPicture}>
 			<Image
-				style={{ width: "100%", height: undefined, aspectRatio: 1 }}
+				style={{
+					width: "100%",
+					height: undefined,
+					aspectRatio: 1,
+					resizeMode: "cover",
+					borderRadius: 100,
+				}}
 				source={image}
 			/>
 		</View>
@@ -125,12 +140,12 @@ export default function LandingScreen({ navigation }) {
 					sections={DATA}
 					renderItem={({ item }) => (
 						<PatientItem
+							image={item.image}
 							name={item.name}
 							sex={item.sex}
 							age={item.age}
 							onPress={() => console.log(item.name + " Pressed")}
 							style={styles.patientItem}
-							image={curly}
 							buttonTextStyle={styles.buttonText}
 							buttonSecondaryTextStyle={
 								styles.buttonSecondaryText
@@ -266,6 +281,8 @@ const styles = StyleSheet.create({
 	},
 	profilePicture: {
 		alignSelf: "center",
+		resizeMode: "cover",
+		borderRadius: 100,
 		margin: 0,
 		marginLeft: 20,
 		borderRadius: 30,
