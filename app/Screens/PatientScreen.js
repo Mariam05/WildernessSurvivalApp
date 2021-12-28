@@ -18,14 +18,8 @@ import {
 	View,
 } from "react-native";
 
-//import for the animation of Collapse and Expand
-import * as Animatable from 'react-native-animatable';
+import { LineChart } from  "react-native-chart-kit";
 
-//import for the collapsible/Expandable view
-import Collapsible from 'react-native-collapsible';
-
-//import for the Accordion view
-import Accordion from 'react-native-collapsible/Accordion';
 
 import colours from "../assets/colours";
 import afro from "../assets/humaaans/Single_Pieces/Head/Front/Afro.png";
