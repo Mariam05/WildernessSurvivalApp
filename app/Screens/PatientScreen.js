@@ -18,7 +18,7 @@ import {
 	View,
 } from "react-native";
 
-import { LineChart } from  "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
 
 
 import colours from "../assets/colours";
@@ -43,13 +43,10 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		dataPoints: [
-			{time: "1640705088", reading: 81},
-			{time: "1640706857", reading: 67},
-			{time: "1640708857", reading: 55},
-			{time: "1640710857", reading: 43},
-			{time: "1640712857", reading: 61},
-		],
+		data: {
+			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
+			data: [81, 67, 55, 43, 51]
+		}
 	},
 	{
 		title: "Heat Check",
@@ -57,13 +54,10 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		dataPoints: [
-			{time: "1640705088", reading: 86},
-			{time: "1640706857", reading: 72},
-			{time: "1640708857", reading: 112},
-			{time: "1640710857", reading: 101},
-			{time: "1640712857", reading: 42},
-		],
+		data: {
+			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
+			data: [86, 72, 112, 101, 42],
+		},
 	},
 	{
 		title: "Radial Pulse",
@@ -71,13 +65,10 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		dataPoints: [
-			{time: "1640705088", reading: 46},
-			{time: "1640706857", reading: 24},
-			{time: "1640708857", reading: 125},
-			{time: "1640710857", reading: 24},
-			{time: "1640712857", reading: 12},
-		],
+		data: {
+			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
+			data: [46, 24, 12, 25, 12],
+		},
 	},
 	{
 		title: "Grip Strength",
@@ -85,30 +76,31 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		dataPoints: [
-			{time: "1640705088", reading: 46},
-			{time: "1640706857", reading: 24},
-			{time: "1640708857", reading: 125},
-			{time: "1640710857", reading: 24},
-			{time: "1640712857", reading: 12},
-		],
+		data: {
+			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
+			data: [46, 125, 67, 55, 102],
+		},
 	},
 	{
 		title: "General Notes",
 		type: "special",
-		dataPoints: [
-			{time: "1640705088", note: "Patient has exhibited signs of hypothermia."},
-			{time: "1640706857", note: "Patient has glassy eyes."},
-			{time: "1640708857", note: "Patient has fainted."},
-			{time: "1640710857", note: "Someone get help"},
-		],
+		data: {
+			labels: ["1640705088", "1640706857", "1640708857", "1640710857"],
+			data: [
+				"Patient has exhibited signs of hypothermia.",
+				"Patient has glassy eyes.",
+				"Patient has fainted.",
+				"Someone get help",
+			],
+		},
 	},
 	{
 		title: "Photos",
 		type: "special",
-		dataPoints: [
-			{time: "1640705088", image: ""},
-		],
+		data: {
+			labels: [],
+			data: [],
+		},
 	},
 ];
 
@@ -123,76 +115,63 @@ const AppButton = ({ onPress, title, style, buttonTextStyle }) => (
 
 
 
-const RenderTimeElapsed = ({section, containsTimeElapsed, isOverdue}) => {
+const RenderTimeElapsed = ({item, containsTimeElapsed, isOverdue}) => {
 	if (containsTimeElapsed){
 			return (<Text style={isOverdue ? styles.timeElapsedRedText : styles.timeElapsedGreenText}
-							>{section.timeElapsed} min ago</Text>)
+							>{item.timeElapsed} min ago</Text>)
 	}
 	return (null)
 }
 
 
-const RenderVitalsHeader = ({
-	section,
+const RenderVitalsItem = ({
+	item,
 	onPress,
 	onPressInfo,
 	onPressAdd,
 	isActive
 }) => {
-	const containsTimeElapsed = "timeElapsed" in section
-	const isOverdue = section.timeElapsed > section.periodicity
+	const containsTimeElapsed = "timeElapsed" in item
+	const isOverdue = item.timeElapsed > item.periodicity
 
 	return (
-		<TouchableOpacity onPress={onPress} style={styles.vitalItem}>
-			<View margin={0} />
+		<View>
+			<TouchableOpacity
+					onPress={onPress}
+					style={styles.vitalsHeader}>
+					<View margin={0} />
 
-			<AppButton
-					title="i"
-					style={styles.infoButton}
-					buttonTextStyle={styles.infoButtonText}
-					onPress={onPressInfo}
-			/>
-
-			<View>
-				<Text style={styles.buttonText}>{section.title}</Text>
-				<RenderTimeElapsed
-						section={section}
-						containsTimeElapsed={containsTimeElapsed}
-						isOverdue = {isOverdue}
+				<AppButton
+						title="i"
+						style={styles.infoButton}
+						buttonTextStyle={styles.infoButtonText}
+						onPress={onPressInfo}
 				/>
-			</View>
 
-			<AppButton
-					title="Add"
-					style={styles.newReadingButton}
-					buttonTextStyle={styles.newReadingButtonText}
-					onPress={onPressAdd}
+				<View>
+					<Text style={styles.buttonText}>{item.title}</Text>
+					<RenderTimeElapsed
+							item={item}
+							containsTimeElapsed={containsTimeElapsed}
+							isOverdue = {isOverdue}
+					/>
+				</View>
+
+				<AppButton
+						title="Add"
+						style={styles.newReadingButton}
+						buttonTextStyle={styles.newReadingButtonText}
+						onPress={onPressAdd}
+				/>
+			</TouchableOpacity>
+			<LineChart
+				data={item.data}
 			/>
-		</TouchableOpacity>
+		</View>
 	)
 };
 
 
-
-const RenderVitalsData = ({
-	section,
-	isActive
-}) => {
-	return (
-      <Animatable.View
-        duration={400}
-        style={styles.content}
-        transition="backgroundColor">
-
-
-        <Animatable.Text
-          animation={isActive ? 'bounceIn' : undefined}
-          style={{ textAlign: 'center' }}>
-          {section.content}
-        </Animatable.Text>
-      </Animatable.View>
-	);
-};
 
 export default function PatientScreen({ navigation }) {
 	//hooks for collapsible data
@@ -248,8 +227,8 @@ export default function PatientScreen({ navigation }) {
 					}}
 					data={DATA}
 					renderItem={({ item }) => (
-						<RenderVitalsHeader
-							section={item}
+						<RenderVitalsItem
+							item={item}
 
 							onPressInfo={() => console.log(item.title + " info pressed")}
 							onPressAdd={() => console.log(item.title + " add new reading")}
@@ -385,7 +364,7 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 		top: Platform.OS == "ios" ? -4 : -14,
 	},
-	vitalItem: {
+	vitalsHeader: {
 		flexDirection: "row",
 		padding: 10,
 		margin: 10,
