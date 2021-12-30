@@ -10,5 +10,7 @@ export default {
 	redText: "#DC0000",
 	greenText: "#08A534",
 	lightBlueBackground: "#7DDBD3",
-	purple: "#CF92E1"
+	purple: "#CF92E1",
+	orange: "#F3BD6A",
+	background: "#E5E5E5",
 };

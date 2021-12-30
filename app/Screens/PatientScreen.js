@@ -15,7 +15,9 @@ import {
 	Text,
 	TouchableOpacity,
 	useWindowDimensions,
+	LayoutAnimation,
 	View,
+	UIManager,
 } from "react-native";
 
 import { VictoryLine, VictoryChart, VictoryTheme, VictoryAxis } from "victory-native";
@@ -41,7 +43,6 @@ const DATA = [
 		timeElapsed: 68,
 		type: "numerical",
 		periodicity: 60,
-		expanded: false,
 		yLabel: "BPM",
 		data: [
 			{
@@ -63,7 +64,6 @@ const DATA = [
 		timeElapsed: 43,
 		type: "numerical",
 		periodicity: 60,
-		expanded: false,
 		yLabel: "Celsius",
 		data: [
 			{
@@ -85,7 +85,6 @@ const DATA = [
 		timeElapsed: 34,
 		type: "numerical",
 		periodicity: 60,
-		expanded: false,
 		yLabel: "BPM",
 		data: [
 			{
@@ -107,7 +106,6 @@ const DATA = [
 		timeElapsed: 34,
 		type: "categorical",
 		periodicity: 60,
-		expanded: false,
 		data: [
 			{
 				timestamp: "1640705088",
@@ -194,61 +192,66 @@ const RenderChart = ({ item }) => {
 		</VictoryChart>)
 }
 
+
 const RenderVitalsItem = ({
 	item,
-	onPress,
 	onPressInfo,
 	onPressAdd,
-	isActive
 }) => {
+	//using function hack to keep track of state
+	function RenderVitalsItemFunc(){
+			const [open, setopen] = useState(false);
+			const onPress = () => {
+				LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+				setopen(!open);
+			};
 
-
-
-	return (
-		<View>
-			<TouchableOpacity
-					onPress={onPress}
-					style={styles.vitalsHeader}>
-					<View margin={0} />
-
-				<AppButton
-						title="i"
-						style={styles.infoButton}
-						buttonTextStyle={styles.infoButtonText}
-						onPress={onPressInfo}
-				/>
-
+			return (
 				<View>
-					<Text style={styles.buttonText}>{item.title}</Text>
-					<RenderTimeElapsed
-							item={item}
-					/>
-				</View>
+					<TouchableOpacity
+							onPress={onPress}
+							style={styles.vitalsHeader}>
+							<View margin={0} />
 
-				<AppButton
-						title="Add"
-						style={styles.newReadingButton}
-						buttonTextStyle={styles.newReadingButtonText}
-						onPress={onPressAdd}
-				/>
-			</TouchableOpacity>
-			<RenderChart
-				item={item}
-			/>
-		</View>
-	)
+						<AppButton
+								title="i"
+								style={styles.infoButton}
+								buttonTextStyle={styles.infoButtonText}
+								onPress={onPressInfo}
+						/>
+
+						<View>
+							<Text style={styles.buttonText}>{item.title}</Text>
+							<RenderTimeElapsed
+									item={item}
+							/>
+						</View>
+
+						<AppButton
+								title="Add"
+								style={styles.newReadingButton}
+								buttonTextStyle={styles.newReadingButtonText}
+								onPress={onPressAdd}
+						/>
+					</TouchableOpacity>
+					{open && (
+						<RenderChart item={item}/>
+					)}
+
+			</View>
+		)
+	}
+	return RenderVitalsItemFunc()
 };
 
 
-
 export default function PatientScreen({ navigation }) {
-	//hooks for collapsible data
-	const [activeSections, setActiveSections] = useState([]);
-	const setSections = (sections) => {
-    //setting up a active section state
-    setActiveSections(sections.includes(undefined) ? [] : sections);
-  };
-
+	// Enable animation for drop-down graph
+	if (Platform.OS === 'android') {
+		if (UIManager.setLayoutAnimationEnabledExperimental) {
+			UIManager.setLayoutAnimationEnabledExperimental(true);
+		}
+	}
 
 	const windowHeight = useWindowDimensions().height;
 
@@ -267,7 +270,7 @@ export default function PatientScreen({ navigation }) {
 				style={styles.container}
 				minHeight={windowHeight}
 			>
-				{/* Code for top-level header */}
+				{/* Code for top-level login header */}
 				<View style={styles.header}>
 					<AppButton
 						title="Logout"
@@ -286,6 +289,25 @@ export default function PatientScreen({ navigation }) {
 					</View>
 				</View>
 
+				{/* Code for patient level header */}
+				<View style={styles.headerPatient}>
+					<View style={styles.profileView}>
+						<Text style={styles.patientName}>Devin Atner</Text>
+						<TouchableOpacity>
+							<Image
+								style={styles.profilePicture}
+								source={chongo}
+							/>
+						</TouchableOpacity>
+					</View>
+					<AppButton
+						title="PDF"
+						style={styles.pdfButton}
+						buttonTextStyle={styles.pdfButtonText}
+						onPress={() => console.log("generate pdf")}
+					/>
+				</View>
+
 				{/* Code for list of vitals */}
 				<FlatList
 					style={styles.vitalsScrollView}
@@ -297,10 +319,8 @@ export default function PatientScreen({ navigation }) {
 					renderItem={({ item }) => (
 						<RenderVitalsItem
 							item={item}
-
 							onPressInfo={() => console.log(item.title + " info pressed")}
 							onPressAdd={() => console.log(item.title + " add new reading")}
-							onPress={() => console.log(item.title + " Pressed")}
 						/>
 					)}
 					keyExtractor={(item, index) => index}
@@ -319,6 +339,55 @@ export default function PatientScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		backgroundColor: colours.background,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	header: {
+		backgroundColor: colours.redBackground,
+		height: Platform.OS == "ios" ? "15%" : "7%",
+		width: "100%",
+		flex: 0.1,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	headerPatient: {
+		backgroundColor: colours.orange,
+		height: Platform.OS == "ios" ? "10%" : "7%",
+		width: "100%",
+		flex: 0.1,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	patientName: {
+		margin: -10,
+		alignSelf: "center",
+		fontSize: 25,
+		fontWeight: "700",
+	},
+	pdfButton: {
+		height: "60%",
+		top: "20%",
+		flex: 1,
+		backgroundColor: colours.lightBlueBackground,
+		borderRadius: 15,
+		color: colours.primary,
+		position: "absolute",
+		right: 10,
+		alignSelf: "center",
+		borderColor: colours.primary,
+		borderWidth: 1,
+		padding: 6,
+	},
+	pdfButtonText: {
+		fontSize: 20,
+		fontWeight: "600",
+		top: Platform.OS == "ios" ? -4 : -1,
+	},
 	backButton: {
 		height: Platform == "ios" ? "35%" : "50%",
 		left: 20,
@@ -329,17 +398,6 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontWeight: "600",
 	},
-	buttonText: {
-		fontSize: 20,
-		color: colours.primary,
-		alignSelf: "flex-start",
-	},
-	buttonSecondaryText: {
-		fontSize: 13,
-		color: colours.primary,
-		alignSelf: "flex-start",
-	},
-
 	content: {
     padding: 20,
     backgroundColor: '#fff',
@@ -355,23 +413,10 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-start",
 	},
 
-	container: {
-		flex: 1,
-		backgroundColor: colours.yellowBackground,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	header: {
-		backgroundColor: colours.redBackground,
-		height: Platform.OS == "ios" ? "15%" : "7%",
-		width: "100%",
-		flex: 0.1,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-	},
+
 	newReadingButton: {
 		backgroundColor: colours.purple,
+		height: "70%",
 		borderRadius: 15,
 		color: colours.primary,
 		position: "absolute",
@@ -382,7 +427,7 @@ const styles = StyleSheet.create({
 		padding: 6,
 	},
 	newReadingButtonText: {
-		fontSize: 20,
+		fontSize: 15,
 		fontWeight: "300",
 		top: Platform.OS == "ios" ? -4 : -1,
 	},
@@ -440,7 +485,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 0,
 		paddingLeft: 20,
 		fontSize: 30,
-		height: 70,
+		height: 60,
 		width: "80%",
 		alignSelf: "center",
 		justifyContent: "flex-start",
