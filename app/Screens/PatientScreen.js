@@ -142,10 +142,13 @@ const DATA = [
 	{
 		title: "Photos",
 		type: "special",
-		data: {
-			labels: [],
-			data: [],
-		},
+		data: [
+			{
+				timestamp: "1640705088",
+				value: "Patient eyes",
+				url: "image url",
+			},
+		],
 	},
 ];
 
@@ -157,21 +160,12 @@ const AppButton = ({ onPress, title, style, buttonTextStyle }) => (
 );
 
 
-const RenderTimeElapsed = ({ item }) => {
-	const containsTimeElapsed = item.hasOwnProperty("timeElapsed")
-	const isOverdue = item.timeElapsed > item.periodicity
+const CustomTheme = {
+		
 
-	if (containsTimeElapsed){
-			return (<Text style={isOverdue ? styles.timeElapsedRedText : styles.timeElapsedGreenText}
-							>{item.timeElapsed} min ago</Text>)
-	}
-	return (null)
 }
 
-
-const RenderChart = ({ item }) => {
-	if (item.type!=="numerical")
-		return (null)
+const RenderChart = (item) => {
 
 	return (<VictoryChart
 				theme={VictoryTheme.material}
@@ -190,6 +184,59 @@ const RenderChart = ({ item }) => {
 				data={item.data}
 			/>
 		</VictoryChart>)
+}
+
+const RenderRow = (data) => {
+	const date = new Date(data.timestamp*1000);
+	const dateString = date.getHours() + ":" + date.getMinutes();
+
+	return (
+		<View style={styles.row}>
+				<View style={styles.timestampCell}>
+					<Text style={styles.timestampCellText}>{dateString}</Text>
+				</View>
+				<View style={styles.categoricalValueCell}>
+					<Text style={styles.categoricalValueCellText}>{data.value}</Text>
+				</View>
+		</View>
+	)
+}
+
+
+
+const RenderTable = (item) => {
+	return (
+		  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+				{
+						item.data.map((datum) => { // This will render a row for each data element.
+								return RenderRow(datum);
+						})
+				}
+			</View>
+
+	)
+}
+
+
+
+const RenderData = ({ item }) => {
+	if (item.type === "numerical"){
+		return RenderChart(item);
+	}
+
+	return RenderTable(item);
+}
+
+
+const RenderTimeElapsed = ({ item }) => {
+	const containsTimeElapsed = item.hasOwnProperty("timeElapsed")
+	const isOverdue = item.timeElapsed > item.periodicity
+
+	if (containsTimeElapsed){
+			return (<Text style={isOverdue ? styles.timeElapsedRedText : styles.timeElapsedGreenText}
+							>{item.timeElapsed} min ago</Text>)
+	}
+	return (null)
 }
 
 
@@ -235,7 +282,7 @@ const RenderVitalsItem = ({
 						/>
 					</TouchableOpacity>
 					{open && (
-						<RenderChart item={item}/>
+						<RenderData item={item}/>
 					)}
 
 			</View>
@@ -501,6 +548,34 @@ const styles = StyleSheet.create({
 	vitalsScrollView: {
 		flex: 1,
 		width: "100%",
+	},
+	row: {
+		flex: 1,
+		alignSelf: 'stretch',
+		flexDirection: 'row',
+		left: 50,
+		marginVertical: "1%",
+		borderBottomColor: "#737373",
+		borderBottomWidth: StyleSheet.hairlineWidth,
+		maxWidth: 300,
+	},
+	timestampCell: {
+		paddingRight: 0,
+		marginRight: 0,
+		width: 50,
+		display: "flex",
+		alignItems: "center",
+		alignSelf: "center",
+		justifyContent: "center",
+	},
+	timestampCellText: {
+		fontWeight: "bold",
+	},
+	categoricalValueCell: {
+		maxWidth: 260,
+	},
+	categoricalValueCellText: {
+		paddingLeft: 5,
 	},
 	profilePicture: {
 		alignSelf: "center",
