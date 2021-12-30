@@ -18,8 +18,7 @@ import {
 	View,
 } from "react-native";
 
-import { LineChart } from "react-native-chart-kit";
-
+import { VictoryLine, VictoryChart, VictoryTheme, VictoryAxis } from "victory-native";
 
 import colours from "../assets/colours";
 import afro from "../assets/humaaans/Single_Pieces/Head/Front/Afro.png";
@@ -43,10 +42,21 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		data: {
-			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
-			data: [81, 67, 55, 43, 51]
-		}
+		yLabel: "BPM",
+		data: [
+			{
+				timestamp: "1640705088",
+				value: 20,
+			},
+			{
+				timestamp: "1640708857",
+				value: 45,
+			},
+			{
+				timestamp: "1640712857",
+				value: 34,
+			},
+		],
 	},
 	{
 		title: "Heat Check",
@@ -54,10 +64,21 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		data: {
-			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
-			data: [86, 72, 112, 101, 42],
-		},
+		yLabel: "Celsius",
+		data: [
+			{
+				timestamp: "1640705088",
+				value: 42,
+			},
+			{
+				timestamp: "1640708857",
+				value: 145,
+			},
+			{
+				timestamp: "1640712857",
+				value: 21,
+			},
+		],
 	},
 	{
 		title: "Radial Pulse",
@@ -65,34 +86,60 @@ const DATA = [
 		type: "numerical",
 		periodicity: 60,
 		expanded: false,
-		data: {
-			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
-			data: [46, 24, 12, 25, 12],
-		},
+		yLabel: "BPM",
+		data: [
+			{
+				timestamp: "1640705088",
+				value: 25,
+			},
+			{
+				timestamp: "1640708857",
+				value: 15,
+			},
+			{
+				timestamp: "1640712857",
+				value: 74,
+			},
+		],
 	},
 	{
 		title: "Grip Strength",
 		timeElapsed: 34,
-		type: "numerical",
+		type: "categorical",
 		periodicity: 60,
 		expanded: false,
-		data: {
-			labels: ["1640705088", "1640706857", "1640708857", "1640710857", "1640712857"],
-			data: [46, 125, 67, 55, 102],
-		},
+		data: [
+			{
+				timestamp: "1640705088",
+				value: "strong",
+			},
+			{
+				timestamp: "1640708857",
+				value: "medium",
+			},
+			{
+				timestamp: "1640712857",
+				value: "weak",
+			},
+		],
 	},
 	{
 		title: "General Notes",
 		type: "special",
-		data: {
-			labels: ["1640705088", "1640706857", "1640708857", "1640710857"],
-			data: [
-				"Patient has exhibited signs of hypothermia.",
-				"Patient has glassy eyes.",
-				"Patient has fainted.",
-				"Someone get help",
-			],
-		},
+		data: [
+			{
+				timestamp: "1640705088",
+				value: "Patient has exhibited signs of hypothermia.",
+			},
+			{
+				timestamp: "1640708857",
+				value: "Patient has fainted.",
+			},
+			{
+				timestamp: "1640712857",
+				value: "Someone get help",
+			},
+		],
 	},
 	{
 		title: "Photos",
@@ -105,8 +152,6 @@ const DATA = [
 ];
 
 
-
-
 const AppButton = ({ onPress, title, style, buttonTextStyle }) => (
 	<TouchableOpacity onPress={onPress} style={style}>
 		<Text style={buttonTextStyle}>{title}</Text>
@@ -114,8 +159,10 @@ const AppButton = ({ onPress, title, style, buttonTextStyle }) => (
 );
 
 
+const RenderTimeElapsed = ({ item }) => {
+	const containsTimeElapsed = item.hasOwnProperty("timeElapsed")
+	const isOverdue = item.timeElapsed > item.periodicity
 
-const RenderTimeElapsed = ({item, containsTimeElapsed, isOverdue}) => {
 	if (containsTimeElapsed){
 			return (<Text style={isOverdue ? styles.timeElapsedRedText : styles.timeElapsedGreenText}
 							>{item.timeElapsed} min ago</Text>)
@@ -124,6 +171,29 @@ const RenderTimeElapsed = ({item, containsTimeElapsed, isOverdue}) => {
 }
 
 
+const RenderChart = ({ item }) => {
+	if (item.type!=="numerical")
+		return (null)
+
+	return (<VictoryChart
+				theme={VictoryTheme.material}
+ 				domainPadding={{x:0, y: 15}}
+				padding={{top:0, bottom:35, left:50, right:50}}
+				margin={{top:0}}
+				height={180}
+			>
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31"},
+					parent: { border: "1px solid #ccc", fill: "#000000"}
+				}}
+				x={(d) => new Date(d.timestamp*1000)}
+				y="value"
+				data={item.data}
+			/>
+		</VictoryChart>)
+}
+
 const RenderVitalsItem = ({
 	item,
 	onPress,
@@ -131,8 +201,8 @@ const RenderVitalsItem = ({
 	onPressAdd,
 	isActive
 }) => {
-	const containsTimeElapsed = "timeElapsed" in item
-	const isOverdue = item.timeElapsed > item.periodicity
+
+
 
 	return (
 		<View>
@@ -152,8 +222,6 @@ const RenderVitalsItem = ({
 					<Text style={styles.buttonText}>{item.title}</Text>
 					<RenderTimeElapsed
 							item={item}
-							containsTimeElapsed={containsTimeElapsed}
-							isOverdue = {isOverdue}
 					/>
 				</View>
 
@@ -164,8 +232,8 @@ const RenderVitalsItem = ({
 						onPress={onPressAdd}
 				/>
 			</TouchableOpacity>
-			<LineChart
-				data={item.data}
+			<RenderChart
+				item={item}
 			/>
 		</View>
 	)
@@ -181,8 +249,8 @@ export default function PatientScreen({ navigation }) {
     setActiveSections(sections.includes(undefined) ? [] : sections);
   };
 
-	const windowHeight = useWindowDimensions().height;
 
+	const windowHeight = useWindowDimensions().height;
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -368,7 +436,8 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		padding: 10,
 		margin: 10,
-		marginBottom: 15,
+		marginBottom: 0,
+		paddingBottom: 0,
 		paddingLeft: 20,
 		fontSize: 30,
 		height: 70,
