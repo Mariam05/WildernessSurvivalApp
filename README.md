@@ -5,7 +5,7 @@
 2. In separate terminal run ```npx react-native start``` -- starts a metro server to host the app (allows real-time updates)
 
 ### Android
-3. Run ```npx expo-cli run:android`` -- this should package everything and FAIL.     
+3. Run ```npx expo-cli run:android``` -- this should package everything and FAIL.     
 4. Open the "android" directory in Android Studio    
 5. Android studio should install necessary libraries and index the project, allowing you to run the app on a simulator (or possibly a real device?)    
 
