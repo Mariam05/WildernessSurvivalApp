@@ -8,6 +8,7 @@ import AppLoading from "expo-app-loading";
 import React, { useState } from "react";
 import {
 	Image,
+	ImageBackground,
 	Platform,
 	SafeAreaView,
 	FlatList,
@@ -20,7 +21,10 @@ import {
 	UIManager,
 } from "react-native";
 
+import ImageModal from 'react-native-image-modal';
+
 import { VictoryLine, VictoryChart, VictoryTheme, VictoryAxis } from "victory-native";
+import customTheme from "../assets/customTheme.js";
 
 import colours from "../assets/colours";
 import afro from "../assets/humaaans/Single_Pieces/Head/Front/Afro.png";
@@ -146,7 +150,7 @@ const DATA = [
 			{
 				timestamp: "1640705088",
 				value: "Patient eyes",
-				url: "image url",
+				url: "https://georgiaeyephysicians.com/wp-content/uploads/2013/10/Treating-Your-Eye-Condition-with-Specialized-Surgery-300x238.jpg",
 			},
 		],
 	},
@@ -159,17 +163,11 @@ const AppButton = ({ onPress, title, style, buttonTextStyle }) => (
 	</TouchableOpacity>
 );
 
-
-const CustomTheme = {
-		
-
-}
-
 const RenderChart = (item) => {
-
-	return (<VictoryChart
-				theme={VictoryTheme.material}
- 				domainPadding={{x:0, y: 15}}
+	return (
+		<VictoryChart
+				theme={customTheme}
+ 				domainPadding={{x:0, y: 20}}
 				padding={{top:0, bottom:35, left:50, right:50}}
 				margin={{top:0}}
 				height={180}
@@ -186,8 +184,47 @@ const RenderChart = (item) => {
 		</VictoryChart>)
 }
 
-const RenderRow = (data) => {
-	const date = new Date(data.timestamp*1000);
+
+
+const RenderRowWithImage = (entry) => {
+		const date = new Date(entry.timestamp*1000);
+		const dateString = date.getHours() + ":" + date.getMinutes();
+
+		const [openImage, setOpenImage] = useState(false);
+		const [imageUrl, setImageUrl] = useState("");
+
+
+		const onPress = () => {
+			setOpenImage(!openImage);
+			setImageUrl(entry.url)
+		};
+
+		return (
+			<TouchableOpacity style={styles.row} onPress={onPress}>
+					<View style={styles.timestampCell}>
+						<Text style={styles.timestampCellText}>{dateString}</Text>
+					</View>
+					<View style={styles.valueCell}>
+						<View style={styles.valueCellText}>
+							<Text>
+								{entry.value}
+							</Text>
+						</View>
+						{openImage && (
+						<View style={styles.valueCellImage}>
+							<Image
+								source={{uri:entry.url}}
+								style={{alignSelf: "center", width: 100, height: 100,resizeMode: 'stretch'}}>
+							</Image>
+						</View>)}
+					</View>
+			</TouchableOpacity>
+		)
+}
+
+
+const RenderRow = (entry) => {
+	const date = new Date(entry.timestamp*1000);
 	const dateString = date.getHours() + ":" + date.getMinutes();
 
 	return (
@@ -195,35 +232,33 @@ const RenderRow = (data) => {
 				<View style={styles.timestampCell}>
 					<Text style={styles.timestampCellText}>{dateString}</Text>
 				</View>
-				<View style={styles.categoricalValueCell}>
-					<Text style={styles.categoricalValueCellText}>{data.value}</Text>
+				<View style={styles.valueCell}>
+					<Text style={styles.valueCellText}>
+						{entry.value}
+					</Text>
 				</View>
 		</View>
 	)
 }
 
-
-
 const RenderTable = (item) => {
+	const hasImage = item.title==="Photos"
+
 	return (
 		  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 				{
-						item.data.map((datum) => { // This will render a row for each data element.
-								return RenderRow(datum);
+						item.data.map((entry) => { // This will render a row for each data element.
+								return hasImage ? RenderRowWithImage(entry) : RenderRow(entry)
 						})
 				}
 			</View>
-
 	)
 }
-
-
 
 const RenderData = ({ item }) => {
 	if (item.type === "numerical"){
 		return RenderChart(item);
 	}
-
 	return RenderTable(item);
 }
 
@@ -245,50 +280,46 @@ const RenderVitalsItem = ({
 	onPressInfo,
 	onPressAdd,
 }) => {
-	//using function hack to keep track of state
-	function RenderVitalsItemFunc(){
-			const [open, setopen] = useState(false);
-			const onPress = () => {
-				LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-				setopen(!open);
-			};
+		const [open, setopen] = useState(false);
+		const onPress = () => {
+			LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+			setopen(!open);
+		};
 
-			return (
-				<View>
-					<TouchableOpacity
-							onPress={onPress}
-							style={styles.vitalsHeader}>
-							<View margin={0} />
+		return (
+			<View>
+				<TouchableOpacity
+						onPress={onPress}
+						style={styles.vitalsHeader}>
+						<View margin={0} />
 
-						<AppButton
-								title="i"
-								style={styles.infoButton}
-								buttonTextStyle={styles.infoButtonText}
-								onPress={onPressInfo}
+					<AppButton
+							title="i"
+							style={styles.infoButton}
+							buttonTextStyle={styles.infoButtonText}
+							onPress={onPressInfo}
+					/>
+
+					<View>
+						<Text style={styles.buttonText}>{item.title}</Text>
+						<RenderTimeElapsed
+								item={item}
 						/>
+					</View>
 
-						<View>
-							<Text style={styles.buttonText}>{item.title}</Text>
-							<RenderTimeElapsed
-									item={item}
-							/>
-						</View>
+					<AppButton
+							title="Add"
+							style={styles.newReadingButton}
+							buttonTextStyle={styles.newReadingButtonText}
+							onPress={onPressAdd}
+					/>
+				</TouchableOpacity>
+				{open && (
+					<RenderData item={item}/>
+				)}
 
-						<AppButton
-								title="Add"
-								style={styles.newReadingButton}
-								buttonTextStyle={styles.newReadingButtonText}
-								onPress={onPressAdd}
-						/>
-					</TouchableOpacity>
-					{open && (
-						<RenderData item={item}/>
-					)}
-
-			</View>
-		)
-	}
-	return RenderVitalsItemFunc()
+		</View>
+	)
 };
 
 
@@ -571,11 +602,16 @@ const styles = StyleSheet.create({
 	timestampCellText: {
 		fontWeight: "bold",
 	},
-	categoricalValueCell: {
+	valueCell: {
 		maxWidth: 260,
 	},
-	categoricalValueCellText: {
+	valueCellText: {
+		flex: 1,
 		paddingLeft: 5,
+	},
+	valueCellImage: {
+		flex: 2,
+		borderWidth: 1,
 	},
 	profilePicture: {
 		alignSelf: "center",
