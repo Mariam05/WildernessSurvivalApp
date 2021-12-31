@@ -23,8 +23,13 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		fontSize: 18,
 		backgroundColor: colours.secondary,
-		opacity: 0.7,
+		opacity: Platform.OS === "ios" ? 1 : 1,
 		borderRadius: 25,
+		shadowColor: colours.primary,
+		shadowOpacity: 0.3,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 6,
 	},
 	landingContainer: {
 		flex: 1,
@@ -39,7 +44,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		top: Platform.OS === "android" ? StatusBar.currentHeight - 60: 40,
+		top: Platform.OS === "android" ? StatusBar.currentHeight - 60: 0,
 	},
 	loginButton: {
 		flexDirection: "column",
@@ -52,6 +57,11 @@ const styles = StyleSheet.create({
 		borderRadius: 25,
 		alignContent: "center",
 		justifyContent: "center",
+		shadowColor: colours.primary,
+		shadowOpacity: 0.5,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 4,
 	},
 	loginButtonText: {
 		fontSize: 20,
@@ -63,6 +73,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		backgroundColor: colours.pinkBackground,
+	},
+	loginStatusBar: {
+		backgroundColor: colours.pinkBackground,
+		
 	},
 	logoutButton: {
 		height: Platform.OS == "ios" ? "35%" : "50%",
@@ -94,7 +108,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colours.pinkBackground,
 		borderRadius: 25,
 		borderColor: "#000",
-		height: Platform.OS == "ios" ? "90%" : "100%",
+		height: "90%",
 	},
 	modalFooter: {
 		justifyContent: "center",
@@ -130,7 +144,7 @@ const styles = StyleSheet.create({
 	},
 	newPatientButton: {
 		flexDirection: "column",
-		width: Platform.OS == "ios" ? 80 : 60,
+		width: "20%", 
 		aspectRatio: 1,
 		backgroundColor: colours.pinkBackground,
 		borderRadius: 100,
@@ -147,8 +161,8 @@ const styles = StyleSheet.create({
 	},
 	newPatientButtonText: {
 		fontSize: 60,
-		fontWeight: "600",
-		top: Platform.OS == "ios" ? -4 : -14,
+		fontWeight: "700",
+		top: "-5%"
 	},
 	patientItem: {
 		flexDirection: "row",
@@ -195,8 +209,9 @@ const styles = StyleSheet.create({
 	},
 	patientScrollView: {
 		flex: 1,
+		top: Platform.OS === "ios" ? 0 : -10,
 		width: "100%",
-		marginBottom: -50,
+		marginBottom: Platform.OS === "ios" ? -35 : -10
 	},
 	profilePicture: {
 		resizeMode: "cover",
@@ -228,6 +243,11 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		top: Platform.OS === "android" ? StatusBar.currentHeight - 60 : 40,
 		right: 10,
+		shadowColor: colours.primary,
+		shadowOpacity: 0.4,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 6,
 	},
 	registerButtonText: {
 		fontSize: 17,
@@ -242,7 +262,7 @@ const styles = StyleSheet.create({
 		fontWeight: "100",
 		textAlign: "center",
 		fontFamily: "Oxygen_700Bold",
-		top: Platform.OS === "android" ? StatusBar.currentHeight - 60 : 40,
+		top: Platform.OS === "ios" ?  0 : StatusBar.currentHeight - 60,
 	},
 	userName: {
 		margin: -10,

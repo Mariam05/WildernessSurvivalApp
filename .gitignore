@@ -61,6 +61,9 @@ xcuserdata
 /android/versioned-react-native/ReactAndroid
 ReactAndroid-temp.aar
 
+# iOS
+/ios/
+
 # Tools
 jarjar-rules.txt
 

@@ -36,10 +36,8 @@ import colours from "../assets/colours";
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
 
-//TouchableOpacity.defaultProps = { activeOpacity: 0.4 };
-
 export default function LandingScreen() {
-	const windowHeight = useWindowDimensions().height;
+	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.redBackground, true);
 
 	const { user, signOut } = useAuth();
 	const navigation = useNavigation();
@@ -69,7 +67,6 @@ export default function LandingScreen() {
 			<SafeAreaView
 				style={styles.landingContainer}
 			>
-				<StatusBar hidden={false} backgroundColor={colours.redBackground} barStyle={"dark-content"}/>
 				<View style={styles.landingHeader}>
 					<LogoutButton
 						closeRealm={closeRealm}
@@ -91,7 +88,7 @@ export default function LandingScreen() {
 					style={styles.patientScrollView}
 					contentContainerStyle={{
 						alignSelf: "stretch",
-						paddingBottom: 150,
+						paddingBottom: "30%",
 					}}
 				>
 					{patients.map((patient, index) => (
@@ -117,7 +114,11 @@ export default function LandingScreen() {
 
 				<PatientModal isVisible={isModalVisible}>
 					<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-						<ScrollView>
+						<ScrollView
+							style={{ top: Platform.OS == "ios" ? "5%" : 0, }}
+							keyboardDismissMode="on-drag"
+							keyboardShouldPersistTaps="never"
+						>
 							<PatientModal.Container>
 								<PatientModal.Header />
 								<PatientModal.Body>
@@ -148,7 +149,7 @@ export default function LandingScreen() {
 												key={index}
 											>
 												<View
-													style={[{width: Platform.OS === "ios" ? "100%" : "90%"}, styles.patientPicture]} 
+													style={[styles.patientPicture, { elevation: 2 }]} 
 												>
 													<Image
 														style={{
@@ -171,19 +172,21 @@ export default function LandingScreen() {
 										returnKeyType="next"
 										textContentType="username"
 										placeholder="First Name"
-										autoCapitalize="none"
+										autoCapitalize="words"
 										autoCorrect={false}
 										value={PatientFN}
 										onChangeText={setPatientFN}
+										onSubmitEditing={() => { this.secondTextInput.focus(); }}
 									/>
 									<View style={{marginVertical: "3%"}} />
 									<TextInput
+										ref={(input) => { this.secondTextInput = input; }}
 										style={[styles.credentialInput, {width: "100%", margin:0}]}
 										clearButtonMode="while-editing"
 										returnKeyType="next"
 										textContentType="username"
 										placeholder="Last Name"
-										autoCapitalize="none"
+										autoCapitalize="words"
 										autoCorrect={false}
 										value={PatientLN}
 										onChangeText={setPatientLN}

@@ -9,10 +9,13 @@ import React, { useEffect, useState } from "react";
 import {
 	Alert,
 	Image,
+	Keyboard,
 	SafeAreaView,
 	StatusBar,
 	Text,
 	TextInput,
+	Touchable,
+	TouchableWithoutFeedback,
 	useWindowDimensions,
 	View,
 } from "react-native";
@@ -72,84 +75,89 @@ export default function LoginScreen({ navigation }) {
 		return <AppLoading />;
 	} else {
 		return (
-			<SafeAreaView
-				style={[styles.loginContainer, {minHeight: windowHeight}]}
-			>
-				<StatusBar hidden={false} backgroundColor={colours.pinkBackground} barStyle={"dark-content"}/>
-				<AppButton
-					title="Register"
-					style={styles.registerButton}
-					buttonTextStyle={styles.registerButtonText}
-					onPress={onPressSignUp}
-				/>
-				<Text style={styles.titleText}>{titleText}</Text>
-				<View style={styles.separator} />
-				<TextInput
-					style={styles.credentialInput}
-					clearButtonMode="while-editing"
-					keyboardType="email-address"
-					returnKeyType="next"
-					textContentType="username"
-					placeholder="Username"
-					onChangeText={(text) => setUsername(text)}
-					value={username}
-					autoCapitalize="none"
-					autoCorrect={false}
-				/>
-				<TextInput
-					style={styles.credentialInput}
-					returnKeyType="go"
-					secureTextEntry={true}
-					textContentType="password"
-					placeholder="Password"
-					onChangeText={(text) => setPassword(text)}
-					value={password}
-					autoCapitalize="none"
-					autoCorrect={false}
-				/>
-				<View style={styles.separator} />
-				<AppButton
-					title="Login"
-					style={styles.loginButton}
-					buttonTextStyle={styles.loginButtonText}
-					onPress={onPressSignIn}
-				/>
-				<View style={styles.separator} />
-				<View style={styles.baseline}>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}> 
+				<SafeAreaView
+					style={[styles.loginContainer, {minHeight: windowHeight}]}
+				>
+					<StatusBar hidden={false} animated={true} backgroundColor={colours.pinkBackground} barStyle={"dark-content"}/>
+					<AppButton
+						title="Register"
+						style={styles.registerButton}
+						buttonTextStyle={styles.registerButtonText}
+						onPress={onPressSignUp}
 					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
+					<Text style={styles.titleText}>{titleText}</Text>
+					<View style={styles.separator} />
+					<TextInput
+						style={styles.credentialInput}
+						clearButtonMode="while-editing"
+						keyboardType="email-address"
+						returnKeyType="next"
+						textContentType="username"
+						placeholder="Username"
+						onChangeText={(text) => setUsername(text)}
+						value={username}
+						autoCapitalize="none"
+						autoCorrect={false}
+    					onSubmitEditing={() => { this.secondTextInput.focus(); }}
 					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
+					<TextInput
+    					ref={(input) => { this.secondTextInput = input; }}
+						style={styles.credentialInput}
+						returnKeyType="done"
+						secureTextEntry={true}
+						textContentType="password"
+						placeholder="Password"
+						value={password}
+						autoCapitalize="none"
+						autoCorrect={false}
+						onChangeText={(text) => setPassword(text)}
+						onSubmitEditing={onPressSignIn}
 					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
+					<View style={styles.separator} />
+					<AppButton
+						title="Login"
+						style={styles.loginButton}
+						buttonTextStyle={styles.loginButtonText}
+						onPress={onPressSignIn}
 					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
-					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
-					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
-					/>
-					<Image
-						style={styles.baselineImage}
-						source={require("../assets/images/grass.png")}
-					/>
-				</View>
-			</SafeAreaView>
+					<View style={styles.separator} />
+					<View style={styles.baseline}>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+						<Image
+							style={styles.baselineImage}
+							source={require("../assets/images/grass.png")}
+						/>
+					</View>
+					</SafeAreaView>
+				</TouchableWithoutFeedback>
 		);
 	}
 }
