@@ -17,13 +17,16 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thereelrg.WildernessSurvivalApp"
     },
     "android": {
+      "softwareKeyboardLayoutMode":"pan",
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.thereelrg.WildernessSurvivalApp"
     },
     "web": {
       "favicon": "./app/assets/images/favicon.png"

@@ -5,30 +5,28 @@ import {
 	useFonts,
 } from "@expo-google-fonts/oxygen";
 import AppLoading from "expo-app-loading";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
+	Alert,
 	Image,
-	Platform,
 	SafeAreaView,
 	StatusBar,
-	StyleSheet,
 	Text,
 	TextInput,
-	TouchableOpacity,
 	useWindowDimensions,
 	View,
 } from "react-native";
+
+import AppButton from "../assets/components/AppButton";
+import { useAuth } from "../../providers/AuthProvider";
+import styles from "../assets/stylesheet";
 import colours from "../assets/colours";
 
-TouchableOpacity.defaultProps = { activeOpacity: 0.8 };
-
-const AppButton = ({ onPress, title, style }) => (
-	<TouchableOpacity onPress={onPress} style={style}>
-		<Text style={styles.buttonText}>{title}</Text>
-	</TouchableOpacity>
-);
-
 export default function LoginScreen({ navigation }) {
+	const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+	const { user, signUp, signIn } = useAuth();
+
 	const windowHeight = useWindowDimensions().height;
 	const titleText = "Wilderness\nVital Tracking";
 
@@ -38,19 +36,51 @@ export default function LoginScreen({ navigation }) {
 		Oxygen_700Bold,
 	});
 
+	useEffect(() => {
+		// If there is a user logged in, go to the Landing page.
+		if (user != null) {
+			navigation.navigate("Landing");
+		}
+	}, [user]);
+
+	const onPressSignIn = async () => {
+		console.log("Trying sign in with user: " + username);
+		try {
+			await signIn(username, password);
+		} catch (error) {
+			const errorMessage = `Failed to sign in: ${error.message}`;
+			console.error(errorMessage);
+			Alert.alert(errorMessage);
+		}
+		setUsername("");
+		setPassword("");
+	};
+
+	const onPressSignUp = async () => {
+		console.log("Trying Sign Up with user: " + username);
+		try {
+			await signUp(username, password);
+			signIn(username, password);
+		} catch (error) {
+			const errorMessage = `Failed to sign up: ${error.message}`;
+			console.error(errorMessage);
+			Alert.alert(errorMessage);
+		}
+	};
+
 	if (!fontsLoaded) {
 		return <AppLoading />;
 	} else {
 		return (
 			<SafeAreaView
-				behavior={"padding"}
-				style={styles.container}
-				minHeight={windowHeight}
+				style={[styles.loginContainer, {minHeight: windowHeight}]}
 			>
+				<StatusBar hidden={false} backgroundColor={colours.pinkBackground} barStyle={"dark-content"}/>
 				<AppButton
 					title="Register"
 					style={styles.registerButton}
-					onPress={() => console.log("Register Pressed")}
+					buttonTextStyle={styles.registerButtonText}
+					onPress={onPressSignUp}
 				/>
 				<Text style={styles.titleText}>{titleText}</Text>
 				<View style={styles.separator} />
@@ -61,6 +91,10 @@ export default function LoginScreen({ navigation }) {
 					returnKeyType="next"
 					textContentType="username"
 					placeholder="Username"
+					onChangeText={(text) => setUsername(text)}
+					value={username}
+					autoCapitalize="none"
+					autoCorrect={false}
 				/>
 				<TextInput
 					style={styles.credentialInput}
@@ -68,12 +102,17 @@ export default function LoginScreen({ navigation }) {
 					secureTextEntry={true}
 					textContentType="password"
 					placeholder="Password"
+					onChangeText={(text) => setPassword(text)}
+					value={password}
+					autoCapitalize="none"
+					autoCorrect={false}
 				/>
 				<View style={styles.separator} />
 				<AppButton
 					title="Login"
 					style={styles.loginButton}
-					onPress={() => navigation.navigate("Landing")}
+					buttonTextStyle={styles.loginButtonText}
+					onPress={onPressSignIn}
 				/>
 				<View style={styles.separator} />
 				<View style={styles.baseline}>
@@ -110,84 +149,7 @@ export default function LoginScreen({ navigation }) {
 						source={require("../assets/images/grass.png")}
 					/>
 				</View>
-				<StatusBar style="auto" />
 			</SafeAreaView>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	buttonText: {
-		fontSize: 18,
-		color: colours.primary,
-		alignSelf: "center",
-	},
-	baseline: {
-		width: "100%",
-		height: 100,
-		flexDirection: "row",
-		justifyContent: "center",
-		position: "absolute",
-		resizeMode: "repeat",
-		bottom: Platform.OS === "ios" ? "5%" : 0,
-	},
-	baselineImage: {
-		margin: -15,
-	},
-	container: {
-		flex: 1,
-		backgroundColor: colours.pinkBackground,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	credentialInput: {
-		height: 50,
-		width: "85%",
-		maxWidth: 350,
-		margin: 12,
-		borderWidth: 0,
-		paddingHorizontal: 20,
-		fontSize: 18,
-		backgroundColor: colours.secondary,
-		opacity: 0.7,
-		borderRadius: 25,
-	},
-	loginButton: {
-		flexDirection: "column",
-		height: 50,
-		width: "80%",
-		maxWidth: 300,
-		margin: 12,
-		backgroundColor: colours.green,
-		borderWidth: 0,
-		borderRadius: 25,
-		alignContent: "center",
-		justifyContent: "center",
-	},
-	registerButton: {
-		flexDirection: "column",
-		height: 40,
-		width: "25%",
-		maxWidth: 100,
-		margin: 12,
-		backgroundColor: colours.blue,
-		borderWidth: 0,
-		borderRadius: 20,
-		alignContent: "center",
-		justifyContent: "center",
-		position: "absolute",
-		top: Platform.OS === "android" ? StatusBar.currentHeight - 20 : 40,
-		right: 10,
-	},
-	separator: {
-		marginVertical: "5%",
-		borderBottomColor: "#737373",
-		borderBottomWidth: StyleSheet.hairlineWidth,
-	},
-	titleText: {
-		fontSize: 50,
-		fontWeight: "100",
-		textAlign: "center",
-		fontFamily: "Oxygen_700Bold",
-	},
-});

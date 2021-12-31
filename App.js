@@ -4,24 +4,35 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import LandingScreen from "./app/Screens/LandingScreen";
 import LoginScreen from "./app/Screens/LoginScreen";
+import { AuthProvider } from "./providers/AuthProvider";
+import { PatientsProvider } from "./providers/PatientProvider";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
 	return (
-		<NavigationContainer>
-			<Stack.Navigator>
-				<Stack.Screen
-					name="Login"
-					component={LoginScreen}
-					options={{ headerShown: false, gestureEnabled: false }}
-				/>
-				<Stack.Screen
-					name="Landing"
-					component={LandingScreen}
-					options={{ headerShown: false, gestureEnabled: false }}
-				/>
-			</Stack.Navigator>
-		</NavigationContainer>
+		<AuthProvider>
+			<NavigationContainer>
+				<Stack.Navigator>
+					<Stack.Screen
+						name="Login"
+						component={LoginScreen}
+						options={{ headerShown: false, gestureEnabled: false }}
+					/>
+					<Stack.Screen
+						name="Landing"
+						options={{ headerShown: false, gestureEnabled: false }}
+					>
+						{() => {
+							return (
+								<PatientsProvider>
+									<LandingScreen />
+								</PatientsProvider>
+							);
+						}}
+					</Stack.Screen>
+				</Stack.Navigator>
+			</NavigationContainer>
+		</AuthProvider>
 	);
 }
