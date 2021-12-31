@@ -144,7 +144,7 @@ export default function LandingScreen({ navigation }) {
 							name={item.name}
 							sex={item.sex}
 							age={item.age}
-							onPress={() => console.log(item.name + " Pressed")}
+							onPress={() => navigation.navigate("Patient")}
 							style={styles.patientItem}
 							buttonTextStyle={styles.buttonText}
 							buttonSecondaryTextStyle={
