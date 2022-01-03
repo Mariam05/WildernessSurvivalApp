@@ -10,11 +10,12 @@ import {
 	Alert,
 	Image,
 	Keyboard,
+	Platform,
 	SafeAreaView,
 	StatusBar,
+	StyleSheet,
 	Text,
 	TextInput,
-	Touchable,
 	TouchableWithoutFeedback,
 	useWindowDimensions,
 	View,
@@ -22,7 +23,7 @@ import {
 
 import AppButton from "../assets/components/AppButton";
 import { useAuth } from "../../providers/AuthProvider";
-import styles from "../assets/stylesheet";
+import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 
 export default function LoginScreen({ navigation }) {
@@ -77,19 +78,19 @@ export default function LoginScreen({ navigation }) {
 		return (
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}> 
 				<SafeAreaView
-					style={[styles.loginContainer, {minHeight: windowHeight}]}
+					style={[globalStyles.container, {minHeight: windowHeight}]}
 				>
 					<StatusBar hidden={false} animated={true} backgroundColor={colours.pinkBackground} barStyle={"dark-content"}/>
 					<AppButton
 						title="Register"
-						style={styles.registerButton}
-						buttonTextStyle={styles.registerButtonText}
+						style={loginStyles.registerButton}
+						buttonTextStyle={loginStyles.registerButtonText}
 						onPress={onPressSignUp}
 					/>
-					<Text style={styles.titleText}>{titleText}</Text>
-					<View style={styles.separator} />
+					<Text style={loginStyles.titleText}>{titleText}</Text>
+					<View style={globalStyles.separator} />
 					<TextInput
-						style={styles.credentialInput}
+						style={globalStyles.credentialInput}
 						clearButtonMode="while-editing"
 						keyboardType="email-address"
 						returnKeyType="next"
@@ -103,7 +104,7 @@ export default function LoginScreen({ navigation }) {
 					/>
 					<TextInput
     					ref={(input) => { this.secondTextInput = input; }}
-						style={styles.credentialInput}
+						style={globalStyles.credentialInput}
 						returnKeyType="done"
 						secureTextEntry={true}
 						textContentType="password"
@@ -114,45 +115,45 @@ export default function LoginScreen({ navigation }) {
 						onChangeText={(text) => setPassword(text)}
 						onSubmitEditing={onPressSignIn}
 					/>
-					<View style={styles.separator} />
+					<View style={globalStyles.separator} />
 					<AppButton
 						title="Login"
-						style={styles.loginButton}
-						buttonTextStyle={styles.loginButtonText}
+						style={loginStyles.loginButton}
+						buttonTextStyle={loginStyles.loginButtonText}
 						onPress={onPressSignIn}
 					/>
-					<View style={styles.separator} />
-					<View style={styles.baseline}>
+					<View style={globalStyles.separator} />
+					<View style={loginStyles.baseline}>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 						<Image
-							style={styles.baselineImage}
+							style={loginStyles.baselineImage}
 							source={require("../assets/images/grass.png")}
 						/>
 					</View>
@@ -161,3 +162,72 @@ export default function LoginScreen({ navigation }) {
 		);
 	}
 }
+
+const loginStyles = StyleSheet.create({
+	baseline: {
+		width: "100%",
+		height: 100,
+		flexDirection: "row",
+		justifyContent: "center",
+		position: "absolute",
+		resizeMode: "repeat",
+		bottom: Platform.OS === "ios" ? "5%" : 0,
+	},
+	baselineImage: {
+		margin: -15,
+	},
+	loginButton: {
+		flexDirection: "column",
+		height: 50,
+		width: "85%",
+		maxWidth: 350,
+		margin: 12,
+		backgroundColor: colours.green,
+		borderWidth: 0,
+		borderRadius: 25,
+		alignContent: "center",
+		justifyContent: "center",
+		shadowColor: colours.primary,
+		shadowOpacity: 0.5,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 4,
+	},
+	loginButtonText: {
+		fontSize: 20,
+		color: colours.primary,
+		alignSelf: "center",
+	},
+	registerButton: {
+		flexDirection: "column",
+		height: 40,
+		width: "25%",
+		maxWidth: 100,
+		margin: 12,
+		backgroundColor: colours.blue,
+		borderWidth: 0,
+		borderRadius: 20,
+		alignContent: "center",
+		justifyContent: "center",
+		position: "absolute",
+		top: Platform.OS === "android" ? StatusBar.currentHeight - 60 : 40,
+		right: 10,
+		shadowColor: colours.primary,
+		shadowOpacity: 0.4,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 6,
+	},
+	registerButtonText: {
+		fontSize: 17,
+		color: colours.primary,
+		alignSelf: "center",
+	},
+	titleText: {
+		fontSize: 50,
+		fontWeight: "100",
+		textAlign: "center",
+		fontFamily: "Oxygen_700Bold",
+		top: Platform.OS === "ios" ?  0 : StatusBar.currentHeight - 60,
+	},
+});

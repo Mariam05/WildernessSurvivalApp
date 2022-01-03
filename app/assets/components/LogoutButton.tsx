@@ -1,6 +1,5 @@
 import React from "react";
-import { Alert, Text, TouchableOpacity } from "react-native";
-import styles from "../stylesheet";
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function LogoutButton({ closeRealm, navigation, signOut }) {
 	return (
@@ -25,3 +24,15 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 		</TouchableOpacity>
 	);
 }
+
+const styles = StyleSheet.create({
+	logoutButton: {
+		height: Platform.OS == "ios" ? "35%" : "50%",
+		left: 20,
+		flex: 1,
+	},
+	logoutButtonText: {
+		fontSize: 20,
+		fontWeight: "600",
+	},
+})

@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import RNModal from "react-native-modal";
 
-import styles from "../stylesheet";
+import colours from "../colours";
 
 type ModalProps = {
 	isVisible: boolean,
@@ -50,3 +50,34 @@ PatientModal.Header = ModalHeader;
 PatientModal.Container = ModalContainer;
 PatientModal.Body = ModalBody;
 PatientModal.Footer = ModalFooter;
+
+
+const styles = StyleSheet.create({
+	modalBody: {
+		justifyContent: "center",
+		paddingHorizontal: 15,
+		minHeight: 10,
+	},
+	modalContainer: {
+		backgroundColor: colours.pinkBackground,
+		borderRadius: 25,
+		borderColor: "#000",
+		height: "90%",
+	},
+	modalFooter: {
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 10,
+		flexDirection: "row",
+	},
+	modalHeader: {
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	modalHeaderText: {
+		paddingTop: 10,
+		textAlign: "center",
+		fontSize: 24,
+		fontWeight: "500",
+	},
+});
