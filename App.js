@@ -4,8 +4,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import LandingScreen from "./app/Screens/LandingScreen";
 import LoginScreen from "./app/Screens/LoginScreen";
+import PatientScreen from "./app/Screens/PatientScreen";
+
 import { AuthProvider } from "./providers/AuthProvider";
 import { PatientsProvider } from "./providers/PatientProvider";
+import { VitalsProvider } from "./providers/VitalProvider";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +34,20 @@ export default function App() {
 							);
 						}}
 					</Stack.Screen>
+					<Stack.Screen
+                        name="Patient"
+                        options={{ headerShown: false, gestureEnabled: false }}
+                    >
+                        {() => {
+                            return (
+                                <VitalsProvider>
+                                    <PatientsProvider>
+                                        <PatientScreen />
+                                    </PatientsProvider>
+                                </VitalsProvider>
+                            );
+                        }}
+                    </Stack.Screen>
 				</Stack.Navigator>
 			</NavigationContainer>
 		</AuthProvider>

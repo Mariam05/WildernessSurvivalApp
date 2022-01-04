@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient } from "../schemas";
+import { Patient, Vital} from "../schemas";
 import { useAuth } from "./AuthProvider";
 
 const PatientsContext = React.createContext(null);
@@ -21,7 +21,7 @@ const PatientsProvider = (props) => {
 		}
 
 		const config: Realm.Configuration = {
-			schema: [Patient.schema],
+			schema: [Patient.schema, Vital.schema],
 			sync: {
 				user: user,
 				partitionValue: `${user.id}`,
@@ -86,6 +86,7 @@ const PatientsProvider = (props) => {
 							age: age || "?",
 							sex: sex || "Other",
 							partition: user.id,
+							vitals: [],
 						})
 					);
 				} catch (error) {
@@ -98,6 +99,9 @@ const PatientsProvider = (props) => {
 			console.log("Failed to write:\n" + name + "\n" + age + "\n" + sex + "\n" + image);
 		}
 	};
+
+    // Define the function for updating a patient
+    //const updatePatient = (patient, vitals)
 
 	// Define the function for deleting a Patient.
 	const deletePatient = (patient) => {

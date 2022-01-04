@@ -83,9 +83,7 @@ export default function LandingScreen() {
 							style={null}
 							image={images[patient.image]}
 							key={index}
-							onPress={() =>
-								console.log(patient.name + " Pressed!")
-							}
+							onPress={() => navigation.navigate("Patient", {patientObj: patient})}
 						/>
 					))}
 				</ScrollView>

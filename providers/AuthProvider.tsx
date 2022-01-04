@@ -39,6 +39,7 @@ const AuthProvider = ({ children }) => {
 			if (userRealm) {
 				userRealm.close();
 				realmRef.current = null;
+				//TODO should clear project data
 			}
 		};
 	}, [user]);
