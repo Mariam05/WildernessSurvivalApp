@@ -31,6 +31,8 @@ import { useVitals } from "../../providers/VitalProvider";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import AppButton from "../assets/components/AppButton";
+import { VitalModal } from "../assets/components/PatientModal";
+import VitalItem, {vitalItemStyles} from "../assets/components/VitalItem";
 
 import globalStyles from "../assets/stylesheet";
 import { images } from "../assets/ProfilePics";
@@ -49,13 +51,9 @@ export default function PatientScreen() {
 	const { user, signOut } = useAuth();
 	const navigation = useNavigation();
 
-	const { updatePatient } = usePatients();
 	const { vitals, createVital, updateVital } = useVitals();
 
-    const [vitalName, setVitalName] = useState("");
-    const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
-    const [vitalType, setVitalType] = useState("");
-    const [vitalCategories, setVitalCategories] = useState("");
+    const [vital, setVital] = useState({});
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
@@ -98,7 +96,7 @@ export default function PatientScreen() {
                             }}
                             data={vitals}
                             renderItem={({ item }) => (
-                                <RenderVitalsItem
+                                <VitalItem
                                     item={item}
                                     onPressInfo={() => console.log(item.title + " info pressed")}
                                     onPressAdd={() => console.log(item.title + " add new reading")}
@@ -107,8 +105,136 @@ export default function PatientScreen() {
                             keyExtractor={(item, index) => index}
                         />
 
-                        {/* Code for add new vital button*/}
-                        <AddButton onPress={() => console.log("New Vital Pressed")}/>
+                        {/* Code for add new vital button */}
+                        <AddButton onPress={isModalVisible}/>
+
+                        {/* Code for add new vital info */}
+                        <VitalModal isVisible={isModalVisible}>
+                            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                                <ScrollView
+                                    style={{ top: Platform.OS == "ios" ? "5%" : 0, }}
+                                    keyboardDismissMode="on-drag"
+                                    keyboardShouldPersistTaps="never"
+                                >
+                                    <VitalModal.Container>
+                                        <VitalModal.Header />
+                                        <VitalModal.Body>
+                                            <View style={{marginVertical: "3%"}} />
+                                            <VitalItem item={vital}/>
+
+                                            <View style={{marginVertical: "3%"}} />
+                                            <Text style={modalStyles.modalSubHeadingText}>
+                                                Profile Picture
+                                            </Text>
+                                            <ScrollView
+                                                horizontal={true}
+                                                style={{
+                                                    padding: 10,
+                                                    height: "10%",
+                                                    marginHorizontal: "-4%",
+                                                }}
+                                            >
+                                                {images.map((image, index) => (
+                                                    <TouchableOpacity
+                                                        onPress={() => setVitalImg(index)}
+                                                        key={index}
+                                                    >
+                                                        <View
+                                                            style={[patientItemStyles.patientPicture, { elevation: 2 }]}
+                                                        >
+                                                            <Image
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: undefined,
+                                                                    aspectRatio: 1,
+                                                                    resizeMode: "cover",
+                                                                    borderRadius: 100,
+                                                                }}
+                                                                source={image}
+                                                            />
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </ScrollView>
+                                            <View style={{marginVertical: "3%"}} />
+                                            <TextInput
+                                                style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+                                                clearButtonMode="while-editing"
+                                                returnKeyType="next"
+                                                textContentType="username"
+                                                placeholder="First Name"
+                                                autoCapitalize="words"
+                                                autoCorrect={false}
+                                                value={VitalFN}
+                                                onChangeText={setVitalFN}
+                                                onSubmitEditing={() => { this.secondTextInput.focus(); }}
+                                            />
+                                            <View style={{marginVertical: "3%"}} />
+                                            <TextInput
+                                                ref={(input) => { this.secondTextInput = input; }}
+                                                style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+                                                clearButtonMode="while-editing"
+                                                returnKeyType="next"
+                                                textContentType="username"
+                                                placeholder="Last Name"
+                                                autoCapitalize="words"
+                                                autoCorrect={false}
+                                                value={VitalLN}
+                                                onChangeText={setVitalLN}
+                                            />
+                                            <View style={{marginVertical: "3%"}} />
+                                            <Text style={modalStyles.modalSubHeadingText}>Age</Text>
+                                            <SegmentedControl
+                                                values={ages}
+                                                onValueChange={setVitalAge}
+                                            />
+                                            <View style={{marginVertical: "3%"}} />
+                                            <Text style={modalStyles.modalSubHeadingText}>Sex</Text>
+                                            <SegmentedControl
+                                                values={sexes}
+                                                onValueChange={setVitalSex}
+                                            />
+                                        </VitalModal.Body>
+                                        <VitalModal.Footer>
+                                            <AppButton
+                                                title="Cancel"
+                                                style={modalStyles.modalCancelButton}
+                                                buttonTextStyle={modalStyles.modalButtonText}
+                                                onPress={() => {
+                                                    setVitalImg(0);
+                                                    setVitalFN("");
+                                                    setVitalLN("");
+                                                    setVitalAge(null);
+                                                    setVitalSex(null);
+                                                    handleModal();
+                                                }}
+                                            />
+                                            <AppButton
+                                                title="Submit"
+                                                style={modalStyles.modalSubmitButton}
+                                                buttonTextStyle={modalStyles.modalButtonText}
+                                                onPress={() => {
+                                                    createVital(
+                                                        VitalImg,
+                                                        VitalFN + " " + VitalLN,
+                                                        VitalAge,
+                                                        VitalSex
+                                                    );
+                                                    setVitalImg(0);
+                                                    setVitalFN("");
+                                                    setVitalLN("");
+                                                    setVitalAge(null);
+                                                    setVitalSex(null);
+                                                    handleModal();
+                                                }}
+                                            />
+                                        </VitalModal.Footer>
+                                    </VitalModal.Container>
+                                </ScrollView>
+                            </KeyboardAvoidingView>
+                        </VitalModal>
+
+
                     </SafeAreaView>
                 );
 	}

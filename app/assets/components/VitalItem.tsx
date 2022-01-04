@@ -1,9 +1,17 @@
 import { VictoryLine, VictoryChart, VictoryTheme, VictoryAxis } from "victory-native";
-import customTheme from "../assets/customTheme.js";
-import colours from "../assets/colours";
-import AppButton from "../assets/components/AppButton";
+import customTheme from "..customTheme.js";
+import colours from "../colours";
+import AppButton from "AppButton";
+import {
+	Image,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View
+} from "react-native";
 
-const RenderChart = (item) => {
+
+const Chart = (item) => {
 	return (
 		<VictoryChart
 				theme={customTheme}
@@ -26,7 +34,7 @@ const RenderChart = (item) => {
 
 
 
-const RenderRowWithImage = (entry) => {
+const RowWithImage = (entry) => {
 		const date = new Date(entry.timestamp*1000);
 		const dateString = date.getHours() + ":" + date.getMinutes();
 
@@ -63,7 +71,7 @@ const RenderRowWithImage = (entry) => {
 }
 
 
-const RenderRow = (entry) => {
+const Row = (entry) => {
 	const date = new Date(entry.timestamp*1000);
 	const dateString = date.getHours() + ":" + date.getMinutes();
 
@@ -81,18 +89,15 @@ const RenderRow = (entry) => {
 	)
 }
 
-const rowStyles = StyleSheet.create({
 
-});
-
-const RenderTable = (item) => {
+const Table = (item) => {
 	const hasImage = item.title==="Photos"
 
 	return (
 		  <View style={vitalItemStyles.table}>
 				{
-						item.data.map((entry) => { // This will render a row for each data element.
-								return hasImage ? RenderRowWithImage(entry) : RenderRow(entry)
+						item.data.map((entry) => { // This will  a row for each data element.
+								return hasImage ? RowWithImage(entry) : Row(entry)
 						})
 				}
 			</View>
@@ -101,32 +106,25 @@ const RenderTable = (item) => {
 
 
 
-const RenderData = ({ item }) => {
+const Data = ({ item }) => {
 	if (item.type === "numerical"){
-		return RenderChart(item);
+		return Chart(item);
 	}
-	return RenderTable(item);
+	return Table(item);
 }
 
 
-const RenderTimeElapsed = ({ item }) => {
-	const containsTimeElapsed = item.hasOwnProperty("timeElapsed")
+const TimeElapsed = ({ item }) => {
 	const isOverdue = item.timeElapsed > item.periodicity
 
-	if (containsTimeElapsed){
-			return (<Text style={isOverdue ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}
-							>{item.timeElapsed} min ago</Text>)
-	}
-	return (null)
+    return (<Text style={isOverdue
+            ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}
+            >{item.timeElapsed} min ago</Text>)
 }
 
 
-export default const RenderVitalsItem = ({
-	item,
-	onPressInfo,
-	onPressAdd,
-}) => {
-		const [open, setopen] = useState(false);
+export default function VitalItem({ item, onPressInfo, onPressAdd }){
+    const [open, setopen] = useState(false);
 		const onPress = () => {
 			LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 			setopen(!open);
@@ -139,18 +137,16 @@ export default const RenderVitalsItem = ({
 						style={vitalItemStyles.vitalsHeader}>
 						<View margin={0} />
 
-					<AppButton
-							title="i"
-							style={vitalItemStyles.infoButton}
-							buttonTextStyle={vitalItemStyles.infoButtonText}
-							onPress={onPressInfo}
-					/>
+                    {item.description && (<AppButton
+                            title="i"
+                            style={vitalItemStyles.infoButton}
+                            buttonTextStyle={vitalItemStyles.infoButtonText}
+                            onPress={onPressInfo}
+                    />)}
 
 					<View>
 						<Text style={vitalItemStyles.vitalItemNameText}>{item.title}</Text>
-						<RenderTimeElapsed
-								item={item}
-						/>
+						{item.timeElapsed && (<TimeElapsed item={item}/>)}
 					</View>
 
 					<AppButton
@@ -160,15 +156,14 @@ export default const RenderVitalsItem = ({
 							onPress={onPressAdd}
 					/>
 				</TouchableOpacity>
-				{open && (
-					<RenderData item={item}/>
-				)}
 
+				{open && item.data && (<Data item={item}/>)}
 		</View>
 	)
-};
+}
 
-vitalItemStyles = StyleSheet.create({
+
+const vitalItemStyles = StyleSheet.create({
     row: {
 		flex: 1,
 		alignSelf: 'stretch',
@@ -206,7 +201,7 @@ vitalItemStyles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
-    }
+    },
     vitalsHeader: {
     		flexDirection: "row",
     		padding: 10,

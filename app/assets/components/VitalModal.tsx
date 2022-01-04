@@ -9,7 +9,7 @@ type ModalProps = {
 	children: React.ReactNode,
 	[x: string]: any,
 };
-export const PatientModal = ({
+export const VitalModal = ({
 	isVisible = false,
 	children,
 	...props
@@ -34,7 +34,7 @@ const ModalContainer = ({ children }: { children: React.ReactNode }) => (
 
 const ModalHeader = () => (
 	<View style={styles.modalHeader}>
-		<Text style={styles.modalHeaderText}>Create a New Patient</Text>
+		<Text style={styles.modalHeaderText}>Create a New Vital</Text>
 	</View>
 );
 
@@ -46,10 +46,10 @@ const ModalFooter = ({ children }: { children?: React.ReactNode }) => (
 	<View style={styles.modalFooter}>{children}</View>
 );
 
-PatientModal.Header = ModalHeader;
-PatientModal.Container = ModalContainer;
-PatientModal.Body = ModalBody;
-PatientModal.Footer = ModalFooter;
+VitalModal.Header = ModalHeader;
+VitalModal.Container = ModalContainer;
+VitalModal.Body = ModalBody;
+VitalModal.Footer = ModalFooter;
 
 
 const styles = StyleSheet.create({

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient, Vital} from "../schemas";
+import { Patient, Vital } from "../schemas";
 import { useAuth } from "./AuthProvider";
 
 const PatientsContext = React.createContext(null);
@@ -86,7 +86,6 @@ const PatientsProvider = (props) => {
 							age: age || "?",
 							sex: sex || "Other",
 							partition: user.id,
-							vitals: [],
 						})
 					);
 				} catch (error) {
