@@ -100,7 +100,9 @@ const VitalsProvider = (props) => {
 	};
 
     // Define the function for updating a vital
-    //const updateVital = (vital, vitals)
+    const updateVital = (vital, reading) => {
+
+    }
 
 	// Define the function for deleting a Vital.
 	/*const deleteVital = (vital) => {

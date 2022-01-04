@@ -101,7 +101,9 @@ const PatientsProvider = (props) => {
 	};
 
     // Define the function for updating a patient
-    //const updatePatient = (patient, vitals)
+    const updatePatient = (patient, vitals) => {
+
+    }
 
 	// Define the function for deleting a Patient.
 	const deletePatient = (patient) => {

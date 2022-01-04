@@ -26,15 +26,17 @@ import SegmentedControl from "@react-native-segmented-control/segmented-control"
 
 import { useAuth } from "../../providers/AuthProvider";
 import { usePatients } from "../../providers/PatientProvider";
+import { useVitals } from "../../providers/VitalProvider";
 
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
+import AppButton from "../assets/components/AppButton";
 
 import globalStyles from "../assets/stylesheet";
 import { images } from "../assets/ProfilePics";
 import colours from "../assets/colours";
 
-export default function PatientScreen({ patientObj }) {
+export default function PatientScreen() {
     // Enable animation for drop-down graph/table
     if (Platform.OS === 'android') {
         if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -42,11 +44,21 @@ export default function PatientScreen({ patientObj }) {
         }
     }
 
-    const { patient } = patientObj.params;
+    const { patientName } = {};
+
 	const { user, signOut } = useAuth();
 	const navigation = useNavigation();
 
-	const { updatePatient, closeRealm } = usePatients();
+	const { updatePatient } = usePatients();
+	const { vitals, createVital, updateVital } = useVitals();
+
+    const [vitalName, setVitalName] = useState("");
+    const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
+    const [vitalType, setVitalType] = useState("");
+    const [vitalCategories, setVitalCategories] = useState("");
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -65,32 +77,26 @@ export default function PatientScreen({ patientObj }) {
                        <ProfileHeader image={images[0]} statusbarColour={colours.redBackground}/>
 
                         {/* Code for patient level header */}
-                        <View style={styles.headerPatient}>
-                            <View style={styles.profileView}>
-                                <Text style={styles.patientName}>{patient.name}</Text>
-                                <TouchableOpacity>
-                                    <Image
-                                        style={styles.profilePicture}
-                                        source={images[patient.image]}
-                                    />
-                                </TouchableOpacity>
+                        <View style={PatientScreenStyles.headerPatient}>
+                            <View style={PatientScreenStyles.profileView}>
+                                <Text style={PatientScreenStyles.patientName}>{patientName}</Text>
                             </View>
                             <AppButton
                                 title="PDF"
-                                style={styles.pdfButton}
-                                buttonTextStyle={styles.pdfButtonText}
+                                style={PatientScreenStyles.pdfButton}
+                                buttonTextStyle={PatientScreenStyles.pdfButtonText}
                                 onPress={() => console.log("generate pdf")}
                             />
                         </View>
 
                         {/* Code for list of vitals */}
                         <FlatList
-                            style={styles.vitalsScrollView}
+                            style={PatientScreenStyles.vitalsScrollView}
                             contentContainerStyle={{
                                 alignSelf: "stretch",
                                 paddingBottom: 100,
                             }}
-                            data={DATA}
+                            data={vitals}
                             renderItem={({ item }) => (
                                 <RenderVitalsItem
                                     item={item}
@@ -110,7 +116,7 @@ export default function PatientScreen({ patientObj }) {
 
 
 
-const vitalItemStyles = StyleSheet.create({
+const PatientScreenStyles = StyleSheet.create({
         headerPatient: {
             backgroundColor: colours.orange,
             height: Platform.OS == "ios" ? "10%" : "7%",
@@ -148,6 +154,7 @@ const vitalItemStyles = StyleSheet.create({
     	vitalsScrollView: {
     		flex: 1,
     		width: "100%",
+    		backgroundColor: colours.background,
     	},
 });
 

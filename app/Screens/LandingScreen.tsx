@@ -83,7 +83,7 @@ export default function LandingScreen() {
 							style={null}
 							image={images[patient.image]}
 							key={index}
-							onPress={() => navigation.navigate("Patient", {patientObj: patient})}
+							onPress={() => navigation.navigate("Patient", {patientName: patient.name})}
 						/>
 					))}
 				</ScrollView>
