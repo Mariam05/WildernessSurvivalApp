@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 
-const Chart = (item) => {
+const Chart = (data) => {
 	return (
 		<VictoryChart
 				theme={customTheme}
@@ -27,7 +27,7 @@ const Chart = (item) => {
 				}}
 				x={(d) => new Date(d.timestamp*1000)}
 				y="value"
-				data={item.data}
+				data={data}
 			/>
 		</VictoryChart>)
 }
@@ -90,13 +90,13 @@ const Row = (entry) => {
 }
 
 
-const Table = (item) => {
-	const hasImage = item.title ==="Photos"
+const Table = (data) => {
+	const hasImage = data && data[0] && data[0].image
 
 	return (
 		  <View style={vitalItemStyles.table}>
 				{
-						item.data.map((entry) => { // This will  a row for each data element.
+						data.map((entry) => { // This will  a row for each data element.
 								return hasImage ? RowWithImage(entry) : Row(entry)
 						})
 				}
@@ -106,8 +106,8 @@ const Table = (item) => {
 
 
 
-const Data = ({ type, data }) => {
-	if (type === "numerical"){
+const Data = ({ type, data,  }) => {
+	if (type === "Numerical"){
 		return Chart(data);
 	}
 	return Table(data);
@@ -123,7 +123,7 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 }
 
 
-export default function VitalItem({ name, , onPressInfo, onPressAdd }){
+export default function VitalItem({ name, periodicity, type, description, data, categories, timeElapsed, onPressInfo, onPressAdd }){
     const [open, setopen] = useState(false);
 		const onPress = () => {
 			LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -146,7 +146,7 @@ export default function VitalItem({ name, , onPressInfo, onPressAdd }){
 
 					<View>
 						<Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
-						{item.timeElapsed && (<TimeElapsed item={item}/>)}
+						{item.timeElapsed && (<TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />)}
 					</View>
 
 					<AppButton

@@ -54,7 +54,7 @@ const VitalsProvider = (props) => {
 		};
 	}, [user]);
 
-	const createVital = (name: string, periodicity: number, type: string, description: string) => {
+	const createVital = (name: string, periodicity: number, type: string, description: string, categories: list) => {
 		const realm = realmRef.current;
 		periodicity = periodicity && periodicity >= 0 ? periodicity : 60;
 		name =
@@ -81,11 +81,13 @@ const VitalsProvider = (props) => {
 					realm.create(
 						"Vital",
 						new Vital({
+						    partition: user.id,
 							periodicity: periodicity || 60,
 							name: name || "New Vital",
-							type: type || "?",
+							type: type || "Numerical",
 							description: description || "",
-							vitals: [],
+							data: [],
+							categories: categories || [],
 						})
 					);
 				} catch (error) {

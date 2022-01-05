@@ -55,12 +55,24 @@ export default function PatientScreen() {
 
 	const { vitals, createVital, updateVital } = useVitals();
 
-    const [vital, setVital] = useState({});
-   /* const [vitalName, setVitalName] = useState("");
+    const [vitalName, setVitalName] = useState("");
     const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
     const [vitalType, setVitalType] = useState("");
     const [vitalCategories, setVitalCategories] = useState([]);
-   */
+
+
+    const updateVitalCategory = (category, index) => {
+        setVitalCategories(arr => {arr[index] = category; return arr});
+    }
+    const deleteVitalCategory = (index) => {
+        setVitalCategories(arr => {arr.splice(index, 1); return arr});
+    }
+    const appendVitalCategory = (category) => {
+        setVitalCategories(arr => [...arr, category]);
+    }
+
+
+    const [newVitalCategory, setNewVitalCategory] = useState("");
 
 
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -140,8 +152,8 @@ export default function PatientScreen() {
                                                 placeholder="Vital Name"
                                                 autoCapitalize="words"
                                                 autoCorrect={false}
-                                                value={vital.name}
-                                                onChangeText={setVital}
+                                                value={vitalName}
+                                                onChangeText={setVitalName}
                                                 onSubmitEditing={() => { this.secondTextInput.focus(); }}
                                             />
                                             <View style={{marginVertical: "3%"}} />
@@ -151,25 +163,58 @@ export default function PatientScreen() {
                                                 clearButtonMode="while-editing"
                                                 keyboardType = 'number-pad'
                                                 returnKeyType="next"
-                                                textContentType="username"
                                                 placeholder="Periodicity (minutes)"
                                                 autoCorrect={false}
-                                                value={vital.periodicity}
-                                                onChangeText={setVital}
+                                                value={vitalPeriodicity}
+                                                onChangeText={setVitalPeriodicity}
                                             />
                                             <View style={{marginVertical: "3%"}} />
                                             <Text style={modalStyles.modalSubHeadingText}>Type</Text>
                                             <SegmentedControl
                                                 values={vitalTypes}
-                                                onValueChange={setVital}
+                                                onValueChange={setVitalType}
                                             />
-
-                                            <View style={{marginVertical: "3%"}} />
-                                            <Text style={modalStyles.modalSubHeadingText}>Sex</Text>
-                                            <SegmentedControl
-                                                values={sexes}
-                                                onValueChange={setVitalSex}
-                                            />
+                                            {vitalType == "Categorical" && vitalCategories.map((category, index) => (
+                                                 <View>
+                                                     <TextInput
+                                                        ref={(input) => { this.secondTextInput = input; }}
+                                                        style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+                                                        clearButtonMode="while-editing"
+                                                        returnKeyType="next"
+                                                        textContentType="username"
+                                                        placeholder="Category {index}"
+                                                        autoCorrect={false}
+                                                        value={category}
+                                                        onChangeText={() => updateVitalCategory(category, index)}
+                                                    />
+                                                    <AppButton
+                                                        title="X"
+                                                        style={modalStyles.vitalCategoryButton}
+                                                        buttonTextStyle={modalStyles.vitalCategoryButtonText}
+                                                        onPress={() => {deleteVitalCategory(index)}}
+                                                    />
+                                                 </View>
+                                                ))
+                                                <View>
+                                                     <TextInput
+                                                        ref={(input) => { this.secondTextInput = input; }}
+                                                        style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+                                                        clearButtonMode="while-editing"
+                                                        returnKeyType="next"
+                                                        textContentType="username"
+                                                        placeholder="Category {index}"
+                                                        autoCorrect={false}
+                                                        value={newVitalCategory}
+                                                        onChangeText={setNewVitalCategory}
+                                                    />
+                                                    <AppButton
+                                                        title="+"
+                                                        style={modalStyles.vitalCategoryButton}
+                                                        buttonTextStyle={modalStyles.vitalCategoryButtonText}
+                                                        onPress={() => {appendVitalCategory(newVitalCategory)}}
+                                                    />
+                                                 </View>
+                                            }
                                         </VitalModal.Body>
                                         <VitalModal.Footer>
                                             <AppButton
@@ -187,16 +232,16 @@ export default function PatientScreen() {
                                                 buttonTextStyle={modalStyles.modalButtonText}
                                                 onPress={() => {
                                                     createVital(
-                                                        VitalImg,
-                                                        VitalFN + " " + VitalLN,
-                                                        VitalAge,
-                                                        VitalSex
+                                                        vitalName,
+                                                        vitalPeriodicity,
+                                                        vitalType,
+                                                        "",
+                                                        vitalCategories
                                                     );
-                                                    setVitalImg(0);
-                                                    setVitalFN("");
-                                                    setVitalLN("");
-                                                    setVitalAge(null);
-                                                    setVitalSex(null);
+                                                    setVitalName("");
+                                                    setVitalPeriodicity(0);
+                                                    setVitalType(null);
+                                                    setVitalCategories([]);
                                                     handleModal();
                                                 }}
                                             />
@@ -254,5 +299,63 @@ const PatientScreenStyles = StyleSheet.create({
     		width: "100%",
     		backgroundColor: colours.background,
     	},
+    	vitalsScrollView: {
+            flex: 1,
+            width: "100%",
+            backgroundColor: colours.background,
+        },
+        vitalCategoryButton: {
+           backgroundColor: colours.purple,
+           height: "70%",
+           color: colours.primary,
+           position: "absolute",
+           right: 10,
+           alignSelf: "center",
+           borderColor: colours.primary,
+           borderWidth: 1,
+           padding: 6,
+        },
+        vitalCategoryButtonText: {
+            fontSize: 30,
+            fontWeight: "700",
+            top: "-5%"
+        },
+});
+
+const modalStyles = StyleSheet.create({
+	modalButtonText: {
+		fontSize: 20,
+		color: colours.primary,
+		alignSelf: "center",
+	},
+	modalCancelButton: {
+		flexDirection: "column",
+		height: 50,
+		width: "40%",
+		maxWidth: 300,
+		margin: 10,
+		backgroundColor: colours.blue,
+		borderWidth: 0,
+		borderRadius: 25,
+		alignContent: "center",
+		justifyContent: "center",
+	},
+	modalSubHeadingText: {
+		fontSize: 17,
+		fontWeight: "500",
+	},
+	modalSubmitButton: {
+		flexDirection: "column",
+		height: 50,
+		width: "40%",
+		maxWidth: 300,
+		margin: 10,
+		backgroundColor: colours.green,
+		borderWidth: 0,
+		borderRadius: 25,
+		alignContent: "center",
+		justifyContent: "center",
+	},
+
 });
 
