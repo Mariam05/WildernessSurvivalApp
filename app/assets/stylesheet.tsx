@@ -18,6 +18,7 @@ const globalStyles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 3,
 		elevation: 6,
+		alignSelf: "center"
 	},
 	container: {
 		flex: 1,

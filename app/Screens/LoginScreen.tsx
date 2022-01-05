@@ -5,7 +5,7 @@ import {
 	useFonts,
 } from "@expo-google-fonts/oxygen";
 import AppLoading from "expo-app-loading";
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import {
 	Alert,
 	Image,
@@ -27,9 +27,11 @@ import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 
 export default function LoginScreen({ navigation }) {
+	const passwordRef = React.createRef<TextInput>();
+	
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const { user, signUp, signIn } = useAuth();
+	const { user, signIn } = useAuth();
 
 	const windowHeight = useWindowDimensions().height;
 	const titleText = "Wilderness\nVital Tracking";
@@ -60,18 +62,6 @@ export default function LoginScreen({ navigation }) {
 		setPassword("");
 	};
 
-	const onPressSignUp = async () => {
-		console.log("Trying Sign Up with user: " + username);
-		try {
-			await signUp(username, password);
-			signIn(username, password);
-		} catch (error) {
-			const errorMessage = `Failed to sign up: ${error.message}`;
-			console.error(errorMessage);
-			Alert.alert(errorMessage);
-		}
-	};
-
 	if (!fontsLoaded) {
 		return <AppLoading />;
 	} else {
@@ -85,7 +75,7 @@ export default function LoginScreen({ navigation }) {
 						title="Register"
 						style={loginStyles.registerButton}
 						buttonTextStyle={loginStyles.registerButtonText}
-						onPress={onPressSignUp}
+						onPress={() => navigation.navigate("Register")}
 					/>
 					<Text style={loginStyles.titleText}>{titleText}</Text>
 					<View style={globalStyles.separator} />
@@ -95,15 +85,15 @@ export default function LoginScreen({ navigation }) {
 						keyboardType="email-address"
 						returnKeyType="next"
 						textContentType="username"
-						placeholder="Username"
+						placeholder="Email"
 						onChangeText={(text) => setUsername(text)}
 						value={username}
 						autoCapitalize="none"
 						autoCorrect={false}
-    					onSubmitEditing={() => { this.secondTextInput.focus(); }}
+    					onSubmitEditing={() => { passwordRef.current.focus(); }}
 					/>
 					<TextInput
-    					ref={(input) => { this.secondTextInput = input; }}
+    					ref={passwordRef}
 						style={globalStyles.credentialInput}
 						returnKeyType="done"
 						secureTextEntry={true}
@@ -210,7 +200,7 @@ const loginStyles = StyleSheet.create({
 		alignContent: "center",
 		justifyContent: "center",
 		position: "absolute",
-		top: Platform.OS === "android" ? StatusBar.currentHeight - 60 : 40,
+		top: Platform.OS === "android" ? -5 : 40,
 		right: 10,
 		shadowColor: colours.primary,
 		shadowOpacity: 0.4,
@@ -225,9 +215,9 @@ const loginStyles = StyleSheet.create({
 	},
 	titleText: {
 		fontSize: 50,
-		fontWeight: "100",
+		fontWeight: "700",
 		textAlign: "center",
 		fontFamily: "Oxygen_700Bold",
-		top: Platform.OS === "ios" ?  0 : StatusBar.currentHeight - 60,
+		top: 0,
 	},
 });

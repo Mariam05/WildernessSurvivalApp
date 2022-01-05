@@ -1,6 +1,32 @@
 import String, { ObjectId, Long } from "bson";
 import internal from "stream";
 
+class User {
+	_partition: String;
+	image: Long;
+	firstName: String;
+	lastName: String;
+
+	constructor({ image, firstName, lastName, partition }) {
+		this._partition = partition;
+		this.image = image;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
+	static schema = {
+		name: "User",
+		properties: {
+			_partition: "string",
+			image: "int",
+			firstName: "string",
+			lastName: "string"
+		},
+		primaryKey: "_partition",
+		required: ["_partition"]
+	};
+}
+
 class Patient {
 	_partition: String;
 	_id?: ObjectId;
