@@ -38,6 +38,8 @@ import globalStyles from "../assets/stylesheet";
 import { images } from "../assets/ProfilePics";
 import colours from "../assets/colours";
 
+const vitalTypes = ["Numerical", "Categorical"];
+
 export default function PatientScreen() {
     // Enable animation for drop-down graph/table
     if (Platform.OS === 'android') {
@@ -54,6 +56,12 @@ export default function PatientScreen() {
 	const { vitals, createVital, updateVital } = useVitals();
 
     const [vital, setVital] = useState({});
+   /* const [vitalName, setVitalName] = useState("");
+    const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
+    const [vitalType, setVitalType] = useState("");
+    const [vitalCategories, setVitalCategories] = useState([]);
+   */
+
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
@@ -123,50 +131,17 @@ export default function PatientScreen() {
                                             <VitalItem item={vital}/>
 
                                             <View style={{marginVertical: "3%"}} />
-                                            <Text style={modalStyles.modalSubHeadingText}>
-                                                Profile Picture
-                                            </Text>
-                                            <ScrollView
-                                                horizontal={true}
-                                                style={{
-                                                    padding: 10,
-                                                    height: "10%",
-                                                    marginHorizontal: "-4%",
-                                                }}
-                                            >
-                                                {images.map((image, index) => (
-                                                    <TouchableOpacity
-                                                        onPress={() => setVitalImg(index)}
-                                                        key={index}
-                                                    >
-                                                        <View
-                                                            style={[patientItemStyles.patientPicture, { elevation: 2 }]}
-                                                        >
-                                                            <Image
-                                                                style={{
-                                                                    width: "100%",
-                                                                    height: undefined,
-                                                                    aspectRatio: 1,
-                                                                    resizeMode: "cover",
-                                                                    borderRadius: 100,
-                                                                }}
-                                                                source={image}
-                                                            />
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </ScrollView>
-                                            <View style={{marginVertical: "3%"}} />
+
                                             <TextInput
                                                 style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
                                                 clearButtonMode="while-editing"
                                                 returnKeyType="next"
                                                 textContentType="username"
-                                                placeholder="First Name"
+                                                placeholder="Vital Name"
                                                 autoCapitalize="words"
                                                 autoCorrect={false}
-                                                value={VitalFN}
-                                                onChangeText={setVitalFN}
+                                                value={vital.name}
+                                                onChangeText={setVital}
                                                 onSubmitEditing={() => { this.secondTextInput.focus(); }}
                                             />
                                             <View style={{marginVertical: "3%"}} />
@@ -174,20 +149,21 @@ export default function PatientScreen() {
                                                 ref={(input) => { this.secondTextInput = input; }}
                                                 style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
                                                 clearButtonMode="while-editing"
+                                                keyboardType = 'number-pad'
                                                 returnKeyType="next"
                                                 textContentType="username"
-                                                placeholder="Last Name"
-                                                autoCapitalize="words"
+                                                placeholder="Periodicity (minutes)"
                                                 autoCorrect={false}
-                                                value={VitalLN}
-                                                onChangeText={setVitalLN}
+                                                value={vital.periodicity}
+                                                onChangeText={setVital}
                                             />
                                             <View style={{marginVertical: "3%"}} />
-                                            <Text style={modalStyles.modalSubHeadingText}>Age</Text>
+                                            <Text style={modalStyles.modalSubHeadingText}>Type</Text>
                                             <SegmentedControl
-                                                values={ages}
-                                                onValueChange={setVitalAge}
+                                                values={vitalTypes}
+                                                onValueChange={setVital}
                                             />
+
                                             <View style={{marginVertical: "3%"}} />
                                             <Text style={modalStyles.modalSubHeadingText}>Sex</Text>
                                             <SegmentedControl
@@ -201,11 +177,7 @@ export default function PatientScreen() {
                                                 style={modalStyles.modalCancelButton}
                                                 buttonTextStyle={modalStyles.modalButtonText}
                                                 onPress={() => {
-                                                    setVitalImg(0);
-                                                    setVitalFN("");
-                                                    setVitalLN("");
-                                                    setVitalAge(null);
-                                                    setVitalSex(null);
+                                                    setVital({})
                                                     handleModal();
                                                 }}
                                             />

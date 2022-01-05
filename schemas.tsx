@@ -2,6 +2,12 @@ import { String, ObjectId, Long, Array} from "bson";
 import internal from "stream";
 import Realm from "realm"
 
+class Reading {
+
+
+}
+
+
 class Vital {
     _partition: String;
 	_id?: ObjectId;
@@ -10,8 +16,10 @@ class Vital {
 	type: String;
 	description?: String;
     readings: Realm.List<String>;
+    categories? : Realm.List<String>;
+    hasImages : Bool;
 
-	constructor({  name, periodicity, type, description, readings, partition, id = new ObjectId() }) {
+	constructor({ name, periodicity, type, description, readings, partition, categories, hasImages, id = new ObjectId() }) {
 	    this._partition = partition;
 		this._id = id;
 		this.name = name;
@@ -19,6 +27,8 @@ class Vital {
 		this.type = type;
 		this.description = description;
 		this.readings = readings;
+		this.categories = categories;
+		this.hasImages = hasImages;
 	}
 
 	static schema = {
@@ -30,7 +40,9 @@ class Vital {
 			periodicity: "int",
 			type: "string",
 			description: "string?",
-			readings: "string[]"
+			readings: "string[]",
+			categories: "string[]",
+			hasImages: "bool",
 		},
 		primaryKey: "_id",
 		required: ["_partition"]

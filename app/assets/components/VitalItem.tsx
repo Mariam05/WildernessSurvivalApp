@@ -1,7 +1,7 @@
 import { VictoryLine, VictoryChart, VictoryTheme, VictoryAxis } from "victory-native";
-import customTheme from "..customTheme.js";
+import customTheme from "../CustomTheme";
 import colours from "../colours";
-import AppButton from "AppButton";
+import AppButton from "./AppButton";
 import {
 	Image,
 	StyleSheet,
@@ -91,7 +91,7 @@ const Row = (entry) => {
 
 
 const Table = (item) => {
-	const hasImage = item.title==="Photos"
+	const hasImage = item.title ==="Photos"
 
 	return (
 		  <View style={vitalItemStyles.table}>
@@ -106,24 +106,24 @@ const Table = (item) => {
 
 
 
-const Data = ({ item }) => {
-	if (item.type === "numerical"){
-		return Chart(item);
+const Data = ({ type, data }) => {
+	if (type === "numerical"){
+		return Chart(data);
 	}
-	return Table(item);
+	return Table(data);
 }
 
 
-const TimeElapsed = ({ item }) => {
-	const isOverdue = item.timeElapsed > item.periodicity
+const TimeElapsed = ({ timeElapsed, periodicity }) => {
+	const isOverdue = timeElapsed > periodicity
 
     return (<Text style={isOverdue
             ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}
-            >{item.timeElapsed} min ago</Text>)
+            >{timeElapsed} min ago</Text>)
 }
 
 
-export default function VitalItem({ item, onPressInfo, onPressAdd }){
+export default function VitalItem({ name, , onPressInfo, onPressAdd }){
     const [open, setopen] = useState(false);
 		const onPress = () => {
 			LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -145,7 +145,7 @@ export default function VitalItem({ item, onPressInfo, onPressAdd }){
                     />)}
 
 					<View>
-						<Text style={vitalItemStyles.vitalItemNameText}>{item.title}</Text>
+						<Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
 						{item.timeElapsed && (<TimeElapsed item={item}/>)}
 					</View>
 
