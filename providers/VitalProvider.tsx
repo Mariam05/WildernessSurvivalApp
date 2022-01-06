@@ -14,6 +14,8 @@ const VitalsProvider = ({ children, partition }) => {
 	// state would.
 	const realmRef = useRef(null);
 
+
+
 	useEffect(() => {
 		if (user == null) {
 			console.error("Null user? Needs to log in!");
@@ -24,29 +26,36 @@ const VitalsProvider = ({ children, partition }) => {
 			schema: [Vital.schema],
 			sync: {
 				user: user,
-				partitionValue: `${partition}`,
+                partitionValue: `${partition}`,
 			},
 		};
 
 		// open a realm for this particular project and get all Vitals
-		Realm.open(config).then((realm) => {
-			realmRef.current = realm;
-			/*realm.write(() => {
-				realm.deleteAll();
-				console.log("deleting all");
-			});*/
+        try {
+            Realm.open(config).then((realm) => {
+                realmRef.current = realm;
+                realm.deleteRealm();
+                /*
+                realm.write(() => {
+                    realm.deleteAll();
+                    console.log("deleting all vitals");
+                });*/
+                const syncVitals = realm.objects("Vital");
+                let sortedVitals = syncVitals.sorted("name");
+                setVitals([...sortedVitals]);
 
-			const syncVitals = realm.objects("Vital");
-			let sortedVitals = syncVitals.sorted("name");
-			setVitals([...sortedVitals]);
+                // we observe changes on the Vitals, in case Sync informs us of changes
+                // started in other devices (or the cloud)
+                sortedVitals.addListener(() => {
+                    console.log("Got new vitals!");
+                    setVitals([...sortedVitals]);
+                });
+            });
+        } catch (error){
+            console.log(error.message);
+        	console.log("Error opening realm:");
+        }
 
-			// we observe changes on the Vitals, in case Sync informs us of changes
-			// started in other devices (or the cloud)
-			sortedVitals.addListener(() => {
-				console.log("Got new data!");
-				setVitals([...sortedVitals]);
-			});
-		});
 
 		return () => {
 			// cleanup function
@@ -79,7 +88,7 @@ const VitalsProvider = ({ children, partition }) => {
 		type = type ? type : "Numerical";
 		description = description ? description : "";
 		categories = categories ? categories : [];
-		console.log(partition, periodicity, name, type, description, categories);
+
 		try {
 			realm.write(() => {
 				// Create a new vital in the same partition -- that is, using the same user id.
@@ -87,8 +96,8 @@ const VitalsProvider = ({ children, partition }) => {
 					realm.create(
 						"Vital",
 						new Vital({
-						    partition: `${partition}`,
-							periodicity: periodicity || 60,
+						    partition: partition,
+							periodicity:  60,
 							name: name || "New Vital",
 							type: type || "Numerical",
 							description: description || "",

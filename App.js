@@ -45,11 +45,9 @@ export default function App() {
                             const { route } = props;
                             const { id, name, vitals } = route.params;
                             return (
-                                <PatientsProvider>
-                                    <VitalsProvider partition={id}>
-                                        <PatientScreen route={route} />
-                                    </VitalsProvider>
-                                </PatientsProvider>
+                                <VitalsProvider partition={id}>
+                                    <PatientScreen route={route} />
+                                </VitalsProvider>
                             );
                         }}
                     </Stack.Screen>

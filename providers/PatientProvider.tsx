@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient, Vital } from "../schemas";
+import { Patient, Vital} from "../schemas";
 import { useAuth } from "./AuthProvider";
 
 const PatientsContext = React.createContext(null);
@@ -21,6 +21,7 @@ const PatientsProvider = (props) => {
 			return;
 		}
 
+
 		const config: Realm.Configuration = {
 			schema: [Patient.schema, Vital.schema],
 			sync: {
@@ -34,7 +35,7 @@ const PatientsProvider = (props) => {
 			realmRef.current = realm;
 			/*realm.write(() => {
 				realm.deleteAll();
-				console.log("deleting all");
+				console.log("deleting all patients");
 			});*/
 
 			const syncPatients = realm.objects("Patient");
@@ -46,6 +47,7 @@ const PatientsProvider = (props) => {
 			sortedPatients.addListener(() => {
 				console.log("Got new patients!");
 				setPatients([...sortedPatients]);
+				console.log(patients);
 			});
 		});
 

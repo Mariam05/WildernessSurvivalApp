@@ -19,6 +19,7 @@ const AuthProvider = ({ children }) => {
 			return;
 		}
 
+        console.log()
 		const config = {
 			sync: {
 				user,
@@ -31,6 +32,7 @@ const AuthProvider = ({ children }) => {
 		// (instead of all the links stored for all the users)
 		Realm.open(config).then((userRealm) => {
 			realmRef.current = userRealm;
+			console.log(userRealm.objects("User"));
 		});
 
 		return () => {
@@ -76,6 +78,9 @@ const AuthProvider = ({ children }) => {
 		user.logOut();
 		setUser(null);
 	};
+
+
+
 
 	return (
 		<AuthContext.Provider

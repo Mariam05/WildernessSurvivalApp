@@ -11,8 +11,7 @@ export default function ProfileHeader({image, statusbarColour }) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(statusbarColour, true);
 
     const {user, signOut} = useAuth();
-	const { closeRealm } =
-        usePatients();
+	const { closeRealm } = usePatients();
     const navigation = useNavigation();
 
     return (

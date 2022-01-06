@@ -1,6 +1,6 @@
-import { String, ObjectId, Long, Array, Object } from "bson";
+import { String, ObjectId, Long, Array, Date } from "bson";
 import internal from "stream";
-import Realm from "realm"
+
 
 class Vital {
     _partition: String;
@@ -9,24 +9,23 @@ class Vital {
 	periodicity?: Long;
 	type: String;
 	description?: String;
-    data: Realm.List<String>;
-    categories?: Realm.List<String>;
+    categories?: Array;
     timeElapsed?: Long;
 
-	constructor({ name, periodicity, type, description, data, partition, categories, timeElapsed, id = new ObjectId() }) {
+	constructor({ name, periodicity, type, description, partition, categories, data, timeElapsed, id = new ObjectId() }) {
 	    this._partition = partition;
 		this._id = id;
 		this.name = name;
 		this.periodicity = periodicity;
 		this.type = type;
 		this.description = description;
-		this.data = data;
 		this.categories = categories;
 		this.timeElapsed = timeElapsed;
 	}
 
 	static schema = {
 		name: "Vital",
+		bsonType: "object",
 		properties: {
 			_id: "objectId?",
 			_partition: "string",
@@ -34,11 +33,10 @@ class Vital {
 			periodicity: "int?",
 			type: "string",
 			description: "string?",
-			data: "string[]",
-			categories: "string[]",
+			categories: {type: "list",objectType: "string"},
 			timeElapsed: "int",
 		},
-		primaryKey: "_id",
+        embedded: true,
 		required: ["_partition"]
 	};
 }
@@ -50,7 +48,7 @@ class Patient {
 	name?: String;
 	age?: String;
 	sex?: String;
-    vitals: Realm.List<Vital>;
+    vitals: Array;
 
 	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
 		this._partition = partition;
@@ -71,8 +69,9 @@ class Patient {
 			name: "string?",
 			age: "string?",
 			sex: "string?",
-			vitals: "Vital[]"
+			vitals: { type: "list", objectType: "Vital"},
 		},
+		schema_version: "2",
 		primaryKey: "_id",
 		required: ["_partition"]
 	};

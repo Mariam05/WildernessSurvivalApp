@@ -28,7 +28,6 @@ import { useNavigation } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
 import { useAuth } from "../../providers/AuthProvider";
-import { usePatients } from "../../providers/PatientProvider";
 import { useVitals } from "../../providers/VitalProvider";
 
 import ProfileHeader from "../assets/components/ProfileHeader";
@@ -93,9 +92,6 @@ export default function PatientScreen({ route }) {
                     <SafeAreaView
                         style={[globalStyles.container, {backgroundColor: colours.redBackground}]}
                     >
-                        {/* Code for top-level login header */}
-                       <ProfileHeader image={images[0]} statusbarColour={colours.redBackground}/>
-
                         {/* Code for patient level header */}
                         <View style={PatientScreenStyles.headerPatient}>
                             <View style={PatientScreenStyles.profileView}>

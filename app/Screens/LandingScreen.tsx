@@ -54,12 +54,18 @@ export default function LandingScreen() {
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
 
-    const onPressPatient = async (patient) => {
-        console.log(patient) //uh code doesn't work unless this line is here lol.
+    const onPressPatient = (patient) => {
+        console.log("here");
+
+        const patientName = patient.name;
+        const patientId = patient._id;
+        const patientVitals = patient.vitals;
+
+        //console.log(patient)
         navigation.navigate("Patient", {
-              id: patient._id,
-              name: patient.name,
-              vitals: patient.vitals,
+              id: patientId,
+              name: patientName,
+              vitals: patientVitals,
         });
     };
 
