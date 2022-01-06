@@ -54,7 +54,7 @@ export default function SignUpScreen() {
             try {
                 await signUp(username, password);
                 const newUser = await signIn(username, password);
-                insertCustomUserData(newUser, profileImg, firstName, lastName);
+                insertCustomUserData(newUser, profileImg, firstName, lastName, username);
             } catch (error) {
                 const errorMessage = `Failed to sign up: ${error.message}`;
                 console.error(errorMessage);

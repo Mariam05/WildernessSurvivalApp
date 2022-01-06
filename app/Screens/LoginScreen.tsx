@@ -27,6 +27,8 @@ import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 
 export default function LoginScreen({ navigation }) {
+	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.pinkBackground, true);
+
 	const passwordRef = React.createRef<TextInput>();
 	
 	const [username, setUsername] = useState("");

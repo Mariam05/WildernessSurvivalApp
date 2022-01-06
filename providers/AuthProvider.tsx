@@ -80,7 +80,8 @@ const AuthProvider = ({ children }) => {
 	/*
 	 * Insert custom data for the specified user
 	 */
-	const insertCustomUserData = (newUser:Realm.User<Realm.DefaultFunctionsFactory, SimpleObject, Realm.DefaultUserProfileData>, image: number, firstName: string, lastName: string) => {
+	const insertCustomUserData = (newUser: Realm.User<Realm.DefaultFunctionsFactory, SimpleObject, Realm.DefaultUserProfileData>,
+		image: number, firstName: string, lastName: string, username: string) => {
 		if (newUser) {
 			const mongodb = newUser.mongoClient("mongodb-atlas");
 			const custom_data_collection = mongodb.db("wilderness").collection("User");
@@ -88,7 +89,8 @@ const AuthProvider = ({ children }) => {
 				"_partition": newUser.id,
 				"image": image,
 				"firstName": firstName,
-				"lastName": lastName
+				"lastName": lastName,
+				"username": username
 			}
 
 			custom_data_collection.insertOne(customData)
