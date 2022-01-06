@@ -54,6 +54,7 @@ const AuthProvider = ({ children }) => {
 		);
 		const newUser = await app.logIn(creds);
 		setUser(newUser);
+		return newUser;
 	};
 
 	// The signUp function takes an email and password and uses the
@@ -76,6 +77,28 @@ const AuthProvider = ({ children }) => {
 		setUser(null);
 	};
 
+	/*
+	 * Insert custom data for the specified user
+	 */
+	const insertCustomUserData = (newUser:Realm.User<Realm.DefaultFunctionsFactory, SimpleObject, Realm.DefaultUserProfileData>, image: number, firstName: string, lastName: string) => {
+		if (newUser) {
+			const mongodb = newUser.mongoClient("mongodb-atlas");
+			const custom_data_collection = mongodb.db("wilderness").collection("User");
+			const customData = {
+				"_partition": newUser.id,
+				"image": image,
+				"firstName": firstName,
+				"lastName": lastName
+			}
+
+			custom_data_collection.insertOne(customData)
+				.then((result) => console.log(`Successfully inserted custom data with _id: ${result.insertedId}`))
+				.catch((err) => console.error(`Failed to insert custom data: ${err}`));
+		} else {
+			console.log("NULL USER");
+		}
+	}
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -83,6 +106,7 @@ const AuthProvider = ({ children }) => {
 				signIn,
 				signOut,
 				user,
+				insertCustomUserData,
 			}}
 		>
 			{children}

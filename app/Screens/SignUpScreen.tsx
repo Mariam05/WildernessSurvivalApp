@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
     Alert,
-    Button,
     Image, 
     Keyboard,
     KeyboardAvoidingView,
@@ -24,14 +23,8 @@ import AppButton from "../assets/components/AppButton";
 import globalStyles from "../assets/stylesheet";
 import { images } from "../assets/ProfilePics";
 import { useNavigation } from "@react-navigation/native";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 
-interface SignUpProps {
-    username?: string,
-
-}
-
-export default function SignUpScreen(props: SignUpProps) {
+export default function SignUpScreen() {
 	const lastNameRef = React.createRef<TextInput>();
     const emailRef = React.createRef<TextInput>();
     const passwordRef = React.createRef<TextInput>();
@@ -53,14 +46,15 @@ export default function SignUpScreen(props: SignUpProps) {
     const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState("");
     
-    const { user, signIn, signUp } = useAuth();
+    const { signIn, signUp, insertCustomUserData } = useAuth();
 
     const onPressSignUp = async () => {
         if (validateInput()) {
-            console.log("Trying Sign Up with user: " + props.username);
+            console.log("Trying Sign Up with user: " + username);
             try {
                 await signUp(username, password);
-                signIn(username, password);
+                const newUser = await signIn(username, password);
+                insertCustomUserData(newUser, profileImg, firstName, lastName);
             } catch (error) {
                 const errorMessage = `Failed to sign up: ${error.message}`;
                 console.error(errorMessage);
@@ -156,7 +150,7 @@ export default function SignUpScreen(props: SignUpProps) {
                                                     resizeMode: "cover",
                                                     borderRadius: 100,
                                                     borderWidth: profileImg === index ? 4 : 0,
-                                                    borderColor: profileImg === index ? colours.green : "transparent"
+                                                    borderColor: profileImg === index ? colours.primary : "transparent"
                                                 }}
                                                 source={image}
                                             />

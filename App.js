@@ -18,16 +18,25 @@ export default function App() {
 					<Stack.Screen
 						name="Login"
 						component={LoginScreen}
-						options={{ headerShown: false, gestureEnabled: false }}
+						options={{
+							headerShown: false,
+							gestureEnabled: false,
+						}}
 					/>
 					<Stack.Screen
 						name="Register"
 						component={SignUpScreen}
-						options={{ headerShown: false, gestureEnabled: true }}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
 					/>
 					<Stack.Screen
 						name="Landing"
-						options={{ headerShown: false, gestureEnabled: false }}
+						options={{
+							headerShown: false,
+							gestureEnabled: false,
+						}}
 					>
 						{() => {
 							return (

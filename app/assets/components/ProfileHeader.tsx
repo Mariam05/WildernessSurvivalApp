@@ -5,15 +5,17 @@ import colours from "../colours";
 import LogoutButton from "./LogoutButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { usePatients } from "../../../providers/PatientProvider";
+import { images } from "../ProfilePics";
 
 
-export default function ProfileHeader({image, statusbarColour }) {
+export default function ProfileHeader({statusbarColour }) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(statusbarColour, true);
 
     const {user, signOut} = useAuth();
-	const { closeRealm } =
-        usePatients();
+	const { closeRealm } = usePatients();
     const navigation = useNavigation();
+
+	user.refreshCustomData();
 
     return (
         <View style={styles.header}>
@@ -23,10 +25,13 @@ export default function ProfileHeader({image, statusbarColour }) {
                 navigation={navigation}
             />
             <View style={styles.profileView}>
-                <TouchableOpacity onPress={() => console.log(user.id)}>
+				<TouchableOpacity onPress={() => {
+					user.refreshCustomData();
+					console.log(user.customData);
+				}}>
                     <Image
-                        style={styles.profilePicture}
-                        source={image}
+						style={styles.profilePicture}
+						source={user.customData ? images[user.customData.image] : null}
                     />
                 </TouchableOpacity>
             </View>

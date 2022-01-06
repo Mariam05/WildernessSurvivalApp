@@ -45,7 +45,7 @@ export default function LandingScreen() {
 	const [PatientSex, setPatientSex] = useState("");
 	const [PatientImg, setPatientImg] = useState(0);
 
-	const { patients, createPatient, deletePatient, closeRealm } =
+	const { patients, createPatient, closeRealm } =
 		usePatients();
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -64,7 +64,7 @@ export default function LandingScreen() {
 			<SafeAreaView
 				style={[globalStyles.container, {backgroundColor: colours.redBackground}]}
 			>
-				<ProfileHeader image={images[0]} statusbarColour={colours.redBackground}/>
+				<ProfileHeader statusbarColour={colours.redBackground}/>
 
 				<ScrollView
 					horizontal={false}
