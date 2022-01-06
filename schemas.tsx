@@ -1,20 +1,19 @@
-import { String, ObjectId, Long, Array} from "bson";
+import { String, ObjectId, Long, Array, Object } from "bson";
 import internal from "stream";
 import Realm from "realm"
-
 
 class Vital {
     _partition: String;
 	_id?: ObjectId;
 	name: String;
-	periodicity: Long;
+	periodicity?: Long;
 	type: String;
 	description?: String;
-    data: Realm.List<Object>;
+    data: Realm.List<String>;
     categories?: Realm.List<String>;
     timeElapsed?: Long;
 
-	constructor({ name, periodicity, type, description,data, partition, categories, timeElapsed, id = new ObjectId() }) {
+	constructor({ name, periodicity, type, description, data, partition, categories, timeElapsed, id = new ObjectId() }) {
 	    this._partition = partition;
 		this._id = id;
 		this.name = name;
@@ -32,10 +31,10 @@ class Vital {
 			_id: "objectId?",
 			_partition: "string",
 			name: "string",
-			periodicity: "int",
+			periodicity: "int?",
 			type: "string",
 			description: "string?",
-			data: "object[]",
+			data: "string[]",
 			categories: "string[]",
 			timeElapsed: "int",
 		},
@@ -51,7 +50,7 @@ class Patient {
 	name?: String;
 	age?: String;
 	sex?: String;
-    vitals: Array;
+    vitals: Realm.List<Vital>;
 
 	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
 		this._partition = partition;
@@ -78,8 +77,5 @@ class Patient {
 		required: ["_partition"]
 	};
 }
-
-
-
 
 export { Patient, Vital };

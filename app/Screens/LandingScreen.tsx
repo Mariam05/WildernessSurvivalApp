@@ -7,6 +7,7 @@ import {
 import AppLoading from "expo-app-loading";
 import React, { useEffect, useState } from "react";
 import {
+    Alert,
 	Image,
 	SafeAreaView,
 	ScrollView,
@@ -23,6 +24,8 @@ import SegmentedControl from "@react-native-segmented-control/segmented-control"
 
 import { useAuth } from "../../providers/AuthProvider";
 import { usePatients } from "../../providers/PatientProvider";
+import { useVitals } from "../../providers/VitalProvider";
+
 import AppButton from "../assets/components/AppButton";
 import PatientItem, {patientItemStyles} from "../assets/components/PatientItem";
 import { PatientModal } from "../assets/components/PatientModal";
@@ -45,11 +48,21 @@ export default function LandingScreen() {
 	const [PatientSex, setPatientSex] = useState("");
 	const [PatientImg, setPatientImg] = useState(0);
 
-	const { patients, createPatient, deletePatient, closeRealm } =
-		usePatients();
+	const { patients, createPatient, deletePatient, closeRealm } = usePatients();
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
+
+
+    const onPressPatient = async (patient) => {
+        console.log(patient) //uh code doesn't work unless this line is here lol.
+        navigation.navigate("Patient", {
+              id: patient._id,
+              name: patient.name,
+              vitals: patient.vitals,
+        });
+    };
+
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -83,9 +96,7 @@ export default function LandingScreen() {
 							style={null}
 							image={images[patient.image]}
 							key={index}
-							onPress={() =>
-								console.log(patient.name + " Pressed!")
-							}
+							onPress={() => onPressPatient(patient)}
 						/>
 					))}
 				</ScrollView>

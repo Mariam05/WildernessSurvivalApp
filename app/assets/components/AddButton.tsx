@@ -3,7 +3,7 @@ import { Platform, StatusBar, StyleSheet } from "react-native";
 import AppButton from "./AppButton";
 import colours from "../colours";
 
-export default function AddButton({onPress}) {
+export default function AddButton({ onPress }) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.redBackground, true);
 
     return (

@@ -22,6 +22,7 @@ export default function App() {
 						component={LoginScreen}
 						options={{ headerShown: false, gestureEnabled: false }}
 					/>
+
 					<Stack.Screen
 						name="Landing"
 						options={{ headerShown: false, gestureEnabled: false }}
@@ -29,22 +30,26 @@ export default function App() {
 						{() => {
 							return (
 								<PatientsProvider>
-									<LandingScreen />
+									 <LandingScreen />
 								</PatientsProvider>
 							);
 						}}
 					</Stack.Screen>
+
 					<Stack.Screen
                         name="Patient"
                         options={{ headerShown: false, gestureEnabled: false }}
                     >
-                        {() => {
+                        {(props) => {
+
+                            const { route } = props;
+                            const { id, name, vitals } = route.params;
                             return (
-                                <VitalsProvider>
-                                    <PatientsProvider>
-                                        <PatientScreen />
-                                    </PatientsProvider>
-                                </VitalsProvider>
+                                <PatientsProvider>
+                                    <VitalsProvider partition={id}>
+                                        <PatientScreen route={route} />
+                                    </VitalsProvider>
+                                </PatientsProvider>
                             );
                         }}
                     </Stack.Screen>

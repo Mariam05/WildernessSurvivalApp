@@ -11,13 +11,16 @@ import {
 	ImageBackground,
 	Platform,
 	SafeAreaView,
+	ScrollView,
 	FlatList,
 	StyleSheet,
 	Text,
+	TextInput,
 	TouchableOpacity,
 	useWindowDimensions,
 	LayoutAnimation,
 	View,
+	KeyboardAvoidingView,
 	UIManager,
 } from "react-native";
 
@@ -31,16 +34,17 @@ import { useVitals } from "../../providers/VitalProvider";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import AppButton from "../assets/components/AppButton";
-import { VitalModal } from "../assets/components/PatientModal";
+import { VitalModal } from "../assets/components/VitalModal";
 import VitalItem, {vitalItemStyles} from "../assets/components/VitalItem";
 
 import globalStyles from "../assets/stylesheet";
 import { images } from "../assets/ProfilePics";
 import colours from "../assets/colours";
 
+
 const vitalTypes = ["Numerical", "Categorical"];
 
-export default function PatientScreen() {
+export default function PatientScreen({ route }) {
     // Enable animation for drop-down graph/table
     if (Platform.OS === 'android') {
         if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -48,18 +52,17 @@ export default function PatientScreen() {
         }
     }
 
-    const { patientName } = {};
+    const { id, name, vitals } = route.params;
 
 	const { user, signOut } = useAuth();
-	const navigation = useNavigation();
 
-	const { vitals, createVital, updateVital } = useVitals();
+	const navigation = useNavigation();
+	const { createVital, updateVital } = useVitals();
 
     const [vitalName, setVitalName] = useState("");
-    const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
+    const [vitalPeriodicity, setVitalPeriodicity] = useState(null);
     const [vitalType, setVitalType] = useState("");
     const [vitalCategories, setVitalCategories] = useState([]);
-
 
     const updateVitalCategory = (category, index) => {
         setVitalCategories(arr => {arr[index] = category; return arr});
@@ -70,7 +73,6 @@ export default function PatientScreen() {
     const appendVitalCategory = (category) => {
         setVitalCategories(arr => [...arr, category]);
     }
-
 
     const [newVitalCategory, setNewVitalCategory] = useState("");
 
@@ -97,7 +99,7 @@ export default function PatientScreen() {
                         {/* Code for patient level header */}
                         <View style={PatientScreenStyles.headerPatient}>
                             <View style={PatientScreenStyles.profileView}>
-                                <Text style={PatientScreenStyles.patientName}>{patientName}</Text>
+                                <Text style={PatientScreenStyles.patientName}>{name}</Text>
                             </View>
                             <AppButton
                                 title="PDF"
@@ -117,7 +119,12 @@ export default function PatientScreen() {
                             data={vitals}
                             renderItem={({ item }) => (
                                 <VitalItem
-                                    item={item}
+                                    name={item.name}
+                                    periodicity={item.periodicity}
+                                    type={item.type}
+                                    categories={item.categories}
+                                    data={item.data}
+                                    timeElapsed={item.timeElapsed}
                                     onPressInfo={() => console.log(item.title + " info pressed")}
                                     onPressAdd={() => console.log(item.title + " add new reading")}
                                 />
@@ -126,7 +133,7 @@ export default function PatientScreen() {
                         />
 
                         {/* Code for add new vital button */}
-                        <AddButton onPress={isModalVisible}/>
+                        <AddButton onPress={handleModal}/>
 
                         {/* Code for add new vital info */}
                         <VitalModal isVisible={isModalVisible}>
@@ -140,7 +147,13 @@ export default function PatientScreen() {
                                         <VitalModal.Header />
                                         <VitalModal.Body>
                                             <View style={{marginVertical: "3%"}} />
-                                            <VitalItem item={vital}/>
+                                            <VitalItem
+                                                name={vitalName}
+                                                periodicity={vitalPeriodicity}
+                                                type={vitalType}
+                                                categories={vitalCategories}
+
+                                            />
 
                                             <View style={{marginVertical: "3%"}} />
 
@@ -154,17 +167,16 @@ export default function PatientScreen() {
                                                 autoCorrect={false}
                                                 value={vitalName}
                                                 onChangeText={setVitalName}
-                                                onSubmitEditing={() => { this.secondTextInput.focus(); }}
                                             />
                                             <View style={{marginVertical: "3%"}} />
                                             <TextInput
-                                                ref={(input) => { this.secondTextInput = input; }}
                                                 style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
                                                 clearButtonMode="while-editing"
-                                                keyboardType = 'number-pad'
                                                 returnKeyType="next"
+                                                textContentType="username"
                                                 placeholder="Periodicity (minutes)"
                                                 autoCorrect={false}
+                                                keyboardType="numeric"
                                                 value={vitalPeriodicity}
                                                 onChangeText={setVitalPeriodicity}
                                             />
@@ -174,47 +186,7 @@ export default function PatientScreen() {
                                                 values={vitalTypes}
                                                 onValueChange={setVitalType}
                                             />
-                                            {vitalType == "Categorical" && vitalCategories.map((category, index) => (
-                                                 <View>
-                                                     <TextInput
-                                                        ref={(input) => { this.secondTextInput = input; }}
-                                                        style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
-                                                        clearButtonMode="while-editing"
-                                                        returnKeyType="next"
-                                                        textContentType="username"
-                                                        placeholder="Category {index}"
-                                                        autoCorrect={false}
-                                                        value={category}
-                                                        onChangeText={() => updateVitalCategory(category, index)}
-                                                    />
-                                                    <AppButton
-                                                        title="X"
-                                                        style={modalStyles.vitalCategoryButton}
-                                                        buttonTextStyle={modalStyles.vitalCategoryButtonText}
-                                                        onPress={() => {deleteVitalCategory(index)}}
-                                                    />
-                                                 </View>
-                                                ))
-                                                <View>
-                                                     <TextInput
-                                                        ref={(input) => { this.secondTextInput = input; }}
-                                                        style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
-                                                        clearButtonMode="while-editing"
-                                                        returnKeyType="next"
-                                                        textContentType="username"
-                                                        placeholder="Category {index}"
-                                                        autoCorrect={false}
-                                                        value={newVitalCategory}
-                                                        onChangeText={setNewVitalCategory}
-                                                    />
-                                                    <AppButton
-                                                        title="+"
-                                                        style={modalStyles.vitalCategoryButton}
-                                                        buttonTextStyle={modalStyles.vitalCategoryButtonText}
-                                                        onPress={() => {appendVitalCategory(newVitalCategory)}}
-                                                    />
-                                                 </View>
-                                            }
+
                                         </VitalModal.Body>
                                         <VitalModal.Footer>
                                             <AppButton
@@ -222,7 +194,10 @@ export default function PatientScreen() {
                                                 style={modalStyles.modalCancelButton}
                                                 buttonTextStyle={modalStyles.modalButtonText}
                                                 onPress={() => {
-                                                    setVital({})
+                                                    setVitalName("");
+                                                    setVitalPeriodicity(0);
+                                                    setVitalType(null);
+                                                    setVitalCategories([]);
                                                     handleModal();
                                                 }}
                                             />

@@ -6,6 +6,7 @@ import { useAuth } from "./AuthProvider";
 const PatientsContext = React.createContext(null);
 
 const PatientsProvider = (props) => {
+
 	const [patients, setPatients] = useState([]);
 	const { user } = useAuth();
 
@@ -43,7 +44,7 @@ const PatientsProvider = (props) => {
 			// we observe changes on the Patients, in case Sync informs us of changes
 			// started in other devices (or the cloud)
 			sortedPatients.addListener(() => {
-				console.log("Got new data!");
+				console.log("Got new patients!");
 				setPatients([...sortedPatients]);
 			});
 		});
@@ -53,6 +54,8 @@ const PatientsProvider = (props) => {
 			closeRealm();
 		};
 	}, [user]);
+
+
 
 	const createPatient = (image: number, name: string, age: string, sex: string) => {
 		const realm = realmRef.current;
@@ -85,6 +88,7 @@ const PatientsProvider = (props) => {
 							name: name || "New Patient",
 							age: age || "?",
 							sex: sex || "Other",
+							vitals: [],
 							partition: user.id,
 						})
 					);
@@ -101,7 +105,7 @@ const PatientsProvider = (props) => {
 
     // Define the function for updating a patient
     const updatePatient = (patient, vitals) => {
-
+        //updateVitals
     }
 
 	// Define the function for deleting a Patient.

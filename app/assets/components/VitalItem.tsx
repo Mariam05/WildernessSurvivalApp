@@ -9,7 +9,7 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-
+import { useState } from "react";
 
 const Chart = (data) => {
 	return (
@@ -38,12 +38,12 @@ const RowWithImage = (entry) => {
 		const date = new Date(entry.timestamp*1000);
 		const dateString = date.getHours() + ":" + date.getMinutes();
 
-		const [openImage, setOpenImage] = useState(false);
+		const [expandedImage, setExpandedImage] = useState(false);
 		const [imageUrl, setImageUrl] = useState("");
 
 
 		const onPress = () => {
-			setOpenImage(!openImage);
+			setExpandedImage(!expandedImage);
 			setImageUrl(entry.url)
 		};
 
@@ -58,7 +58,7 @@ const RowWithImage = (entry) => {
 								{entry.value}
 							</Text>
 						</View>
-						{openImage && (
+						{expandedImage && (
 						<View style={vitalItemStyles.valueCellImage}>
 							<Image
 								source={{uri:entry.url}}
@@ -106,7 +106,7 @@ const Table = (data) => {
 
 
 
-const Data = ({ type, data,  }) => {
+const Data = ({ type, data }) => {
 	if (type === "Numerical"){
 		return Chart(data);
 	}
@@ -124,42 +124,45 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 
 
 export default function VitalItem({ name, periodicity, type, description, data, categories, timeElapsed, onPressInfo, onPressAdd }){
-    const [open, setopen] = useState(false);
-		const onPress = () => {
-			LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-			setopen(!open);
-		};
+    const [expanded, setExpanded] = useState(false);
+    const onPress = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setExpanded(!expanded);
+    };
 
-		return (
-			<View>
-				<TouchableOpacity
-						onPress={onPress}
-						style={vitalItemStyles.vitalsHeader}>
-						<View margin={0} />
+    return (
+        <View>
+            <TouchableOpacity
+                    onPress={onPress}
+                    style={vitalItemStyles.vitalsHeader}>
+                    <View margin={0} />
 
-                    {item.description && (<AppButton
-                            title="i"
-                            style={vitalItemStyles.infoButton}
-                            buttonTextStyle={vitalItemStyles.infoButtonText}
-                            onPress={onPressInfo}
-                    />)}
+                {description && (<AppButton
+                        title="i"
+                        style={vitalItemStyles.infoButton}
+                        buttonTextStyle={vitalItemStyles.infoButtonText}
+                        onPress={onPressInfo}
+                />)}
 
-					<View>
-						<Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
-						{item.timeElapsed && (<TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />)}
-					</View>
+                <View>
+                    <Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
+                    {timeElapsed && (<TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />)}
+                </View>
 
-					<AppButton
-							title="Add"
-							style={vitalItemStyles.newReadingButton}
-							buttonTextStyle={vitalItemStyles.newReadingButtonText}
-							onPress={onPressAdd}
-					/>
-				</TouchableOpacity>
+                {onPressAdd && (<AppButton
+                        title="Add"
+                        style={vitalItemStyles.newReadingButton}
+                        buttonTextStyle={vitalItemStyles.newReadingButtonText}
+                        onPress={onPressAdd}
+                    />
+                )}
 
-				{open && item.data && (<Data item={item}/>)}
-		</View>
-	)
+            </TouchableOpacity>
+
+            {expanded && data && (
+                <Data type={type} data={data}/>)
+             }
+    </View>)
 }
 
 

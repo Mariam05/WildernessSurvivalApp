@@ -5,7 +5,7 @@ import { useAuth } from "./AuthProvider";
 
 const VitalsContext = React.createContext(null);
 
-const VitalsProvider = (props) => {
+const VitalsProvider = ({ children, partition }) => {
 	const [vitals, setVitals] = useState([]);
 	const { user } = useAuth();
 
@@ -24,7 +24,7 @@ const VitalsProvider = (props) => {
 			schema: [Vital.schema],
 			sync: {
 				user: user,
-				partitionValue: `${user.id}`,
+				partitionValue: `${partition}`,
 			},
 		};
 
@@ -54,6 +54,10 @@ const VitalsProvider = (props) => {
 		};
 	}, [user]);
 
+    const selectPatient = (patient) => {
+        setPatient(patient);
+     };
+
 	const createVital = (name: string, periodicity: number, type: string, description: string, categories: list) => {
 		const realm = realmRef.current;
 		periodicity = periodicity && periodicity >= 0 ? periodicity : 60;
@@ -72,8 +76,10 @@ const VitalsProvider = (props) => {
 					)
 					.join(" ")
 				: "New Vital";
-		type = type && type.length > 1 ? type : "?";
+		type = type ? type : "Numerical";
 		description = description ? description : "";
+		categories = categories ? categories : [];
+		console.log(partition, periodicity, name, type, description, categories);
 		try {
 			realm.write(() => {
 				// Create a new vital in the same partition -- that is, using the same user id.
@@ -81,13 +87,14 @@ const VitalsProvider = (props) => {
 					realm.create(
 						"Vital",
 						new Vital({
-						    partition: user.id,
+						    partition: `${partition}`,
 							periodicity: periodicity || 60,
 							name: name || "New Vital",
 							type: type || "Numerical",
 							description: description || "",
 							data: [],
 							categories: categories || [],
+							timeElapsed: 0,
 						})
 					);
 				} catch (error) {
@@ -97,7 +104,7 @@ const VitalsProvider = (props) => {
 			});
 		} catch (error) {
 			console.log(error.message)
-			console.log("Failed to write:\n" + name + "\n" + type + "\n" + description + "\n" + periodicity);
+			console.log("Failed to write vital:\n" + name + "\n" + periodicity + "\n" + type + "\n" + description + "\n" + (typeof categories));
 		}
 	};
 
@@ -136,7 +143,7 @@ const VitalsProvider = (props) => {
 				vitals,
 			}}
 		>
-			{props.children}
+			{children}
 		</VitalsContext.Provider>
 	);
 };
