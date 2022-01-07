@@ -7,6 +7,7 @@ import LoginScreen from "./app/Screens/LoginScreen";
 import { AuthProvider } from "./providers/AuthProvider";
 import { PatientsProvider } from "./providers/PatientProvider";
 import SignUpScreen from "./app/Screens/SignUpScreen";
+import ProfileScreen from "./app/Screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,21 @@ export default function App() {
 							gestureEnabled: true,
 						}}
 					/>
+					<Stack.Screen
+						name="Profile"
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
+					>
+						{() => {
+							return (
+								<PatientsProvider>
+									<ProfileScreen />
+								</PatientsProvider>
+							);
+						}}
+					</Stack.Screen>
 					<Stack.Screen
 						name="Landing"
 						options={{

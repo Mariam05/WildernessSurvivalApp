@@ -5,11 +5,12 @@ import {
 	useFonts,
 } from "@expo-google-fonts/oxygen";
 import AppLoading from "expo-app-loading";
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import {
 	Image,
 	SafeAreaView,
 	ScrollView,
+	StatusBar,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -44,12 +45,13 @@ export default function LandingScreen() {
 	const [PatientAge, setPatientAge] = useState("");
 	const [PatientSex, setPatientSex] = useState("");
 	const [PatientImg, setPatientImg] = useState(0);
+	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	const { patients, createPatient, closeRealm } =
 		usePatients();
 
-	const [isModalVisible, setIsModalVisible] = useState(false);
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
+	const lastNameRef = createRef<TextInput>();
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -156,11 +158,11 @@ export default function LandingScreen() {
 										autoCorrect={false}
 										value={PatientFN}
 										onChangeText={setPatientFN}
-										onSubmitEditing={() => { this.secondTextInput.focus(); }}
+										onSubmitEditing={() => { lastNameRef.current.focus(); }}
 									/>
 									<View style={{marginVertical: "3%"}} />
 									<TextInput
-										ref={(input) => { this.secondTextInput = input; }}
+										ref={lastNameRef}
 										style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
 										clearButtonMode="while-editing"
 										returnKeyType="next"
@@ -243,7 +245,7 @@ const modalStyles = StyleSheet.create({
 		width: "40%",
 		maxWidth: 300,
 		margin: 10,
-		backgroundColor: colours.blue,
+		backgroundColor: "tomato",
 		borderWidth: 0,
 		borderRadius: 25,
 		alignContent: "center",

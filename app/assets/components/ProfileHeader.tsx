@@ -2,13 +2,12 @@ import { Image, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from "
 import { useNavigation } from "@react-navigation/native";
 
 import colours from "../colours";
-import LogoutButton from "./LogoutButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { usePatients } from "../../../providers/PatientProvider";
 import { images } from "../ProfilePics";
 
 
-export default function ProfileHeader({statusbarColour }) {
+export default function ProfileHeader({statusbarColour}) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(statusbarColour, true);
 
     const {user, signOut} = useAuth();
@@ -19,15 +18,10 @@ export default function ProfileHeader({statusbarColour }) {
 
     return (
         <View style={styles.header}>
-            <LogoutButton
-                closeRealm={closeRealm}
-                signOut={signOut}
-                navigation={navigation}
-            />
             <View style={styles.profileView}>
 				<TouchableOpacity onPress={() => {
 					user.refreshCustomData();
-					console.log(user.customData);
+					navigation.navigate("Profile");
 				}}>
                     <Image
 						style={styles.profilePicture}
@@ -42,13 +36,12 @@ export default function ProfileHeader({statusbarColour }) {
 
 const styles = StyleSheet.create({
 	header: {
-		backgroundColor: colours.redBackground,
-		width: "100%",
 		flex: 0.1,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
+		flexDirection: "column",
+		alignItems: "flex-end",
 		top: Platform.OS === "android" ? StatusBar.currentHeight - 60: 0,
+		width: "100%",
+		backgroundColor: colours.redBackground,
 	},
 	profilePicture: {
 		resizeMode: "cover",
@@ -64,6 +57,6 @@ const styles = StyleSheet.create({
 		alignContent: "center",
 		justifyContent: "flex-end",
 		flexDirection: "row",
-		flex: 0.5,
+		backgroundColor: "transparent",
 	},
 });

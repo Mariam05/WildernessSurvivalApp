@@ -82,6 +82,9 @@ const AuthProvider = ({ children }) => {
 	 */
 	const insertCustomUserData = (newUser: Realm.User<Realm.DefaultFunctionsFactory, SimpleObject, Realm.DefaultUserProfileData>,
 		image: number, firstName: string, lastName: string, username: string) => {
+		firstName = firstName.toLowerCase().replace(firstName[0], firstName[0].toUpperCase());
+		lastName = lastName.toLowerCase().replace(lastName[0], lastName[0].toUpperCase());
+		username = username.toLowerCase();
 		if (newUser) {
 			const mongodb = newUser.mongoClient("mongodb-atlas");
 			const custom_data_collection = mongodb.db("wilderness").collection("User");
