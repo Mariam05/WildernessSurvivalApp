@@ -3,24 +3,21 @@ import { useNavigation } from "@react-navigation/native";
 
 import colours from "../colours";
 import { useAuth } from "../../../providers/AuthProvider";
-import { usePatients } from "../../../providers/PatientProvider";
 import { images } from "../ProfilePics";
 
 
 export default function ProfileHeader({statusbarColour}) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(statusbarColour, true);
 
-    const {user, signOut} = useAuth();
-	const { closeRealm } = usePatients();
+    const {user} = useAuth();
     const navigation = useNavigation();
-
-	user.refreshCustomData();
 
     return (
         <View style={styles.header}>
             <View style={styles.profileView}>
 				<TouchableOpacity onPress={() => {
 					user.refreshCustomData();
+					console.log(user.profile);
 					navigation.navigate("Profile");
 				}}>
                     <Image

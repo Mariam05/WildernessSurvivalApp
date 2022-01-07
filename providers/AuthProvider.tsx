@@ -81,10 +81,9 @@ const AuthProvider = ({ children }) => {
 	 * Insert custom data for the specified user
 	 */
 	const insertCustomUserData = (newUser: Realm.User<Realm.DefaultFunctionsFactory, SimpleObject, Realm.DefaultUserProfileData>,
-		image: number, firstName: string, lastName: string, username: string) => {
+		image: number, firstName: string, lastName: string) => {
 		firstName = firstName.toLowerCase().replace(firstName[0], firstName[0].toUpperCase());
 		lastName = lastName.toLowerCase().replace(lastName[0], lastName[0].toUpperCase());
-		username = username.toLowerCase();
 		if (newUser) {
 			const mongodb = newUser.mongoClient("mongodb-atlas");
 			const custom_data_collection = mongodb.db("wilderness").collection("User");
@@ -93,12 +92,39 @@ const AuthProvider = ({ children }) => {
 				"image": image,
 				"firstName": firstName,
 				"lastName": lastName,
-				"username": username
 			}
 
 			custom_data_collection.insertOne(customData)
 				.then((result) => console.log(`Successfully inserted custom data with _id: ${result.insertedId}`))
 				.catch((err) => console.error(`Failed to insert custom data: ${err}`));
+		} else {
+			console.log("NULL USER");
+		}
+	}
+
+	/*
+	 * Update the current user's custom data, no user passed because the user must be logged in
+   	 */
+	const updateCustomUserData = async (newImage: number, newFirstName: string, newLastName: string) => {
+		if (user) {
+			const mongodb = user.mongoClient("mongodb-atlas");
+			const custom_data_collection = mongodb.db("wilderness").collection("User");
+			const filter = {
+				_partition: user.id,
+			};
+
+			const updateData = {
+				$set: {
+					image: newImage,
+					firstName: newFirstName,
+					lastName: newLastName,
+				}
+			}
+
+			await custom_data_collection.updateOne(filter, updateData)
+				.then((result) => console.log(`Successfully updated custom data with _id: ${result.upsertedId}`))
+				.then(() => user.refreshCustomData())
+				.catch((err) => console.error(`Failed to update custom data: ${err}`));
 		} else {
 			console.log("NULL USER");
 		}
@@ -112,6 +138,7 @@ const AuthProvider = ({ children }) => {
 				signOut,
 				user,
 				insertCustomUserData,
+				updateCustomUserData,
 			}}
 		>
 			{children}

@@ -1,15 +1,15 @@
-import String, { ObjectId, Long } from "bson";
-import internal from "stream";
+import { ObjectId } from "bson";
 
-class Patient {
+class Patient extends Realm.Object {
 	_partition: String;
 	_id?: ObjectId;
-	image?: Long;
-	name?: String;
-	age?: String;
-	sex?: String;
+	image?: number;
+	name?: string;
+	age?: string;
+	sex?: string;
 
 	constructor({ image, name, age, sex, partition, id = new ObjectId() }) {
+		super();
 		this._partition = partition;
 		this._id = id;
 		this.image = image;

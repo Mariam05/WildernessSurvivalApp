@@ -54,6 +54,42 @@ const PatientsProvider = (props) => {
 		};
 	}, [user]);
 
+	const refreshRealm = () => {
+		closeRealm();
+		if (user == null) {
+			console.error("Null user? Needs to log in!");
+			return;
+		}
+
+		const config: Realm.Configuration = {
+			schema: [Patient.schema],
+			sync: {
+				user: user,
+				partitionValue: `${user.id}`,
+			},
+		};
+
+		// open a realm for this particular project and get all Patients
+		Realm.open(config).then((realm) => {
+			realmRef.current = realm;
+			/*realm.write(() => {
+				realm.deleteAll();
+				console.log("deleting all");
+			});*/
+
+			const syncPatients = realm.objects("Patient");
+			let sortedPatients = syncPatients.sorted("name");
+			setPatients([...sortedPatients]);
+
+			// we observe changes on the Patients, in case Sync informs us of changes
+			// started in other devices (or the cloud)
+			sortedPatients.addListener(() => {
+				console.log("Got new data!");
+				setPatients([...sortedPatients]);
+			});
+		});
+	};
+
 	const createPatient = (image: number, name: string, age: string, sex: string) => {
 		const realm = realmRef.current;
 		image = image && image >= 0 ? image : 0;
@@ -127,6 +163,7 @@ const PatientsProvider = (props) => {
 				createPatient,
 				deletePatient,
 				closeRealm,
+				refreshRealm,
 				patients,
 			}}
 		>

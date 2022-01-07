@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Alert,
     Image, 
@@ -28,7 +28,9 @@ import LogoutButton from "../assets/components/LogoutButton";
 import { usePatients } from "../../providers/PatientProvider";
 
 export default function ProfileScreen() {
-    const { user, signOut } = useAuth();
+    StatusBar.setBackgroundColor(colours.blue);
+
+    const { user, signOut, updateCustomUserData } = useAuth();
     const { closeRealm } = usePatients();
 
 	const lastNameRef = React.createRef<TextInput>();
@@ -46,7 +48,7 @@ export default function ProfileScreen() {
     const [profileImg, setProfileImg] = useState(user.customData.image);
     const [firstName, setFirstName] = useState(user.customData.firstName);
     const [lastName, setLastName] = useState(user.customData.lastName);
-    const [username, setUsername] = useState(user.customData.username);
+    const [username, setUsername] = useState(user.profile.email);
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -58,6 +60,36 @@ export default function ProfileScreen() {
     const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState("");
     const [confirmNewPasswordErrorMessage, setConfirmNewPasswordErrorMessage] = useState("");
     
+    const onPressSubmitEdit = async () => {
+        console.log("Done Editing!");
+        formatStrings();
+        validateInput();
+        await updateCustomUserData(profileImg, firstName, lastName);
+        await user.refreshCustomData();
+    }
+
+    const formatStrings = () => {
+        let formattedFN = firstName
+            .split(' ')
+            .map(function (word: string) {
+                return word.charAt(0)
+                    .toUpperCase() + word.slice(1)
+                        .toLowerCase();
+            })
+            .join(' ');
+        setFirstName(formattedFN);
+
+        let formattedLN = lastName
+            .split(' ')
+            .map(function (word: string) {
+                return word.charAt(0)
+                    .toUpperCase() + word.slice(1)
+                        .toLowerCase();
+            })
+            .join(' ');
+        setLastName(formattedLN);
+    }
+
     const validateInput = (): boolean => {
         let error = true;
         let specialCharPattern = new RegExp("^(?=.*[-+_!@#$%^&*?]).+$");
@@ -175,9 +207,13 @@ export default function ProfileScreen() {
                                         }}
                                         source={images[profileImg]} />
                                 </View>
-                                <TouchableOpacity onPress={() => setEditImg(true)}>
-                                    <Text style={profileStyles.smallEditText}>Edit Avatar</Text>
-                                </TouchableOpacity>
+                                {editing ?
+                                    <TouchableOpacity onPress={() => setEditImg(true)}>
+                                        <Text style={profileStyles.smallEditText}>Edit Avatar</Text>
+                                    </TouchableOpacity>
+                                    :
+                                    null
+                                }
                             </>
                         }
                         
@@ -388,7 +424,11 @@ export default function ProfileScreen() {
                     onPress={() => {
                         setEditing(!editing);
                         setEditPassword(false);
-                        editing ? console.log("Done Editing!") : console.log("Editing!");
+                        editing ?
+                            onPressSubmitEdit()
+                        :
+                            console.log("Editing!")
+                        
                     }}
                     style={profileStyles.editButton}
                     buttonTextStyle={profileStyles.backButtonText} />

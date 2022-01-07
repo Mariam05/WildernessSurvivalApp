@@ -19,7 +19,7 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
 import { useAuth } from "../../providers/AuthProvider";
@@ -32,6 +32,7 @@ import { images } from "../assets/ProfilePics";
 import colours from "../assets/colours";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
+import { Patient } from "../../schemas";
 
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
@@ -47,7 +48,7 @@ export default function LandingScreen() {
 	const [PatientImg, setPatientImg] = useState(0);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const { patients, createPatient, closeRealm } =
+	const { patients, createPatient, refreshRealm } =
 		usePatients();
 
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
@@ -58,6 +59,13 @@ export default function LandingScreen() {
 		Oxygen_400Regular,
 		Oxygen_700Bold,
 	});
+
+	const isFocused = useIsFocused();
+
+	useEffect(() => {
+		user.refreshCustomData();
+		refreshRealm();
+	}, [isFocused])
 
 	if (!fontsLoaded) {
 		return <AppLoading />;
@@ -76,20 +84,23 @@ export default function LandingScreen() {
 						paddingBottom: "30%",
 					}}
 				>
-					{patients.map((patient, index) => (
-						<PatientItem
-							enabled={true}
-							name={patient.name}
-							age={patient.age}
-							sex={patient.sex}
-							style={null}
-							image={images[patient.image]}
-							key={index}
-							onPress={() =>
-								console.log(patient.name + " Pressed!")
-							}
-						/>
-					))}
+					{
+						patients.map((patient: Patient, index: number) => (
+							patient.isValid() ?
+							<PatientItem
+								enabled={true}
+								name={patient.name}
+								age={patient.age}
+								sex={patient.sex}
+								style={null}
+								image={images[patient.image]}
+								key={index}
+								onPress={() =>
+									console.log(patient.name + " Pressed!")
+								}
+							/> : null
+						))
+					}
 				</ScrollView>
 				<AddButton onPress={handleModal}/>
 
