@@ -11,7 +11,6 @@ import {
     StyleSheet,
     Text,
     TextInput,
-    Touchable,
     TouchableOpacity,
     TouchableWithoutFeedback,
     useWindowDimensions,
@@ -28,9 +27,9 @@ import LogoutButton from "../assets/components/LogoutButton";
 import { usePatients } from "../../providers/PatientProvider";
 
 export default function ProfileScreen() {
-    StatusBar.setBackgroundColor(colours.blue);
+    Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.blue);
 
-    const { user, signOut, updateCustomUserData } = useAuth();
+    const { user, signOut, updateCustomUserData, changePassword } = useAuth();
     const { closeRealm } = usePatients();
 
 	const lastNameRef = React.createRef<TextInput>();
@@ -48,14 +47,14 @@ export default function ProfileScreen() {
     const [profileImg, setProfileImg] = useState(user.customData.image);
     const [firstName, setFirstName] = useState(user.customData.firstName);
     const [lastName, setLastName] = useState(user.customData.lastName);
-    const [username, setUsername] = useState(user.profile.email);
+    const [email, setEmail] = useState(user.profile.email);
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     
     const [firstNameErrorMessage, setFirstNameErrorMessage] = useState("");
     const [lastNameErrorMessage, setLastNameErrorMessage] = useState("");
-    const [usernameErrorMessage, setUsernameErrorMessage] = useState("");
+    const [emailErrorMessage, setEmailErrorMessage] = useState("");
     const [oldPasswordErrorMessage, setOldPasswordErrorMessage] = useState("");
     const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState("");
     const [confirmNewPasswordErrorMessage, setConfirmNewPasswordErrorMessage] = useState("");
@@ -66,6 +65,29 @@ export default function ProfileScreen() {
         validateInput();
         await updateCustomUserData(profileImg, firstName, lastName);
         await user.refreshCustomData();
+    }
+
+    const onPressChangePassword = async () => {
+        Alert.alert("Change Password?",
+            "Changing your password will log you out and require that you log in with your new credentials", [
+            {
+                text: "Change Password",
+				style: "destructive",
+                onPress: async () => {
+                    if (validateChangePassword()) {
+                        try {
+                            await changePassword(email, oldPassword, newPassword);
+                            navigation.popToTop();
+                            closeRealm();
+                            signOut();
+                        } catch (error) {
+                            Alert.alert("There was an error", error.message, [{ text: "Ok", style: "default" }])
+                        }
+                    }
+                },
+            },
+            { text: "Cancel", style: "cancel" },
+        ]);
     }
 
     const formatStrings = () => {
@@ -92,10 +114,6 @@ export default function ProfileScreen() {
 
     const validateInput = (): boolean => {
         let error = true;
-        let specialCharPattern = new RegExp("^(?=.*[-+_!@#$%^&*?]).+$");
-        let numericCharPattern = new RegExp("^(?=.*\\d).+$");
-        let uppercaseCharPattern = new RegExp("^(?=.*[A-Z]).+$");
-        let lowercaseCharPattern = new RegExp("^(?=.*[a-z]).+$");
 
         if (firstName === "") {
             setFirstNameErrorMessage("Must enter a valid first name");
@@ -105,8 +123,22 @@ export default function ProfileScreen() {
             setLastNameErrorMessage("Must enter a valid last name");
             error = false;
         }
-        if (username === "" || username.indexOf("@") < 2 || username.indexOf("@") > username.length - 5 ) {
-            setUsernameErrorMessage("Must enter a valid email");
+        if (email === "" || email.indexOf("@") < 2 || email.indexOf("@") > email.length - 5 ) {
+            setEmailErrorMessage("Must enter a valid email");
+            error = false;
+        }
+        return error;
+    };
+
+    const validateChangePassword = () => {
+        let error = true;
+        let specialCharPattern = new RegExp("^(?=.*[-+_!@#$%^&*?]).+$");
+        let numericCharPattern = new RegExp("^(?=.*\\d).+$");
+        let uppercaseCharPattern = new RegExp("^(?=.*[A-Z]).+$");
+        let lowercaseCharPattern = new RegExp("^(?=.*[a-z]).+$");
+
+        if (user.profile.email != email) {
+            setEmailErrorMessage("Cannot change email and password at the same time");
             error = false;
         }
         if (oldPassword === "") {
@@ -137,8 +169,12 @@ export default function ProfileScreen() {
             setConfirmNewPasswordErrorMessage("Passwords do not match");
             error = false;
         }
+        if (newPassword === oldPassword) {
+            setNewPasswordErrorMessage("New password cannot be the same as the old password");
+            error = false;
+        }
         return error;
-    };
+    }
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -268,23 +304,23 @@ export default function ProfileScreen() {
                                     <TextInput
                                         ref={emailRef}
                                         blurOnSubmit={false}
-                                        style={[globalStyles.credentialInput, {backgroundColor: usernameErrorMessage ? "tomato" : "white"}]}
+                                        style={[globalStyles.credentialInput, {backgroundColor: emailErrorMessage ? "tomato" : "white"}]}
                                         clearButtonMode="while-editing"
                                         keyboardType="email-address"
                                         returnKeyType="next"
                                         textContentType="username"
                                         placeholder="Email"
                                         onChangeText={(text) => {
-                                            setUsernameErrorMessage("");
-                                            setUsername(text);
+                                            setEmailErrorMessage("");
+                                            setEmail(text);
                                         }}
-                                        value={username}
+                                        value={email}
                                         autoCapitalize="none"
                                         autoCorrect={false}
                                         autoCompleteType="email"
                                         onSubmitEditing={() => Keyboard.dismiss()}
                                     />
-                                    { usernameErrorMessage.length > 0 && <Text style={profileStyles.errorMessage}>{usernameErrorMessage}</Text>}
+                                    { emailErrorMessage.length > 0 && <Text style={profileStyles.errorMessage}>{emailErrorMessage}</Text>}
 
                                     <View style={globalStyles.separator} />
                                     {editPassword ?
@@ -344,7 +380,7 @@ export default function ProfileScreen() {
                                                         setConfirmNewPasswordErrorMessage("");
                                                         setConfirmNewPassword(text);
                                                     }}
-                                                    onSubmitEditing={() => console.log("Changing Password!") }
+                                                    onSubmitEditing={onPressChangePassword}
                                                 />
                                             {confirmNewPasswordErrorMessage.length > 0 && <Text style={profileStyles.errorMessage}>{confirmNewPasswordErrorMessage}</Text>}
                                         
@@ -359,7 +395,7 @@ export default function ProfileScreen() {
                                                     title="Submit"
                                                     style={[profileStyles.changePasswordButton, {backgroundColor: colours.green, height: "100%"}]}
                                                     buttonTextStyle={profileStyles.changePasswordButtonText}
-                                                    onPress={() => setEditPassword(false)}
+                                                    onPress={onPressChangePassword}
                                                 />
                                                 
                                             </View>
@@ -395,7 +431,7 @@ export default function ProfileScreen() {
                                     <Text style={profileStyles.subHeading}>Contact Details:</Text>
                                     <View style={profileStyles.credentialOutput}>
                                         <Text style={[profileStyles.smallEditText, {alignSelf: "flex-start", top: 0}]}>Email:</Text>
-                                        <Text style={profileStyles.credentialText}>{username}</Text>
+                                        <Text style={profileStyles.credentialText}>{email}</Text>
                                     </View>
                          
                                     <View style={globalStyles.separator} />

@@ -77,6 +77,26 @@ const AuthProvider = ({ children }) => {
 		setUser(null);
 	};
 
+	/**
+	 * Changes the password of a user. 
+	 * Assumes the email is checked and is a match with the current user's email.
+	 * Assumes that the password entry is validated.
+	 */
+	const changePassword = async (email: string, oldPass: string, newPass: string) => {
+		email = email.toLowerCase();
+		const oldCreds = Realm.Credentials.emailPassword(
+			email,
+			oldPass
+		);
+
+		await app.logIn(oldCreds);
+		
+		await app.emailPasswordAuth.callResetPasswordFunction({
+			email: email,
+			password: newPass
+		}, []);
+	};
+
 	/*
 	 * Insert custom data for the specified user
 	 */
@@ -137,6 +157,7 @@ const AuthProvider = ({ children }) => {
 				signIn,
 				signOut,
 				user,
+				changePassword,
 				insertCustomUserData,
 				updateCustomUserData,
 			}}

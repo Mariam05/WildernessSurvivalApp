@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Platform, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import colours from "../colours";
 import AppButton from "./AppButton";
 
@@ -12,7 +12,7 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 			onPress={() => {
 				Alert.alert("Log Out?", null, [
 					{
-						text: "Yes, Log Out",
+						text: "Log Out",
 						style: "destructive",
 						onPress: () => {
 							navigation.popToTop();
