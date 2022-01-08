@@ -7,6 +7,7 @@ import {
 	StyleSheet,
 	Text,
 	TouchableOpacity,
+	LayoutAnimation,
 	View
 } from "react-native";
 import { useState } from "react";
@@ -129,7 +130,6 @@ export default function VitalItem({ name, periodicity, type, description, data, 
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setExpanded(!expanded);
     };
-
     return (
         <View>
             <TouchableOpacity
@@ -137,7 +137,7 @@ export default function VitalItem({ name, periodicity, type, description, data, 
                     style={vitalItemStyles.vitalsHeader}>
                     <View margin={0} />
 
-                {description && (<AppButton
+                {description!=undefined && (<AppButton
                         title="i"
                         style={vitalItemStyles.infoButton}
                         buttonTextStyle={vitalItemStyles.infoButtonText}

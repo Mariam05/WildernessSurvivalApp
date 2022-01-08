@@ -41,10 +41,11 @@ export default function App() {
                     >
                         {(props) => {
                             const { route } = props;
+                            const { patientId } = route.params;
                             return (
-                                <PatientsProvider>
+                                <VitalsProvider patientId={patientId}>
                                     <PatientScreen route={route} />
-                                </PatientsProvider>
+                                </VitalsProvider>
                             );
                         }}
                     </Stack.Screen>

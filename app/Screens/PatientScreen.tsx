@@ -4,8 +4,9 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
+import { ObjectId } from "bson";
 import AppLoading from "expo-app-loading";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import {
 	Image,
 	ImageBackground,
@@ -28,7 +29,7 @@ import { useNavigation } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
 import { useAuth } from "../../providers/AuthProvider";
-import { usePatients } from "../../providers/PatientProvider";
+import { useVitals } from "../../providers/VitalProvider";
 
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
@@ -50,14 +51,12 @@ export default function PatientScreen({ route }) {
             UIManager.setLayoutAnimationEnabledExperimental(true);
         }
     }
-
-    const { patientId, name, vitalsJSON } = route.params;
-    const vitals = JSON.parse(vitalsJSON);
-
 	const { user, signOut } = useAuth();
-
 	const navigation = useNavigation();
-	const { createVital } = usePatients();
+	const { vitals, createVital} = useVitals();
+
+    const { patientId, patientName } = route.params;
+    const patient = getPatient(patientId);
 
     const [vitalName, setVitalName] = useState("");
     const [vitalPeriodicity, setVitalPeriodicity] = useState("");
@@ -105,7 +104,7 @@ export default function PatientScreen({ route }) {
                             </TouchableOpacity>
 
                             <View style={PatientScreenStyles.profileView}>
-                                <Text style={PatientScreenStyles.patientName}>{name}</Text>
+                                <Text style={PatientScreenStyles.patientName}>{patientName}</Text>
                             </View>
 
                             <AppButton
@@ -131,6 +130,7 @@ export default function PatientScreen({ route }) {
                                     type={item.type}
                                     categories={item.categories}
                                     data={item.data}
+                                    description={item.description}
                                     timeElapsed={item.timeElapsed}
                                     onPressInfo={() => console.log(item.title + " info pressed")}
                                     onPressAdd={() => console.log(item.title + " add new reading")}
@@ -183,7 +183,7 @@ export default function PatientScreen({ route }) {
                                                 placeholder="Periodicity (minutes)"
                                                 autoCorrect={false}
                                                 keyboardType="numeric"
-                                                value={vitalPeriodicity}
+                                                value={vitalPeriodicity.toString()}
                                                 onChangeText={setVitalPeriodicity}
                                             />
                                             <View style={{marginVertical: "3%"}} />
@@ -263,7 +263,7 @@ export default function PatientScreen({ route }) {
                                                 buttonTextStyle={modalStyles.modalButtonText}
                                                 onPress={() => {
                                                     createVital(
-                                                        patientId,
+                                                        new ObjectId(patientId),
                                                         vitalName,
                                                         parseInt(vitalPeriodicity),
                                                         vitalType,

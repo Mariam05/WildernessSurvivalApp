@@ -48,7 +48,7 @@ export default function LandingScreen() {
 	const [PatientSex, setPatientSex] = useState("");
 	const [PatientImg, setPatientImg] = useState(0);
 
-	const { patients, createPatient, deletePatient, closeRealm } = usePatients();
+	const { patients, createPatient, deletePatient, closeRealm, setPatient } = usePatients();
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
@@ -57,8 +57,7 @@ export default function LandingScreen() {
     const onPressPatient = (patient) => {
         navigation.navigate("Patient", {
               patientId: patient._id.toString(),
-              name: patient.name,
-              vitalsJSON: JSON.stringify(patient.vitals), //serializable
+              patientName: patient.name,
         });
     };
 
