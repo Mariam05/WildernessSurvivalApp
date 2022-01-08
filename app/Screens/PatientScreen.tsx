@@ -56,7 +56,6 @@ export default function PatientScreen({ route }) {
 	const { vitals, createVital} = useVitals();
 
     const { patientId, patientName } = route.params;
-    const patient = getPatient(patientId);
 
     const [vitalName, setVitalName] = useState("");
     const [vitalPeriodicity, setVitalPeriodicity] = useState("");
@@ -96,7 +95,7 @@ export default function PatientScreen({ route }) {
                     >
                         {/* Code for patient level header */}
                         <View style={PatientScreenStyles.headerPatient}>
-                            <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => navigation.goBack()}>
+                            <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => navigation.navigate("Landing")}>
                                 <Image
                                     style={PatientScreenStyles.backButtonImage}
                                     source={require("../assets/images/back.png")}

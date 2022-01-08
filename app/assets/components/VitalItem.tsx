@@ -13,6 +13,14 @@ import {
 import { useState } from "react";
 
 const Chart = (data) => {
+
+    const mappedData = data.map(d => {
+        return {
+            timestamp: d.timestamp,
+            value: d.value,
+        }
+    })
+
 	return (
 		<VictoryChart
 				theme={customTheme}
@@ -26,12 +34,13 @@ const Chart = (data) => {
 					data: { stroke: "#c43a31"},
 					parent: { border: "1px solid #ccc", fill: "#000000"}
 				}}
-				x={(d) => new Date(d.timestamp*1000)}
+				x={(d) => new Date(parseInt(d.timestamp)*1000)}
 				y="value"
-				data={data}
+				data={mappedData}
 			/>
 		</VictoryChart>)
 }
+
 
 
 
@@ -92,7 +101,7 @@ const Row = (entry) => {
 
 
 const Table = (data) => {
-	const hasImage = data && data[0] && data[0].image
+	const hasImage = data && data[0] && data[0].url!=null
 
 	return (
 		  <View style={vitalItemStyles.table}>

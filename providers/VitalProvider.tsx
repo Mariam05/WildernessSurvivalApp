@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Vital } from "../schemas";
+import { Patient, Vital, Reading } from "../schemas";
 import { useAuth } from "./AuthProvider";
+import { ObjectId } from "bson";
 
 const VitalsContext = React.createContext(null);
 
@@ -21,7 +22,7 @@ const VitalsProvider = ({ children, patientId }) => {
 		}
 
 		const config: Realm.Configuration = {
-			schema: [Patient.schema, Vital.schema],
+			schema: [Patient.schema, Vital.schema, Reading.schema],
 			sync: {
 				user: user,
                 partitionValue: `${user.id}`,
@@ -38,9 +39,10 @@ const VitalsProvider = ({ children, patientId }) => {
                     realm.deleteAll();
                     console.log("deleting all vitals");
                 });*/
-                const syncVitals = realm.objects("Patient");
-                const patientDoc = realm.objectForPrimaryKey("Patient", patientId);
-                let sortedVitals = patientDoc.vitals.sortedVitals("name");
+
+                const patientDoc = realm.objectForPrimaryKey("Patient", new ObjectId(patientId));
+                const syncVitals = patientDoc.vitals;
+                let sortedVitals = syncVitals.sorted("name");
                 setVitals([...sortedVitals]);
 
                 // we observe changes on the Vitals, in case Sync informs us of changes
@@ -62,52 +64,49 @@ const VitalsProvider = ({ children, patientId }) => {
 		};
 	}, [user]);
 
-    const selectPatient = (patient) => {
-        setPatient(patient);
-     };
 
 	 const createVital = (patientId: objectId, name: string, periodicity: number, type: string, description: string, categories: list) => {
-        		const realm = realmRef.current;
-        		periodicity = periodicity && periodicity >= 0 ? periodicity : 60;
-        		name =
-        			name && name.length > 1
-        				? name
-        					.toLowerCase()
-        					.split(" ")
-        					.map((word) =>
-        						word
-        							? word.replace(
-        								word[0],
-        								word[0].toUpperCase()
-        							)
-        							: null
-        					)
-        					.join(" ")
-        				: "New Vital";
-        		type = type ? type : "Numerical";
-        		description = description ? description : "";
-        		categories = categories ? categories : [];
+        const realm = realmRef.current;
+        periodicity = periodicity && periodicity >= 0 ? periodicity : 60;
+        name =
+            name && name.length > 1
+                ? name
+                    .toLowerCase()
+                    .split(" ")
+                    .map((word) =>
+                        word
+                            ? word.replace(
+                                word[0],
+                                word[0].toUpperCase()
+                            )
+                            : null
+                    )
+                    .join(" ")
+                : "New Vital";
+        type = type ? type : "Numerical";
+        description = description ? description : "";
+        categories = categories ? categories : [];
 
-                const vital = new Vital({
-                        periodicity:  60,
-                        name: name || "New Vital",
-                        type: type || "Numerical",
-                        description: description || "",
-                        data: [],
-                        categories: categories || [],
-                        timeElapsed: 0,
-                    })
+        const vital = new Vital({
+                periodicity:  60,
+                name: name || "New Vital",
+                type: type || "Numerical",
+                description: description || "",
+                data: [],
+                categories: categories || [],
+                timeElapsed: 0,
+            })
 
-        		try {
-        		     const patientDoc = realm.objectForPrimaryKey("Patient", patientId);
-        			 realm.write(() => {
-        				patientDoc.vitals.push(vital);
-        			});
-        		} catch (error) {
-        			console.log(error.message)
-        			console.log("Failed to write vital:\n" + name + "\n" + periodicity + "\n" + type + "\n" + description + "\n" + (typeof categories));
-        		}
-        	};
+        try {
+             const patientDoc = realm.objectForPrimaryKey("Patient", patientId);
+             realm.write(() => {
+                patientDoc.vitals.push(vital);
+            });
+        } catch (error) {
+            console.log(error.message)
+            console.log("Failed to write vital:\n" + name + "\n" + periodicity + "\n" + type + "\n" + description + "\n" + (typeof categories));
+        }
+    };
 
     // Define the function for updating a vital
     const updateVital = (vital, reading) => {

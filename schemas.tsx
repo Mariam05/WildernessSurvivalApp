@@ -1,6 +1,28 @@
-import { String, ObjectId, Long, Array, Date } from "bson";
+import { String, Object, ObjectId, Long, Array, Mixed } from "bson";
 import internal from "stream";
 
+class Reading {
+    timestamp: String;
+    value?: Mixed;
+    url?: String;
+
+    constructor({timestamp=Date.now(), value, url}){
+        this.timestamp = timestamp;
+        this.value = value;
+        this.url = url;
+    }
+
+    static schema = {
+        name: "Reading",
+        bsonType: "object",
+        properties: {
+            timestamp: "string",
+            value: "mixed?",
+            url: "string?",
+        },
+        embedded: true,
+    }
+}
 
 class Vital {
 	name: String;
@@ -8,6 +30,7 @@ class Vital {
 	type: String;
 	description?: String;
     timeElapsed?: Long;
+    data: Array;
 
 	constructor({ name, periodicity, type, description, categories, data, timeElapsed }) {
 		this.name = name;
@@ -27,7 +50,8 @@ class Vital {
 			periodicity: "int?",
 			type: "string",
 			description: "string?",
-			timeElapsed: "int",
+			data: { type: "list", objectType: "Reading"},
+			timeElapsed: "int?",
 		},
         embedded: true,
 	};
@@ -68,4 +92,4 @@ class Patient {
 	};
 }
 
-export { Patient, Vital };
+export { Patient, Vital, Reading };

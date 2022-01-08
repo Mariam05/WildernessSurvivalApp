@@ -61,7 +61,9 @@ export default function LandingScreen() {
         });
     };
 
-
+    console.log("landing");
+    console.log(patients);
+    console.log(typeof patients);
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,

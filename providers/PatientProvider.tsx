@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient, Vital} from "../schemas";
+import { Patient, Vital, Reading } from "../schemas";
 import { useAuth } from "./AuthProvider";
 
 const PatientsContext = React.createContext(null);
@@ -21,7 +21,7 @@ const PatientsProvider = (props) => {
 		}
 
 		const config: Realm.Configuration = {
-			schema: [Patient.schema, Vital.schema],
+			schema: [Patient.schema, Vital.schema, Reading.schema],
 			sync: {
 				user: user,
 				partitionValue: `${user.id}`,
@@ -75,19 +75,71 @@ const PatientsProvider = (props) => {
 				: "New Patient";
 		age = age && age.length > 1 ? age : "?";
 		sex = sex && sex.length > 1 ? sex : "?";
-		let patientDoc;
+
+		const temperatureVital = new Vital({
+            periodicity:  60,
+            name: "Heat Check",
+            type: "Numerical",
+            description: "Temp Desc",
+            data: [new Reading({
+                        timestamp: "1640705088",
+                        value: 42,
+                    }),
+                    new Reading({
+                        timestamp: "1640708857",
+                        value: 145,
+                    }),
+                    new Reading({
+                        timestamp: "1640712857",
+                        value: 21,
+                    })],
+            timeElapsed: 10,
+        })
+
+         const generalVital = new Vital({
+             periodicity:  60,
+             name: "General",
+             type: "Special",
+             description: "General notes",
+             data: [new Reading({
+                         timestamp: "1640705088",
+                         value: "Patient has exhibited signs of hypothermia.",
+                     }),
+                     new Reading({
+                         timestamp: "1640708857",
+                         value: "Patient has fainted.",
+                     }),
+                     new Reading({
+                         timestamp: "1640712857",
+                         value:  "Someone get help",
+                     })],
+         })
+
+         const photosVital = new Vital({
+              periodicity:  60,
+              name: "Photos",
+              type: "Special",
+              description: "Photo notes",
+              data: [new Reading({
+                          timestamp: "1640705088",
+                          value: "Patient eyes",
+                          url: "https://georgiaeyephysicians.com/wp-content/uploads/2013/10/Treating-Your-Eye-Condition-with-Specialized-Surgery-300x238.jpg",
+                      })
+                    ],
+          })
+
 		try {
 			realm.write(() => {
 				// Create a new patient in the same partition -- that is, using the same user id.
 				try {
-					patientDoc = realm.create(
+					realm.create(
 						"Patient",
 						new Patient({
 							image: image || 0,
 							name: name || "New Patient",
 							age: age || "?",
 							sex: sex || "Other",
-							vitals: [],
+							vitals: [photosVital, generalVital, temperatureVital],
 							partition: user.id,
 						})
 					);
@@ -102,7 +154,7 @@ const PatientsProvider = (props) => {
 		}
 
 		//Add default vitals
-		createVital(patientDoc._id, "Temperature", 60, "Numerical", "Desc for temperature", []);
+		//createVital(patientDoc._id, "Temperature", 60, "Numerical", "Desc for temperature", []);
 
 	};
 

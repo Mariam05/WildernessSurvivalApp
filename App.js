@@ -8,6 +8,7 @@ import PatientScreen from "./app/Screens/PatientScreen";
 
 import { AuthProvider } from "./providers/AuthProvider";
 import { PatientsProvider } from "./providers/PatientProvider";
+import { VitalsProvider } from "./providers/VitalProvider";
 
 const Stack = createNativeStackNavigator();
 
