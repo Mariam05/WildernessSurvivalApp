@@ -3,22 +3,18 @@ import internal from "stream";
 
 
 class Vital {
-    _partition: String;
-	_id?: ObjectId;
 	name: String;
 	periodicity?: Long;
 	type: String;
 	description?: String;
-    categories?: Array;
     timeElapsed?: Long;
 
-	constructor({ name, periodicity, type, description, partition, categories, data, timeElapsed, id = new ObjectId() }) {
-	    this._partition = partition;
-		this._id = id;
+	constructor({ name, periodicity, type, description, categories, data, timeElapsed }) {
 		this.name = name;
 		this.periodicity = periodicity;
 		this.type = type;
 		this.description = description;
+		this.data = data;
 		this.categories = categories;
 		this.timeElapsed = timeElapsed;
 	}
@@ -27,17 +23,13 @@ class Vital {
 		name: "Vital",
 		bsonType: "object",
 		properties: {
-			_id: "objectId?",
-			_partition: "string",
 			name: "string",
 			periodicity: "int?",
 			type: "string",
 			description: "string?",
-			categories: {type: "list",objectType: "string"},
 			timeElapsed: "int",
 		},
         embedded: true,
-		required: ["_partition"]
 	};
 }
 
@@ -48,7 +40,7 @@ class Patient {
 	name?: String;
 	age?: String;
 	sex?: String;
-    vitals: Array;
+	vitals: Array;
 
 	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
 		this._partition = partition;
@@ -69,9 +61,8 @@ class Patient {
 			name: "string?",
 			age: "string?",
 			sex: "string?",
-			vitals: { type: "list", objectType: "Vital"},
+			vitals: { type: "list", objectType: "Vital"}
 		},
-		schema_version: "2",
 		primaryKey: "_id",
 		required: ["_partition"]
 	};

@@ -28,7 +28,7 @@ import { useNavigation } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
 import { useAuth } from "../../providers/AuthProvider";
-import { useVitals } from "../../providers/VitalProvider";
+import { usePatients } from "../../providers/PatientProvider";
 
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
@@ -57,10 +57,10 @@ export default function PatientScreen({ route }) {
 	const { user, signOut } = useAuth();
 
 	const navigation = useNavigation();
-	const { createVital, updateVital } = useVitals();
+	const { createVital } = usePatients();
 
     const [vitalName, setVitalName] = useState("");
-    const [vitalPeriodicity, setVitalPeriodicity] = useState(null);
+    const [vitalPeriodicity, setVitalPeriodicity] = useState("");
     const [vitalType, setVitalType] = useState("");
     const [vitalCategories, setVitalCategories] = useState([]);
     const [newVitalCategory, setNewVitalCategory] = useState("");
@@ -263,8 +263,9 @@ export default function PatientScreen({ route }) {
                                                 buttonTextStyle={modalStyles.modalButtonText}
                                                 onPress={() => {
                                                     createVital(
+                                                        patientId,
                                                         vitalName,
-                                                        vitalPeriodicity,
+                                                        parseInt(vitalPeriodicity),
                                                         vitalType,
                                                         "",
                                                         vitalCategories

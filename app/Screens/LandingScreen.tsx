@@ -5,7 +5,7 @@ import {
 	useFonts,
 } from "@expo-google-fonts/oxygen";
 import AppLoading from "expo-app-loading";
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import {
     Alert,
 	Image,
@@ -24,7 +24,7 @@ import SegmentedControl from "@react-native-segmented-control/segmented-control"
 
 import { useAuth } from "../../providers/AuthProvider";
 import { usePatients } from "../../providers/PatientProvider";
-import { useVitals } from "../../providers/VitalProvider";
+
 
 import AppButton from "../assets/components/AppButton";
 import PatientItem, {patientItemStyles} from "../assets/components/PatientItem";
@@ -52,7 +52,7 @@ export default function LandingScreen() {
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
-
+    const lastNameRef = createRef<TextInput>();
 
     const onPressPatient = (patient) => {
         navigation.navigate("Patient", {
@@ -61,6 +61,7 @@ export default function LandingScreen() {
               vitalsJSON: JSON.stringify(patient.vitals), //serializable
         });
     };
+
 
 
 	let [fontsLoaded] = useFonts({
@@ -166,11 +167,11 @@ export default function LandingScreen() {
 										autoCorrect={false}
 										value={PatientFN}
 										onChangeText={setPatientFN}
-										onSubmitEditing={() => { this.secondTextInput.focus(); }}
+										onSubmitEditing={() => { this.lastNameRef.focus(); }}
 									/>
 									<View style={{marginVertical: "3%"}} />
 									<TextInput
-										ref={(input) => { this.secondTextInput = input; }}
+										ref={lastNameRef}
 										style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
 										clearButtonMode="while-editing"
 										returnKeyType="next"
@@ -192,6 +193,7 @@ export default function LandingScreen() {
 									<SegmentedControl
 										values={sexes}
 										onValueChange={setPatientSex}
+
 									/>
 								</PatientModal.Body>
 								<PatientModal.Footer>

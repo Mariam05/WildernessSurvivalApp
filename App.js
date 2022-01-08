@@ -8,7 +8,6 @@ import PatientScreen from "./app/Screens/PatientScreen";
 
 import { AuthProvider } from "./providers/AuthProvider";
 import { PatientsProvider } from "./providers/PatientProvider";
-import { VitalsProvider } from "./providers/VitalProvider";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,13 +40,11 @@ export default function App() {
                         options={{ headerShown: false, gestureEnabled: false }}
                     >
                         {(props) => {
-
                             const { route } = props;
-                            const { patientId } = route.params;
                             return (
-                                <VitalsProvider partition={patientId}>
+                                <PatientsProvider>
                                     <PatientScreen route={route} />
-                                </VitalsProvider>
+                                </PatientsProvider>
                             );
                         }}
                     </Stack.Screen>

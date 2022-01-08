@@ -55,6 +55,48 @@ const PatientsProvider = (props) => {
 		};
 	}, [user]);
 
+    const createVital = (patientId: objectId, name: string, periodicity: number, type: string, description: string, categories: list) => {
+    		const realm = realmRef.current;
+    		periodicity = periodicity && periodicity >= 0 ? periodicity : 60;
+    		name =
+    			name && name.length > 1
+    				? name
+    					.toLowerCase()
+    					.split(" ")
+    					.map((word) =>
+    						word
+    							? word.replace(
+    								word[0],
+    								word[0].toUpperCase()
+    							)
+    							: null
+    					)
+    					.join(" ")
+    				: "New Vital";
+    		type = type ? type : "Numerical";
+    		description = description ? description : "";
+    		categories = categories ? categories : [];
+
+            const vital = new Vital({
+                    periodicity:  60,
+                    name: name || "New Vital",
+                    type: type || "Numerical",
+                    description: description || "",
+                    data: [],
+                    categories: categories || [],
+                    timeElapsed: 0,
+                })
+
+    		try {
+    		     const patient = realm.objectForPrimaryKey("Patient", patientId);
+    			 realm.write(() => {
+    				patient.vitals.push(vital);
+    			});
+    		} catch (error) {
+    			console.log(error.message)
+    			console.log("Failed to write vital:\n" + name + "\n" + periodicity + "\n" + type + "\n" + description + "\n" + (typeof categories));
+    		}
+    	};
 
 
 	const createPatient = (image: number, name: string, age: string, sex: string) => {
@@ -77,11 +119,12 @@ const PatientsProvider = (props) => {
 				: "New Patient";
 		age = age && age.length > 1 ? age : "?";
 		sex = sex && sex.length > 1 ? sex : "?";
+		let patient;
 		try {
 			realm.write(() => {
 				// Create a new patient in the same partition -- that is, using the same user id.
 				try {
-					realm.create(
+					patient = realm.create(
 						"Patient",
 						new Patient({
 							image: image || 0,
@@ -101,7 +144,11 @@ const PatientsProvider = (props) => {
 			console.log(error.message)
 			console.log("Failed to write:\n" + name + "\n" + age + "\n" + sex + "\n" + image);
 		}
+		createVital(patient._id, "Temperature", 60, "Numerical", "", []);
+
+
 	};
+
 
     // Define the function for updating a patient
     const updatePatient = (patient, vitals) => {

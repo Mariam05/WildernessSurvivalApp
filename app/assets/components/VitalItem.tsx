@@ -117,9 +117,9 @@ const Data = ({ type, data }) => {
 const TimeElapsed = ({ timeElapsed, periodicity }) => {
 	const isOverdue = timeElapsed > periodicity
 
-    return (<Text style={isOverdue
-            ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}
-            >{timeElapsed} min ago</Text>)
+    return (<Text style={isOverdue ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}>
+                {timeElapsed.toString()} min ago
+            </Text>)
 }
 
 
@@ -146,7 +146,9 @@ export default function VitalItem({ name, periodicity, type, description, data, 
 
                 <View>
                     <Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
-                    {timeElapsed && (<TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />)}
+                    {timeElapsed!=undefined && (
+                        <TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />
+                        )}
                 </View>
 
                 {onPressAdd && (<AppButton
