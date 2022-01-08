@@ -319,6 +319,7 @@ export default function ProfileScreen() {
                                         autoCorrect={false}
                                         autoCompleteType="email"
                                         onSubmitEditing={() => Keyboard.dismiss()}
+                                        editable={false}
                                     />
                                     { emailErrorMessage.length > 0 && <Text style={profileStyles.errorMessage}>{emailErrorMessage}</Text>}
 
