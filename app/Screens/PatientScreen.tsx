@@ -51,7 +51,8 @@ export default function PatientScreen({ route }) {
         }
     }
 
-    const { id, name, vitals } = route.params;
+    const { patientId, name, vitalsJSON } = route.params;
+    const vitals = JSON.parse(vitalsJSON);
 
 	const { user, signOut } = useAuth();
 
@@ -62,19 +63,21 @@ export default function PatientScreen({ route }) {
     const [vitalPeriodicity, setVitalPeriodicity] = useState(null);
     const [vitalType, setVitalType] = useState("");
     const [vitalCategories, setVitalCategories] = useState([]);
+    const [newVitalCategory, setNewVitalCategory] = useState("");
 
     const updateVitalCategory = (category, index) => {
         setVitalCategories(arr => {arr[index] = category; return arr});
+        setNewVitalCategory("");
     }
     const deleteVitalCategory = (index) => {
         setVitalCategories(arr => {arr.splice(index, 1); return arr});
+        setVitalCategories(arr => [...arr]); //required to re render
+        setNewVitalCategory("");
     }
     const appendVitalCategory = (category) => {
         setVitalCategories(arr => [...arr, category]);
+        setNewVitalCategory("");
     }
-
-    const [newVitalCategory, setNewVitalCategory] = useState("");
-
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
@@ -94,9 +97,17 @@ export default function PatientScreen({ route }) {
                     >
                         {/* Code for patient level header */}
                         <View style={PatientScreenStyles.headerPatient}>
+                            <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => navigation.goBack()}>
+                                <Image
+                                    style={PatientScreenStyles.backButtonImage}
+                                    source={require("../assets/images/back.png")}
+                                />
+                            </TouchableOpacity>
+
                             <View style={PatientScreenStyles.profileView}>
                                 <Text style={PatientScreenStyles.patientName}>{name}</Text>
                             </View>
+
                             <AppButton
                                 title="PDF"
                                 style={PatientScreenStyles.pdfButton}
@@ -148,7 +159,6 @@ export default function PatientScreen({ route }) {
                                                 periodicity={vitalPeriodicity}
                                                 type={vitalType}
                                                 categories={vitalCategories}
-
                                             />
 
                                             <View style={{marginVertical: "3%"}} />
@@ -183,6 +193,56 @@ export default function PatientScreen({ route }) {
                                                 onValueChange={setVitalType}
                                             />
 
+                                           <View style={{marginVertical: "1%"}} />
+                                           {vitalType == "Categorical" && (
+                                                <View>
+                                                    {vitalCategories.map((category, index) => (
+                                                        <View>
+                                                            <View>
+                                                                <TextInput
+                                                                    style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+                                                                    clearButtonMode="while-editing"
+                                                                    returnKeyType="next"
+                                                                    textContentType="username"
+                                                                    placeholder="category"
+                                                                    autoCapitalize="words"
+                                                                    autoCorrect={false}
+                                                                    value={category}
+                                                                    onChangeText={(val) => updateVitalCategory(val, index)}
+                                                                />
+                                                                <AppButton
+                                                                    title="x"
+                                                                    style={PatientScreenStyles.vitalCategoryButton}
+                                                                    buttonTextStyle={PatientScreenStyles.vitalCategoryDeleteButtonText}
+                                                                    onPress={() => deleteVitalCategory(index)}
+                                                                />
+                                                            </View>
+                                                            <View style={{marginVertical: "1%"}} />
+                                                        </View>
+
+                                                   ))}
+                                                    <View>
+                                                       <TextInput
+                                                           style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+                                                           clearButtonMode="while-editing"
+                                                           returnKeyType="next"
+                                                           textContentType="username"
+                                                           placeholder={"Category " + (vitalCategories.length+1)}
+                                                           autoCapitalize="words"
+                                                           autoCorrect={false}
+                                                           value={newVitalCategory}
+                                                           onChangeText={setNewVitalCategory}
+                                                       />
+                                                       <AppButton
+                                                           title="+"
+                                                           style={PatientScreenStyles.vitalCategoryButton}
+                                                           buttonTextStyle={PatientScreenStyles.vitalCategoryAddButtonText}
+                                                           onPress={() => appendVitalCategory(newVitalCategory)}
+                                                       />
+                                                   </View>
+                                                </View>
+                                            )}
+
                                         </VitalModal.Body>
                                         <VitalModal.Footer>
                                             <AppButton
@@ -192,7 +252,7 @@ export default function PatientScreen({ route }) {
                                                 onPress={() => {
                                                     setVitalName("");
                                                     setVitalPeriodicity(0);
-                                                    setVitalType(null);
+                                                    setVitalType("");
                                                     setVitalCategories([]);
                                                     handleModal();
                                                 }}
@@ -233,23 +293,37 @@ export default function PatientScreen({ route }) {
 const PatientScreenStyles = StyleSheet.create({
         headerPatient: {
             backgroundColor: colours.orange,
-            height: Platform.OS == "ios" ? "10%" : "7%",
-            width: "100%",
-            flex: 0.1,
+            height: Platform.OS == "ios" ? "10%" : "8%",
+            padding: 0,
+            display: "flex",
             flexDirection: "row",
+            width: "100%",
             alignItems: "center",
+            alignSelf: "center",
             justifyContent: "center",
         },
-        patientName: {
-            margin: -10,
+        backButton: {
+            left: 10,
+            position: "absolute",
+            justifyContent: "center",
             alignSelf: "center",
+            padding: 0,
+            margin: 0,
+            width: 40,
+            height: "100%",
+        },
+        backButtonImage: {
+            width: "100%",
+            height: "50%",
+        },
+        patientName: {
+            alignItems: "center",
             fontSize: 25,
             fontWeight: "700",
         },
         pdfButton: {
             height: "60%",
             top: "20%",
-            flex: 1,
             backgroundColor: colours.lightBlueBackground,
             borderRadius: 15,
             color: colours.primary,
@@ -275,21 +349,38 @@ const PatientScreenStyles = StyleSheet.create({
             width: "100%",
             backgroundColor: colours.background,
         },
+
         vitalCategoryButton: {
-           backgroundColor: colours.purple,
-           height: "70%",
-           color: colours.primary,
+           backgroundColor: colours.redBackground,
+
+
+           height: "50%",
+           aspectRatio: 1,
+
            position: "absolute",
            right: 10,
-           alignSelf: "center",
-           borderColor: colours.primary,
-           borderWidth: 1,
-           padding: 6,
+           top: 10,
+
+           borderRadius: 100,
+           flexDirection: "column",
+           alignItems: "center",
+           justifyContent: "center",
+           elevation: 7,
+            shadowColor: colours.primary,
+            shadowOpacity: 0.9,
+            shadowOffset: { width: 0, height: 3 },
+            shadowRadius: 4,
+
         },
-        vitalCategoryButtonText: {
-            fontSize: 30,
+         vitalCategoryDeleteButtonText: {
+            fontSize: 24,
             fontWeight: "700",
-            top: "-5%"
+            top: -7,
+        },
+        vitalCategoryAddButtonText: {
+            fontSize: 25,
+            fontWeight: "700",
+            top: -7,
         },
 });
 

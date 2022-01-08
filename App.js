@@ -43,9 +43,9 @@ export default function App() {
                         {(props) => {
 
                             const { route } = props;
-                            const { id, name, vitals } = route.params;
+                            const { patientId } = route.params;
                             return (
-                                <VitalsProvider partition={id}>
+                                <VitalsProvider partition={patientId}>
                                     <PatientScreen route={route} />
                                 </VitalsProvider>
                             );

@@ -14,8 +14,6 @@ const VitalsProvider = ({ children, partition }) => {
 	// state would.
 	const realmRef = useRef(null);
 
-
-
 	useEffect(() => {
 		if (user == null) {
 			console.error("Null user? Needs to log in!");
@@ -30,16 +28,35 @@ const VitalsProvider = ({ children, partition }) => {
 			},
 		};
 
-		// open a realm for this particular project and get all Vitals
+		// open a realm for this particular patientId (partition) and get all Vitals
         try {
             Realm.open(config).then((realm) => {
                 realmRef.current = realm;
-                realm.deleteRealm();
-                /*
-                realm.write(() => {
-                    realm.deleteAll();
-                    console.log("deleting all vitals");
-                });*/
+                try {
+                    realm.write(() => {
+                        try {
+                            realm.create(
+                                "Vital",
+                                new Vital({
+                                    partition: partition,
+                                    periodicity:  60,
+                                    name: "Temperature",
+                                    type: "Numerical",
+                                    description: "Measures temperature",
+                                    data: [],
+                                    timeElapsed: 0,
+                                })
+                            );
+                        } catch (error) {
+                            console.log(error.message)
+                            console.log("Failed to create temperature vital")
+                        }
+                    });
+                } catch (error) {
+                    console.log(error.message)
+                    console.log("Failed to write temperature vital");
+                }
+
                 const syncVitals = realm.objects("Vital");
                 let sortedVitals = syncVitals.sorted("name");
                 setVitals([...sortedVitals]);
@@ -56,16 +73,12 @@ const VitalsProvider = ({ children, partition }) => {
         	console.log("Error opening realm:");
         }
 
-
 		return () => {
 			// cleanup function
 			closeRealm();
 		};
 	}, [user]);
 
-    const selectPatient = (patient) => {
-        setPatient(patient);
-     };
 
 	const createVital = (name: string, periodicity: number, type: string, description: string, categories: list) => {
 		const realm = realmRef.current;
@@ -91,7 +104,6 @@ const VitalsProvider = ({ children, partition }) => {
 
 		try {
 			realm.write(() => {
-				// Create a new vital in the same partition -- that is, using the same user id.
 				try {
 					realm.create(
 						"Vital",
@@ -108,7 +120,7 @@ const VitalsProvider = ({ children, partition }) => {
 					);
 				} catch (error) {
 					console.log(error.message)
-					console.log("Failed to create record")
+					console.log("Failed to create vital")
 				}
 			});
 		} catch (error) {

@@ -55,17 +55,10 @@ export default function LandingScreen() {
 
 
     const onPressPatient = (patient) => {
-        console.log("here");
-
-        const patientName = patient.name;
-        const patientId = patient._id;
-        const patientVitals = patient.vitals;
-
-        //console.log(patient)
         navigation.navigate("Patient", {
-              id: patientId,
-              name: patientName,
-              vitals: patientVitals,
+              patientId: patient._id.toString(),
+              name: patient.name,
+              vitalsJSON: JSON.stringify(patient.vitals), //serializable
         });
     };
 

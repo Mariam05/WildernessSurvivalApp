@@ -21,7 +21,6 @@ const PatientsProvider = (props) => {
 			return;
 		}
 
-
 		const config: Realm.Configuration = {
 			schema: [Patient.schema, Vital.schema],
 			sync: {
@@ -47,7 +46,6 @@ const PatientsProvider = (props) => {
 			sortedPatients.addListener(() => {
 				console.log("Got new patients!");
 				setPatients([...sortedPatients]);
-				console.log(patients);
 			});
 		});
 
