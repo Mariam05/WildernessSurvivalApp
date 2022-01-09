@@ -37,10 +37,11 @@ import { Patient } from "../../schemas";
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
 
-export default function LandingScreen() {
+export default function LandingScreen({ navigation }) {
+	console.log("landing screen");
+	
 	const { user, signOut } = useAuth();
-	const navigation = useNavigation();
-
+	signOut();
 	const [PatientFN, setPatientFN] = useState("");
 	const [PatientLN, setPatientLN] = useState("");
 	const [PatientAge, setPatientAge] = useState("");
@@ -53,6 +54,14 @@ export default function LandingScreen() {
 
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
 	const lastNameRef = createRef<TextInput>();
+
+
+	const onPressPatient = (patient) => {
+		navigation.navigate("Patient", {
+			patientId: patient._id.toString(),
+			patientName: patient.name,
+		});
+	};
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -95,9 +104,7 @@ export default function LandingScreen() {
 								style={null}
 								image={images[patient.image]}
 								key={index}
-								onPress={() =>
-									console.log(patient.name + " Pressed!")
-								}
+								onPress={onPressPatient}
 							/> : null
 						))
 					}

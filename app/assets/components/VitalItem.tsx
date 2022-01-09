@@ -134,7 +134,7 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 }
 
 
-function VitalItem({ name, periodicity, type, description, data, categories, timeElapsed, onPressInfo, onPressAdd }) {
+function VitalItem({ name, periodicity, type }) {
     const [expanded, setExpanded] = useState(false);
     const onPress = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -145,7 +145,6 @@ function VitalItem({ name, periodicity, type, description, data, categories, tim
             <TouchableOpacity
                 onPress={onPress}
                 style={vitalItemStyles.vitalsHeader}>
-                <View margin={0} />
 
                 {description != undefined && (<AppButton
                     title="i"

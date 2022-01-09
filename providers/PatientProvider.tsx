@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient } from "../schemas";
+import { Patient, Vital, Reading} from "../schemas";
 import { useAuth } from "./AuthProvider";
+import defaultVitals from "../app/assets/defaultVitals";
 
 const PatientsContext = React.createContext(null);
 
@@ -21,7 +22,7 @@ const PatientsProvider = (props) => {
 		}
 
 		const config: Realm.Configuration = {
-			schema: [Patient.schema],
+			schema: [Patient.schema, Vital.schema, Reading.schema],
 			sync: {
 				user: user,
 				partitionValue: `${user.id}`,
@@ -122,6 +123,7 @@ const PatientsProvider = (props) => {
 							age: age || "?",
 							sex: sex || "Other",
 							partition: user.id,
+							vitals: [defaultVitals],
 						})
 					);
 				} catch (error) {

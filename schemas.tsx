@@ -1,21 +1,37 @@
 import { ObjectId } from "bson";
 
+interface VitalProps{
+	name: string;
+	periodicity?: number;
+	type: string;
+	description?: string;
+	timeElapsed?: number;
+	data: Array<Reading>;
+	categories?: Array<string>;
+}
+
+interface ReadingProps {
+	timestamp: string;
+	value: any;
+	url?: string;
+}
+
 class Reading {
 	timestamp: string;
-	value?: any;
+	value: any;
 	url?: string;
 
-	constructor({ timestamp = Date.now().toString(), value, url }) {
-		this.timestamp = timestamp;
-		this.value = value;
-		this.url = url;
+	constructor(reading: ReadingProps) {
+		this.timestamp = reading.timestamp;
+		this.value = reading.value;
+		this.url = reading.url ?? "";
 	}
 
 	static schema = {
 		name: "Reading",
 		properties: {
 			timestamp: "string",
-			value: "mixed?",
+			value: "mixed",
 			url: "string?",
 		},
 		embedded: true,
@@ -29,16 +45,16 @@ class Vital {
 	description?: string;
 	timeElapsed?: number;
 	data: Array<Reading>;
-	categories: Array<String>;
+	categories?: Array<string>;
 
-	constructor({ name, periodicity, type, description, categories, data, timeElapsed }) {
-		this.name = name;
-		this.periodicity = periodicity;
-		this.type = type;
-		this.description = description;
-		this.data = data;
-		this.categories = categories;
-		this.timeElapsed = timeElapsed;
+	constructor(vital : VitalProps) {
+		this.name = vital.name;
+		this.periodicity = vital.periodicity;
+		this.type = vital.type;
+		this.description = vital.description;
+		this.data = vital.data;
+		this.categories = vital.categories;
+		this.timeElapsed = vital.timeElapsed;
 	}
 
 	static schema = {
@@ -49,6 +65,7 @@ class Vital {
 			type: "string",
 			description: "string?",
 			data: { type: "list", objectType: "Reading" },
+			categories: "string[]",
 			timeElapsed: "int?",
 		},
 		embedded: true,

@@ -52,6 +52,8 @@ const AuthProvider = ({ children }) => {
 			email.toLowerCase(),
 			password
 		);
+		
+
 		const newUser = await app.logIn(creds);
 		setUser(newUser);
 		return newUser;

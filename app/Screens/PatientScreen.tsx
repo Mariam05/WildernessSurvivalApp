@@ -44,7 +44,7 @@ import colours from "../assets/colours";
 
 const vitalTypes = ["Numerical", "Categorical"];
 
-export default function PatientScreen({ route }) {
+export default function PatientScreen({ navigation, route }) {
     // Enable animation for drop-down graph/table
     if (Platform.OS === 'android') {
         if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -52,13 +52,12 @@ export default function PatientScreen({ route }) {
         }
     }
     const { user, signOut } = useAuth();
-    const navigation = useNavigation();
-    const { vitals, createVital } = useVitals();
+    const { patient, createVital } = useVitals();
 
     const { patientId, patientName } = route.params;
 
     const [vitalName, setVitalName] = useState("");
-    const [vitalPeriodicity, setVitalPeriodicity] = useState("");
+    const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
     const [vitalType, setVitalType] = useState("");
     const [vitalCategories, setVitalCategories] = useState([]);
     const [newVitalCategory, setNewVitalCategory] = useState("");
@@ -102,7 +101,7 @@ export default function PatientScreen({ route }) {
                         />
                     </TouchableOpacity>
 
-                    <View style={PatientScreenStyles.profileView}>
+                    <View >
                         <Text style={PatientScreenStyles.patientName}>{patientName}</Text>
                     </View>
 
@@ -121,13 +120,12 @@ export default function PatientScreen({ route }) {
                         alignSelf: "stretch",
                         paddingBottom: 100,
                     }}
-                    data={vitals}
+                    data={patient.vitals}
                     renderItem={({ item }) => (
                         <VitalItem
                             name={item.name}
                             periodicity={item.periodicity}
                             type={item.type}
-                            categories={item.categories}
                             data={item.data}
                             description={item.description}
                             timeElapsed={item.timeElapsed}
@@ -135,7 +133,7 @@ export default function PatientScreen({ route }) {
                             onPressAdd={() => console.log(item.title + " add new reading")}
                         />
                     )}
-                    keyExtractor={(item, index) => index}
+                    keyExtractor={(item, index) => index.toString()}
                 />
 
                 {/* Code for add new vital button */}
@@ -157,7 +155,11 @@ export default function PatientScreen({ route }) {
                                         name={vitalName}
                                         periodicity={vitalPeriodicity}
                                         type={vitalType}
-                                        categories={vitalCategories}
+                                        description={""}
+                                        data={[]}
+                                        timeElapsed={0}
+                                        onPressAdd={null}
+                                        onPressInfo={null}
                                     />
 
                                     <View style={{ marginVertical: "3%" }} />
@@ -183,7 +185,7 @@ export default function PatientScreen({ route }) {
                                         autoCorrect={false}
                                         keyboardType="numeric"
                                         value={vitalPeriodicity.toString()}
-                                        onChangeText={setVitalPeriodicity}
+                                        onChangeText={(val) => setVitalPeriodicity(parseInt(val))}
                                     />
                                     <View style={{ marginVertical: "3%" }} />
                                     <Text style={modalStyles.modalSubHeadingText}>Type</Text>
@@ -264,7 +266,7 @@ export default function PatientScreen({ route }) {
                                             createVital(
                                                 new ObjectId(patientId),
                                                 vitalName,
-                                                parseInt(vitalPeriodicity),
+                                                vitalPeriodicity,
                                                 vitalType,
                                                 "",
                                                 vitalCategories
@@ -344,12 +346,6 @@ const PatientScreenStyles = StyleSheet.create({
         width: "100%",
         backgroundColor: colours.background,
     },
-    vitalsScrollView: {
-        flex: 1,
-        width: "100%",
-        backgroundColor: colours.background,
-    },
-
     vitalCategoryButton: {
         backgroundColor: colours.redBackground,
 
