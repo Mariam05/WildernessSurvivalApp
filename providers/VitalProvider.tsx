@@ -7,7 +7,7 @@ import { ObjectId } from "bson";
 const VitalsContext = React.createContext(null);
 
 const VitalsProvider = ({ children, patientId }) => {
-    const [vitals, setVitals] = useState([]);
+    const [patient, setPatient] = useState({});
     const { user } = useAuth();
 
     // Use a Ref to store the realm rather than the state because it is not
@@ -41,16 +41,15 @@ const VitalsProvider = ({ children, patientId }) => {
                 });*/
 
                 const patientDoc = realm.objectForPrimaryKey("Patient", new ObjectId(patientId));
-                const syncVitals = patientDoc.vitals;
-                let sortedVitals = syncVitals.sorted("name");
-                setVitals([...sortedVitals]);
+                setPatient(patientDoc);
+                console.log(patientDoc);
 
                 // we observe changes on the Vitals, in case Sync informs us of changes
                 // started in other devices (or the cloud)
-                sortedVitals.addListener(() => {
+                /*sortedVitals.addListener(() => {
                     console.log("Got new vitals!");
                     setVitals([...sortedVitals]);
-                });
+                });*/
             });
         } catch (error) {
             console.log(error.message);
@@ -62,10 +61,10 @@ const VitalsProvider = ({ children, patientId }) => {
             // cleanup function
             closeRealm();
         };
-    }, [user]);
+    }, [user, patientId]);
 
 
-    const createVital = (patientId: objectId, name: string, periodicity: number, type: string, description: string, categories: list) => {
+    const createVital = (patientId: ObjectId, name: string, periodicity: number, type: string, description: string, categories: Array<string>) => {
         const realm = realmRef.current;
         periodicity = periodicity && periodicity >= 0 ? periodicity : 60;
         name =
@@ -128,7 +127,7 @@ const VitalsProvider = ({ children, patientId }) => {
         if (realm) {
             realm.close();
             realmRef.current = null;
-            setVitals([]);
+            setPatient({});
         }
     };
 
@@ -140,7 +139,7 @@ const VitalsProvider = ({ children, patientId }) => {
             value={{
                 createVital,
                 closeRealm,
-                vitals,
+                patient,
             }}
         >
             {children}

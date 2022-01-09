@@ -41,7 +41,7 @@ export default function LandingScreen({ navigation }) {
 	console.log("landing screen");
 	
 	const { user, signOut } = useAuth();
-	signOut();
+
 	const [PatientFN, setPatientFN] = useState("");
 	const [PatientLN, setPatientLN] = useState("");
 	const [PatientAge, setPatientAge] = useState("");

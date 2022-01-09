@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
 import { Patient, Vital, Reading} from "../schemas";
 import { useAuth } from "./AuthProvider";
-import defaultVitals from "../app/assets/defaultVitals";
+//import defaultVitals from "../app/assets/defaultVitals";
 
 const PatientsContext = React.createContext(null);
 
@@ -111,19 +111,81 @@ const PatientsProvider = (props) => {
 				: "New Patient";
 		age = age && age.length > 1 ? age : "?";
 		sex = sex && sex.length > 1 ? sex : "?";
+
+		try {
+
+
+			const temperatureVital = new Vital({
+				periodicity: 60,
+				name: "Heat Check",
+				type: "Numerical",
+				description: "Temp Desc",
+				data: [new Reading({
+					timestamp: "1640705088",
+					value: 42,
+					url: ""
+				}),
+				new Reading({
+					timestamp: "1640708857",
+					value: 145,
+				}),
+				new Reading({
+					timestamp: "1640712857",
+					value: 21,
+				})],
+				categories: [],
+				timeElapsed: 10,
+			})
+
+			const generalVital = new Vital({
+				periodicity: 60,
+				name: "General",
+				type: "Special",
+				description: "General notes",
+				data: [new Reading({
+					timestamp: "1640705088",
+					value: "Patient has exhibited signs of hypothermia.",
+				}),
+				new Reading({
+					timestamp: "1640708857",
+					value: "Patient has fainted.",
+				}),
+				new Reading({
+					timestamp: "1640712857",
+					value: "Someone get help",
+				})],
+			})
+
+			const photosVital = new Vital({
+				periodicity: 60,
+				name: "Photos",
+				type: "Special",
+				description: "Photo notes",
+				data: [new Reading({
+					timestamp: "1640705088",
+					value: "Patient eyes",
+					url: "https://georgiaeyephysicians.com/wp-content/uploads/2013/10/Treating-Your-Eye-Condition-with-Specialized-Surgery-300x238.jpg",
+				})
+				],
+			})
+
+
+		} catch (error) {
+			console.log("failed to make vitals ");
+		}
+		const defaultVitals = [];
+
 		try {
 			realm.write(() => {
 				// Create a new patient in the same partition -- that is, using the same user id.
 				try {
 					realm.create(
-						"Patient",
-						new Patient({
+						"Patient", new Patient({
 							image: image || 0,
 							name: name || "New Patient",
 							age: age || "?",
 							sex: sex || "Other",
 							partition: user.id,
-							vitals: [defaultVitals],
 						})
 					);
 				} catch (error) {

@@ -3,13 +3,13 @@ import customTheme from "../CustomTheme";
 import colours from "../colours";
 import AppButton from "./AppButton";
 import {
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
+	Image,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
     LayoutAnimation,
     Platform,
-    View
+	View
 } from "react-native";
 import { useState } from "react";
 
@@ -22,119 +22,119 @@ const Chart = (data) => {
         }
     })
 
-    return (
-        <VictoryChart
-            theme={customTheme}
-            domainPadding={{ x: 0, y: 20 }}
-            padding={{ top: 0, bottom: 35, left: 50, right: 50 }}
-            margin={{ top: 0 }}
-            height={180}
-        >
-            <VictoryLine
-                style={{
-                    data: { stroke: "#c43a31" },
-                    parent: { border: "1px solid #ccc", fill: "#000000" }
-                }}
-                x={(d) => new Date(parseInt(d.timestamp) * 1000)}
-                y="value"
-                data={mappedData}
-            />
-        </VictoryChart>)
+	return (
+		<VictoryChart
+				theme={customTheme}
+ 				domainPadding={{x:0, y: 20}}
+				padding={{top:0, bottom:35, left:50, right:50}}
+				margin={{top:0}}
+				height={180}
+			>
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31"},
+					parent: { border: "1px solid #ccc", fill: "#000000"}
+				}}
+				x={(d) => new Date(parseInt(d.timestamp)*1000)}
+				y="value"
+				data={mappedData}
+			/>
+		</VictoryChart>)
 }
 
 
 
 
 const RowWithImage = (entry) => {
-    const date = new Date(entry.timestamp * 1000);
-    const dateString = date.getHours() + ":" + date.getMinutes();
+		const date = new Date(entry.timestamp*1000);
+		const dateString = date.getHours() + ":" + date.getMinutes();
 
-    const [expandedImage, setExpandedImage] = useState(false);
-    const [imageUrl, setImageUrl] = useState("");
+		const [expandedImage, setExpandedImage] = useState(false);
+		const [imageUrl, setImageUrl] = useState("");
 
 
-    const onPress = () => {
-        setExpandedImage(!expandedImage);
-        setImageUrl(entry.url)
-    };
+		const onPress = () => {
+			setExpandedImage(!expandedImage);
+			setImageUrl(entry.url)
+		};
 
-    return (
-        <TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
-            <View style={vitalItemStyles.timestampCell}>
-                <Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
-            </View>
-            <View style={vitalItemStyles.valueCell}>
-                <View style={vitalItemStyles.valueCellText}>
-                    <Text>
-                        {entry.value}
-                    </Text>
-                </View>
-                {expandedImage && (
-                    <View style={vitalItemStyles.valueCellImage}>
-                        <Image
-                            source={{ uri: entry.url }}
-                            style={{ alignSelf: "center", width: 100, height: 100, resizeMode: 'stretch' }}>
-                        </Image>
-                    </View>)}
-            </View>
-        </TouchableOpacity>
-    )
+		return (
+			<TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
+					<View style={vitalItemStyles.timestampCell}>
+						<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+					</View>
+					<View style={vitalItemStyles.valueCell}>
+						<View style={vitalItemStyles.valueCellText}>
+							<Text>
+								{entry.value}
+							</Text>
+						</View>
+						{expandedImage && (
+						<View style={vitalItemStyles.valueCellImage}>
+							<Image
+								source={{uri:entry.url}}
+								style={{alignSelf: "center", width: 100, height: 100,resizeMode: 'stretch'}}>
+							</Image>
+						</View>)}
+					</View>
+			</TouchableOpacity>
+		)
 }
 
 
 const Row = (entry) => {
-    const date = new Date(entry.timestamp * 1000);
-    const dateString = date.getHours() + ":" + date.getMinutes();
+	const date = new Date(entry.timestamp*1000);
+	const dateString = date.getHours() + ":" + date.getMinutes();
 
-    return (
-        <View style={vitalItemStyles.row}>
-            <View style={vitalItemStyles.timestampCell}>
-                <Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
-            </View>
-            <View style={vitalItemStyles.valueCell}>
-                <Text style={vitalItemStyles.valueCellText}>
-                    {entry.value}
-                </Text>
-            </View>
-        </View>
-    )
+	return (
+		<View style={vitalItemStyles.row}>
+				<View style={vitalItemStyles.timestampCell}>
+					<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+				</View>
+				<View style={vitalItemStyles.valueCell}>
+					<Text style={vitalItemStyles.valueCellText}>
+						{entry.value}
+					</Text>
+				</View>
+		</View>
+	)
 }
 
 
 const Table = (data) => {
-    const hasImage = data && data[0] && data[0].url != null
+	const hasImage = data && data[0] && data[0].url!=null
 
-    return (
-        <View style={vitalItemStyles.table}>
-            {
-                data.map((entry) => { // This will  a row for each data element.
-                    return hasImage ? RowWithImage(entry) : Row(entry)
-                })
-            }
-        </View>
-    )
+	return (
+		  <View style={vitalItemStyles.table}>
+				{
+						data.map((entry) => { // This will  a row for each data element.
+								return hasImage ? RowWithImage(entry) : Row(entry)
+						})
+				}
+			</View>
+	)
 }
 
 
 
 const Data = ({ type, data }) => {
-    if (type === "Numerical") {
-        return Chart(data);
-    }
-    return Table(data);
+	if (type === "Numerical"){
+		return Chart(data);
+	}
+	return Table(data);
 }
 
 
 const TimeElapsed = ({ timeElapsed, periodicity }) => {
-    const isOverdue = timeElapsed > periodicity
+	const isOverdue = timeElapsed > periodicity
 
     return (<Text style={isOverdue ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}>
-        {timeElapsed.toString()} min ago
-    </Text>)
+                {timeElapsed.toString()} min ago
+            </Text>)
 }
 
 
-function VitalItem({ name, periodicity, type }) {
+ function VitalItem({ name, periodicity, type, description, data, timeElapsed, onPressInfo, onPressAdd }){
     const [expanded, setExpanded] = useState(false);
     const onPress = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -143,117 +143,119 @@ function VitalItem({ name, periodicity, type }) {
     return (
         <View>
             <TouchableOpacity
-                onPress={onPress}
-                style={vitalItemStyles.vitalsHeader}>
+                    onPress={onPress}
+                    style={vitalItemStyles.vitalsHeader}>
 
-                {description != undefined && (<AppButton
-                    title="i"
-                    style={vitalItemStyles.infoButton}
-                    buttonTextStyle={vitalItemStyles.infoButtonText}
-                    onPress={onPressInfo}
+
+                {description!=undefined && (<AppButton
+                        title="i"
+                        style={vitalItemStyles.infoButton}
+                        buttonTextStyle={vitalItemStyles.infoButtonText}
+                        onPress={onPressInfo}
                 />)}
 
                 <View>
                     <Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
-                    {timeElapsed != undefined && (
+                    {timeElapsed!=undefined && (
                         <TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />
-                    )}
+                        )}
                 </View>
 
                 {onPressAdd && (<AppButton
-                    title="Add"
-                    style={vitalItemStyles.newReadingButton}
-                    buttonTextStyle={vitalItemStyles.newReadingButtonText}
-                    onPress={onPressAdd}
-                />
+                        title="Add"
+                        style={vitalItemStyles.newReadingButton}
+                        buttonTextStyle={vitalItemStyles.newReadingButtonText}
+                        onPress={onPressAdd}
+                    />
                 )}
 
             </TouchableOpacity>
 
             {expanded && data && (
-                <Data type={type} data={data} />)
-            }
-        </View>)
+                <Data type={type} data={data}/>)
+             }
+    </View>)
 }
 
+export default VitalItem;
 
-const vitalItemStyles = StyleSheet.create({
+export const vitalItemStyles = StyleSheet.create({
     row: {
-        flex: 1,
-        alignSelf: 'stretch',
-        flexDirection: 'row',
-        left: 50,
-        marginVertical: "1%",
-        borderBottomColor: "#737373",
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        maxWidth: 300,
-    },
-    timestampCell: {
-        paddingRight: 0,
-        marginRight: 0,
-        width: 50,
-        display: "flex",
-        alignItems: "center",
-        alignSelf: "center",
-        justifyContent: "center",
-    },
-    timestampCellText: {
-        fontWeight: "bold",
-    },
-    valueCell: {
-        maxWidth: 260,
-    },
-    valueCellText: {
-        flex: 1,
-        paddingLeft: 5,
-    },
-    valueCellImage: {
-        flex: 2,
-        borderWidth: 1,
-    },
+		flex: 1,
+		alignSelf: 'stretch',
+		flexDirection: 'row',
+		left: 50,
+		marginVertical: "1%",
+		borderBottomColor: "#737373",
+		borderBottomWidth: StyleSheet.hairlineWidth,
+		maxWidth: 300,
+	},
+	timestampCell: {
+		paddingRight: 0,
+		marginRight: 0,
+		width: 50,
+		display: "flex",
+		alignItems: "center",
+		alignSelf: "center",
+		justifyContent: "center",
+	},
+	timestampCellText: {
+		fontWeight: "bold",
+	},
+	valueCell: {
+		maxWidth: 260,
+	},
+	valueCellText: {
+		flex: 1,
+		paddingLeft: 5,
+	},
+	valueCellImage: {
+		flex: 2,
+		borderWidth: 1,
+	},
     table: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
     },
     vitalsHeader: {
-        flexDirection: "row",
-        padding: 10,
-        margin: 10,
-        marginBottom: 0,
-        paddingBottom: 0,
-        paddingLeft: 20,
-        fontSize: 30,
-        height: 60,
-        width: "80%",
-        alignSelf: "center",
-        justifyContent: "flex-start",
-        fontWeight: "900",
-        backgroundColor: colours.lightBlueBackground,
-        borderRadius: 20,
-        shadowColor: colours.primary,
-        shadowOpacity: 0.8,
-        shadowOffset: { width: 1, height: 3 },
-        shadowRadius: 3,
-        elevation: 10,
+    		flexDirection: "row",
+    		padding: 10,
+    		margin: 10,
+    		marginBottom: 0,
+    		paddingBottom: 0,
+    		paddingLeft: 20,
+    		fontSize: 30,
+    		height: 60,
+    		width: "80%",
+    		alignSelf: "center",
+    		justifyContent: "flex-start",
+    		fontWeight: "900",
+    		backgroundColor: colours.lightBlueBackground,
+    		borderRadius: 20,
+    		shadowColor: colours.primary,
+    		shadowOpacity: 0.8,
+    		shadowOffset: { width: 1, height: 3 },
+    		shadowRadius: 3,
+    		elevation: 10,
     },
     infoButton: {
-        flexDirection: "column",
-        width: Platform.OS == "ios" ? 30 : 20,
-        aspectRatio: 1,
-        backgroundColor: colours.purple,
-        borderRadius: 100,
-        alignSelf: "center",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "absolute",
-        left: -5,
-        top: -5,
-        shadowColor: colours.primary,
-        shadowOpacity: 0.9,
-        shadowOffset: { width: 0, height: 3 },
-        shadowRadius: 4,
-        elevation: 7,
+    		flexDirection: "column",
+    		width: Platform.OS == "ios" ? 30: 20,
+    		aspectRatio: 1,
+    		backgroundColor: colours.purple,
+    		borderRadius: 100,
+    		alignSelf: "center",
+    		alignItems: "center",
+    		justifyContent: "center",
+    		position: "absolute",
+    		left: -5,
+    		top: -5,
+    		shadowColor: colours.primary,
+    		shadowOpacity: 0.9,
+    		shadowOffset: { width: 0, height: 3 },
+    		shadowRadius: 4,
+    		elevation: 7,
     },
     infoButtonText: {
         fontSize: 30,
@@ -293,7 +295,3 @@ const vitalItemStyles = StyleSheet.create({
         alignSelf: "flex-start",
     },
 });
-
-
-export default VitalItem;
-export { vitalItemStyles };

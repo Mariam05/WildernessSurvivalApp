@@ -38,7 +38,7 @@ class Reading {
 	}
 }
 
-class Vital {
+class Vital{
 	name: string;
 	periodicity?: number;
 	type: string;
@@ -47,7 +47,7 @@ class Vital {
 	data: Array<Reading>;
 	categories?: Array<string>;
 
-	constructor(vital : VitalProps) {
+	constructor(vital: VitalProps) {
 		this.name = vital.name;
 		this.periodicity = vital.periodicity;
 		this.type = vital.type;
@@ -79,9 +79,8 @@ class Patient extends Realm.Object {
 	name?: string;
 	age?: string;
 	sex?: string;
-	vitals: Array<Vital>;
 
-	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
+	constructor({ image, name, age, sex, partition, id = new ObjectId() }) {
 		super();
 		this._partition = partition;
 		this._id = id;
@@ -89,7 +88,6 @@ class Patient extends Realm.Object {
 		this.name = name;
 		this.age = age;
 		this.sex = sex;
-		this.vitals = vitals;
 	}
 
 	static schema = {
@@ -101,7 +99,6 @@ class Patient extends Realm.Object {
 			name: "string?",
 			age: "string?",
 			sex: "string?",
-			vitals: { type: "list", objectType: "Vital" }
 		},
 		primaryKey: "_id",
 		required: ["_partition"]
