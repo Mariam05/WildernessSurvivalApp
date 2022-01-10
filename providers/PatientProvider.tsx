@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient } from "../schemas";
+import { Patient, Vital, Reading} from "../schemas";
 import { useAuth } from "./AuthProvider";
+import defaultVitals from "../app/assets/defaultVitals";
 
 const PatientsContext = React.createContext(null);
 
@@ -21,7 +22,7 @@ const PatientsProvider = (props) => {
 		}
 
 		const config: Realm.Configuration = {
-			schema: [Patient.schema],
+			schema: [Patient.schema, Vital.schema, Reading.schema],
 			sync: {
 				user: user,
 				partitionValue: `${user.id}`,
@@ -62,7 +63,7 @@ const PatientsProvider = (props) => {
 		}
 
 		const config: Realm.Configuration = {
-			schema: [Patient.schema],
+			schema: [Patient.schema, Vital.schema, Reading.schema],
 			sync: {
 				user: user,
 				partitionValue: `${user.id}`,
@@ -110,18 +111,20 @@ const PatientsProvider = (props) => {
 				: "New Patient";
 		age = age && age.length > 1 ? age : "?";
 		sex = sex && sex.length > 1 ? sex : "?";
+
+
 		try {
 			realm.write(() => {
 				// Create a new patient in the same partition -- that is, using the same user id.
 				try {
 					realm.create(
-						"Patient",
-						new Patient({
+						"Patient", new Patient({
 							image: image || 0,
 							name: name || "New Patient",
 							age: age || "?",
 							sex: sex || "Other",
 							partition: user.id,
+							vitals: defaultVitals
 						})
 					);
 				} catch (error) {
