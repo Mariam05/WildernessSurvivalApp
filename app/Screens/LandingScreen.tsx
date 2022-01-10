@@ -38,8 +38,6 @@ const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
 
 export default function LandingScreen({ navigation }) {
-	console.log("landing screen");
-	
 	const { user, signOut } = useAuth();
 
 	const [PatientFN, setPatientFN] = useState("");
@@ -76,6 +74,7 @@ export default function LandingScreen({ navigation }) {
 		refreshRealm();
 	}, [isFocused])
 
+
 	if (!fontsLoaded) {
 		return <AppLoading />;
 	} else {
@@ -104,7 +103,7 @@ export default function LandingScreen({ navigation }) {
 								style={null}
 								image={images[patient.image]}
 								key={index}
-								onPress={onPressPatient}
+								onPress={() => onPressPatient(patient)}
 							/> : null
 						))
 					}

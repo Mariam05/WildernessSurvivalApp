@@ -6,8 +6,12 @@ import LandingScreen from "./app/Screens/LandingScreen";
 import LoginScreen from "./app/Screens/LoginScreen";
 import { AuthProvider } from "./providers/AuthProvider";
 import { PatientsProvider } from "./providers/PatientProvider";
+
+import { VitalsProvider } from "./providers/VitalProvider";
+
 import SignUpScreen from "./app/Screens/SignUpScreen";
 import ProfileScreen from "./app/Screens/ProfileScreen";
+import PatientScreen from "./app/Screens/PatientScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -54,11 +58,26 @@ export default function App() {
 							gestureEnabled: false,
 						}}
 					>
-						{() => {
+						{(props) => {
+							const { navigation } = props;
 							return (
 								<PatientsProvider>
-									<LandingScreen />
+									<LandingScreen navigation={navigation} />
 								</PatientsProvider>
+							);
+						}}
+					</Stack.Screen>
+					<Stack.Screen
+						name="Patient"
+						options={{ headerShown: false, gestureEnabled: false }}
+					>
+						{(props) => {
+							const { navigation, route } = props;
+							const { patientId } = route.params;
+							return (
+								<VitalsProvider patientId={patientId}>
+									<PatientScreen route={route} navigation={navigation} />
+								</VitalsProvider>
 							);
 						}}
 					</Stack.Screen>

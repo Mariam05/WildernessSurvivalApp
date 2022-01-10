@@ -171,7 +171,7 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 
             </TouchableOpacity>
 
-            {expanded && data && (
+            {expanded && data && data.length > 0 && (
                 <Data type={type} data={data}/>)
              }
     </View>)

@@ -54,5 +54,6 @@ const photosVital = new Vital({
     ],
 })
 
+
 const defaultVitals = [photosVital, generalVital, temperatureVital];
 export default defaultVitals

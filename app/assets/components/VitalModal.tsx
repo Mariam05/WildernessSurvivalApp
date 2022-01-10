@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colours.pinkBackground,
 		borderRadius: 25,
 		borderColor: "#000",
-		height: "90%",
+		height: "100%",
 	},
 	modalFooter: {
 		justifyContent: "center",

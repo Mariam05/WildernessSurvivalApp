@@ -6,8 +6,9 @@ interface VitalProps{
 	type: string;
 	description?: string;
 	timeElapsed?: number;
-	data: Array<Reading>;
-	categories?: Array<string>;
+	data: Reading[];
+	categories?: string[];
+
 }
 
 interface ReadingProps {
@@ -44,8 +45,8 @@ class Vital{
 	type: string;
 	description?: string;
 	timeElapsed?: number;
-	data: Array<Reading>;
-	categories?: Array<string>;
+	data: Reading[];
+	categories?: string[];
 
 	constructor(vital: VitalProps) {
 		this.name = vital.name;
@@ -64,7 +65,7 @@ class Vital{
 			periodicity: "int?",
 			type: "string",
 			description: "string?",
-			data: { type: "list", objectType: "Reading" },
+			data: "Reading[]",
 			categories: "string[]",
 			timeElapsed: "int?",
 		},
@@ -72,22 +73,23 @@ class Vital{
 	};
 }
 
-class Patient extends Realm.Object {
+class Patient {
 	_partition: string;
 	_id?: ObjectId;
 	image?: number;
 	name?: string;
 	age?: string;
 	sex?: string;
+	vitals: Vital[];
 
-	constructor({ image, name, age, sex, partition, id = new ObjectId() }) {
-		super();
+	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
 		this._partition = partition;
 		this._id = id;
 		this.image = image;
 		this.name = name;
 		this.age = age;
 		this.sex = sex;
+		this.vitals = vitals;
 	}
 
 	static schema = {
@@ -99,6 +101,7 @@ class Patient extends Realm.Object {
 			name: "string?",
 			age: "string?",
 			sex: "string?",
+			vitals: "Vital[]"
 		},
 		primaryKey: "_id",
 		required: ["_partition"]

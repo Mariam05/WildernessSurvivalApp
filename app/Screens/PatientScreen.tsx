@@ -94,7 +94,7 @@ export default function PatientScreen({ navigation, route }) {
             >
                 {/* Code for patient level header */}
                 <View style={PatientScreenStyles.headerPatient}>
-                    <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => navigation.navigate("Landing")}>
+                    <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => navigation.goBack()}>
                         <Image
                             style={PatientScreenStyles.backButtonImage}
                             source={require("../assets/images/back.png")}
