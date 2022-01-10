@@ -42,7 +42,6 @@ const VitalsProvider = ({ children, patientId }) => {
 
                 const patientDoc = realm.objectForPrimaryKey("Patient", new ObjectId(patientId));
                 setPatient(patientDoc);
-                console.log(patientDoc);
 
                 // we observe changes on the Vitals, in case Sync informs us of changes
                 // started in other devices (or the cloud)

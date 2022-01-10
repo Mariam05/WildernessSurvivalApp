@@ -39,7 +39,8 @@ const Chart = (data) => {
 				y="value"
 				data={mappedData}
 			/>
-		</VictoryChart>)
+		</VictoryChart>
+	)
 }
 
 

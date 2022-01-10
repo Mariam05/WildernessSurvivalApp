@@ -16,47 +16,14 @@ const PatientsProvider = (props) => {
 	const realmRef = useRef(null);
 
 	useEffect(() => {
-		if (user == null) {
-			console.error("Null user? Needs to log in!");
-			return;
-		}
-
-		const config: Realm.Configuration = {
-			schema: [Patient.schema, Vital.schema, Reading.schema],
-			sync: {
-				user: user,
-				partitionValue: `${user.id}`,
-			},
-		};
-
-		// open a realm for this particular project and get all Patients
-		Realm.open(config).then((realm) => {
-			realmRef.current = realm;
-			/*realm.write(() => {
-				realm.deleteAll();
-				console.log("deleting all");
-			});*/
-
-			const syncPatients = realm.objects("Patient");
-			let sortedPatients = syncPatients.sorted("name");
-			setPatients([...sortedPatients]);
-
-			// we observe changes on the Patients, in case Sync informs us of changes
-			// started in other devices (or the cloud)
-			sortedPatients.addListener(() => {
-				console.log("Got new data!");
-				setPatients([...sortedPatients]);
-			});
-		});
-
+		openRealm();
 		return () => {
 			// cleanup function
 			closeRealm();
 		};
 	}, [user]);
 
-	const refreshRealm = () => {
-		closeRealm();
+	const openRealm = () => {
 		if (user == null) {
 			console.error("Null user? Needs to log in!");
 			return;
@@ -89,6 +56,11 @@ const PatientsProvider = (props) => {
 				setPatients([...sortedPatients]);
 			});
 		});
+	}
+
+	const refreshRealm = () => {
+		closeRealm();
+		openRealm();
 	};
 
 	const createPatient = (image: number, name: string, age: string, sex: string) => {

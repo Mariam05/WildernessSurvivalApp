@@ -129,8 +129,8 @@ export default function PatientScreen({ navigation, route }) {
                             data={item.data}
                             description={item.description}
                             timeElapsed={item.timeElapsed}
-                            onPressInfo={() => console.log(item.title + " info pressed")}
-                            onPressAdd={() => console.log(item.title + " add new reading")}
+                            onPressInfo={() => console.log(item.name + " info pressed")}
+                            onPressAdd={() => console.log(item.name + " add new reading")}
                         />
                     )}
                     keyExtractor={(item, index) => index.toString()}
