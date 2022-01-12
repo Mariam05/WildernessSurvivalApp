@@ -1,17 +1,15 @@
 import { Image, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 import colours from "../colours";
 import { useAuth } from "../../../providers/AuthProvider";
 import { images } from "../ProfilePics";
 
 
-export default function ProfileHeader({statusbarColour}) {
+export default function ProfileHeader({statusbarColour, navigation}) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(statusbarColour, true);
 
     const {user} = useAuth();
-    const navigation = useNavigation();
-
+    
     return (
         <View style={styles.header}>
             <View style={styles.profileView}>

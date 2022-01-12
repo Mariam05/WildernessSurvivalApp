@@ -9,38 +9,31 @@ import AppLoading from "expo-app-loading";
 import React, { useState } from "react";
 import {
     Image,
-    ImageBackground,
     Platform,
     SafeAreaView,
     ScrollView,
-    FlatList,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    useWindowDimensions,
-    LayoutAnimation,
     View,
     KeyboardAvoidingView,
     UIManager,
+    StatusBar,
 } from "react-native";
 
-import { useNavigation } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
-import { useAuth } from "../../providers/AuthProvider";
 import { useVitals } from "../../providers/VitalProvider";
 
-import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import AppButton from "../assets/components/AppButton";
 import { VitalModal } from "../assets/components/VitalModal";
 import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
 
 import globalStyles from "../assets/stylesheet";
-import { images } from "../assets/ProfilePics";
 import colours from "../assets/colours";
-
+import { Vital } from "../../schemas";
 
 const vitalTypes = ["Numerical", "Categorical"];
 
@@ -51,14 +44,13 @@ export default function PatientScreen({ navigation, route }) {
             UIManager.setLayoutAnimationEnabledExperimental(true);
         }
     }
-    const { user, signOut } = useAuth();
-    const { patient, createVital } = useVitals();
-
+	
     const { patientId, patientName } = route.params;
+    const { patient, createVital, closeRealm } = useVitals();
 
     const [vitalName, setVitalName] = useState("");
-    const [vitalPeriodicity, setVitalPeriodicity] = useState(0);
-    const [vitalType, setVitalType] = useState("");
+    const [vitalPeriodicity, setVitalPeriodicity] = useState<number>();
+    const [vitalType, setVitalType] = useState("Numerical");
     const [vitalCategories, setVitalCategories] = useState([]);
     const [newVitalCategory, setNewVitalCategory] = useState("");
 
@@ -84,24 +76,30 @@ export default function PatientScreen({ navigation, route }) {
         Oxygen_400Regular,
         Oxygen_700Bold,
     });
-
+         
+    Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.yellowBackground, true);
+           
     if (!fontsLoaded) {
         return <AppLoading />;
     } else {
         return (
             <SafeAreaView
-                style={[globalStyles.container, { backgroundColor: colours.redBackground }]}
+                style={[globalStyles.container, { backgroundColor: colours.yellowBackground }]}
             >
                 {/* Code for patient level header */}
                 <View style={PatientScreenStyles.headerPatient}>
-                    <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => navigation.goBack()}>
+                    <TouchableOpacity style={PatientScreenStyles.backButton} onPress={() => {
+                        navigation.goBack();
+                        closeRealm();
+                    }
+                    }>
                         <Image
                             style={PatientScreenStyles.backButtonImage}
                             source={require("../assets/images/back.png")}
                         />
                     </TouchableOpacity>
 
-                    <View >
+                    <View style={{flex: 1, flexDirection: "row", alignItems:"center", justifyContent:"center"}}>
                         <Text style={PatientScreenStyles.patientName}>{patientName}</Text>
                     </View>
 
@@ -109,32 +107,36 @@ export default function PatientScreen({ navigation, route }) {
                         title="PDF"
                         style={PatientScreenStyles.pdfButton}
                         buttonTextStyle={PatientScreenStyles.pdfButtonText}
-                        onPress={() => console.log("generate pdf")}
+                        onPress={() => console.log("Generate PDF")}
                     />
                 </View>
 
-                {/* Code for list of vitals */}
-                <FlatList
+                <ScrollView
                     style={PatientScreenStyles.vitalsScrollView}
                     contentContainerStyle={{
                         alignSelf: "stretch",
-                        paddingBottom: 100,
+                        paddingBottom: "30%"
                     }}
-                    data={patient.vitals}
-                    renderItem={({ item }) => (
-                        <VitalItem
-                            name={item.name}
-                            periodicity={item.periodicity}
-                            type={item.type}
-                            data={item.data}
-                            description={item.description}
-                            timeElapsed={item.timeElapsed}
-                            onPressInfo={() => console.log(item.name + " info pressed")}
-                            onPressAdd={() => console.log(item.name + " add new reading")}
-                        />
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                />
+                >
+                    <View style={{height: 10}} />
+                    {
+                        patient ?
+                        patient.vitals.map((vital: Vital, index: number) => (
+                            <VitalItem
+                                enabled={true}
+                                name={vital.name}
+                                periodicity={vital.periodicity}
+                                type={vital.type}
+                                data={vital.data}
+                                description={vital.description}
+                                timeElapsed={vital.timeElapsed}
+                                onPressInfo={() => console.log(vital.name + " info pressed")}
+                                onPressAdd={() => console.log(vital.name + " add new reading")}
+                                key={index}
+                            />
+                        )) : null
+                    }
+                </ScrollView>
 
                 {/* Code for add new vital button */}
                 <AddButton onPress={handleModal} />
@@ -152,12 +154,13 @@ export default function PatientScreen({ navigation, route }) {
                                 <VitalModal.Body>
                                     <View style={{ marginVertical: "3%" }} />
                                     <VitalItem
+                                        enabled={false}
                                         name={vitalName}
                                         periodicity={vitalPeriodicity}
                                         type={vitalType}
                                         description={""}
                                         data={[]}
-                                        timeElapsed={0}
+                                        timeElapsed={null}
                                         onPressAdd={null}
                                         onPressInfo={null}
                                     />
@@ -184,7 +187,7 @@ export default function PatientScreen({ navigation, route }) {
                                         placeholder="Periodicity (minutes)"
                                         autoCorrect={false}
                                         keyboardType="numeric"
-                                        value={vitalPeriodicity.toString()}
+                                        value={vitalPeriodicity ? vitalPeriodicity.toString() : null}
                                         onChangeText={(val) => setVitalPeriodicity(parseInt(val))}
                                     />
                                     <View style={{ marginVertical: "3%" }} />
@@ -202,19 +205,19 @@ export default function PatientScreen({ navigation, route }) {
                                                     <View>
                                                         <TextInput
                                                             style={[globalStyles.credentialInput, { width: "100%", margin: 0 }]}
-                                                            clearButtonMode="while-editing"
-                                                            returnKeyType="next"
+                                                            clearButtonMode="never"
+                                                            returnKeyType="none"
                                                             textContentType="username"
                                                             placeholder="category"
                                                             autoCapitalize="words"
-                                                            autoCorrect={false}
+                                                            autoCorrect={true}
                                                             value={category}
                                                             onChangeText={(val) => updateVitalCategory(val, index)}
                                                         />
                                                         <AppButton
                                                             title="x"
                                                             style={PatientScreenStyles.vitalCategoryButton}
-                                                            buttonTextStyle={PatientScreenStyles.vitalCategoryDeleteButtonText}
+                                                            buttonTextStyle={PatientScreenStyles.vitalCategoryButtonText}
                                                             onPress={() => deleteVitalCategory(index)}
                                                         />
                                                     </View>
@@ -222,7 +225,7 @@ export default function PatientScreen({ navigation, route }) {
                                                 </View>
 
                                             ))}
-                                            <View>
+                                            <View >
                                                 <TextInput
                                                     style={[globalStyles.credentialInput, { width: "100%", margin: 0 }]}
                                                     clearButtonMode="while-editing"
@@ -237,7 +240,7 @@ export default function PatientScreen({ navigation, route }) {
                                                 <AppButton
                                                     title="+"
                                                     style={PatientScreenStyles.vitalCategoryButton}
-                                                    buttonTextStyle={PatientScreenStyles.vitalCategoryAddButtonText}
+                                                    buttonTextStyle={PatientScreenStyles.vitalCategoryButtonText}
                                                     onPress={() => appendVitalCategory(newVitalCategory)}
                                                 />
                                             </View>
@@ -283,8 +286,6 @@ export default function PatientScreen({ navigation, route }) {
                         </ScrollView>
                     </KeyboardAvoidingView>
                 </VitalModal>
-
-
             </SafeAreaView>
         );
     }
@@ -293,45 +294,44 @@ export default function PatientScreen({ navigation, route }) {
 
 
 const PatientScreenStyles = StyleSheet.create({
-    headerPatient: {
-        backgroundColor: colours.orange,
-        height: Platform.OS == "ios" ? "10%" : "8%",
-        padding: 0,
-        display: "flex",
-        flexDirection: "row",
-        width: "100%",
-        alignItems: "center",
-        alignSelf: "center",
-        justifyContent: "center",
-    },
     backButton: {
-        left: 10,
-        position: "absolute",
+        flexDirection: "column",
         justifyContent: "center",
-        alignSelf: "center",
-        padding: 0,
-        margin: 0,
+        alignSelf: "flex-start",
+        marginLeft: 10,
+        marginRight: 20, // allows text to center properly, essentially makes it the same width as the PDF button
         width: 40,
         height: "100%",
     },
     backButtonImage: {
         width: "100%",
-        height: "50%",
+        height: "40%",
+    },
+    headerPatient: {
+        flex: 0.1, 
+        flexDirection: "row",
+        alignItems: "center",
+        alignSelf: "center",
+        justifyContent: "center",
+        alignContent: "center",
+        backgroundColor: colours.orange,
+        width: "100%",
     },
     patientName: {
-        alignItems: "center",
+        flex: 1, 
+        textAlign: "center",
+        height: "100%",
         fontSize: 25,
         fontWeight: "700",
     },
     pdfButton: {
-        height: "60%",
-        top: "20%",
+        alignSelf: "center",
+        justifyContent: "center",
+        marginRight: 10,
+        width: 60,
         backgroundColor: colours.lightBlueBackground,
         borderRadius: 15,
         color: colours.primary,
-        position: "absolute",
-        right: 10,
-        alignSelf: "center",
         borderColor: colours.primary,
         borderWidth: 1,
         padding: 6,
@@ -339,44 +339,34 @@ const PatientScreenStyles = StyleSheet.create({
     pdfButtonText: {
         fontSize: 20,
         fontWeight: "600",
-        top: Platform.OS == "ios" ? -4 : -1,
+        alignSelf: "center"
     },
     vitalsScrollView: {
         flex: 1,
         width: "100%",
         backgroundColor: colours.background,
+        marginBottom: Platform.OS === "ios" ? "-10%" : 0
     },
     vitalCategoryButton: {
-        backgroundColor: colours.redBackground,
-
-
-        height: "50%",
-        aspectRatio: 1,
-
         position: "absolute",
-        right: 10,
-        top: 10,
-
+		height: "100%",
+		width: undefined,
+        aspectRatio: 1,
         borderRadius: 100,
-        flexDirection: "column",
-        alignItems: "center",
+		backgroundColor: "white",
         justifyContent: "center",
-        elevation: 7,
-        shadowColor: colours.primary,
-        shadowOpacity: 0.9,
-        shadowOffset: { width: 0, height: 3 },
-        shadowRadius: 4,
-
+        alignItems: "center",
+		right: 0,
+		top: "0%",
+		elevation: 6
+        
     },
-    vitalCategoryDeleteButtonText: {
-        fontSize: 24,
-        fontWeight: "700",
-        top: -7,
-    },
-    vitalCategoryAddButtonText: {
-        fontSize: 25,
-        fontWeight: "700",
-        top: -7,
+    vitalCategoryButtonText: {
+        alignSelf: "center",
+        fontSize: 30,
+		fontWeight: "normal",
+        top: "-5%",
+        left: "2%"
     },
 });
 

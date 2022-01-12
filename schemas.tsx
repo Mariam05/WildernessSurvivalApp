@@ -39,7 +39,7 @@ class Reading {
 	}
 }
 
-class Vital{
+class Vital {
 	name: string;
 	periodicity?: number;
 	type: string;
@@ -73,7 +73,7 @@ class Vital{
 	};
 }
 
-class Patient {
+class Patient extends Realm.Object {
 	_partition: string;
 	_id?: ObjectId;
 	image?: number;
@@ -83,6 +83,7 @@ class Patient {
 	vitals: Vital[];
 
 	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
+		super();
 		this._partition = partition;
 		this._id = id;
 		this.image = image;

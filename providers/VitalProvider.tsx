@@ -7,7 +7,7 @@ import { ObjectId } from "bson";
 const VitalsContext = React.createContext(null);
 
 const VitalsProvider = ({ children, patientId }) => {
-    const [patient, setPatient] = useState({});
+    const [patient, setPatient] = useState<Realm.Object>();
     const { user } = useAuth();
 
     // Use a Ref to store the realm rather than the state because it is not
@@ -45,10 +45,10 @@ const VitalsProvider = ({ children, patientId }) => {
 
                 // we observe changes on the Vitals, in case Sync informs us of changes
                 // started in other devices (or the cloud)
-                /*sortedVitals.addListener(() => {
+                patientDoc.addListener(() => {
                     console.log("Got new vitals!");
-                    setVitals([...sortedVitals]);
-                });*/
+                    setPatient(patientDoc);
+                });
             });
         } catch (error) {
             console.log(error.message);
@@ -60,7 +60,7 @@ const VitalsProvider = ({ children, patientId }) => {
             // cleanup function
             closeRealm();
         };
-    }, [user, patientId]);
+    }, [patientId]);
 
 
     const createVital = (patientId: ObjectId, name: string, periodicity: number, type: string, description: string, categories: Array<string>) => {
@@ -126,7 +126,7 @@ const VitalsProvider = ({ children, patientId }) => {
         if (realm) {
             realm.close();
             realmRef.current = null;
-            setPatient({});
+            setPatient(null);
         }
     };
 

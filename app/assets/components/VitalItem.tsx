@@ -24,12 +24,11 @@ const Chart = (data) => {
 
 	return (
 		<VictoryChart
-				theme={customTheme}
- 				domainPadding={{x:0, y: 20}}
-				padding={{top:0, bottom:35, left:50, right:50}}
-				margin={{top:0}}
-				height={180}
-			>
+			theme={customTheme}
+			domainPadding={{ x: 0, y: 20 }}
+			padding={{top:5, bottom:35, left:50, right:50}}
+			height={180}
+		>
 			<VictoryLine
 				style={{
 					data: { stroke: "#c43a31"},
@@ -43,43 +42,40 @@ const Chart = (data) => {
 	)
 }
 
-
-
-
 const RowWithImage = (entry) => {
-		const date = new Date(entry.timestamp*1000);
-		const dateString = date.getHours() + ":" + date.getMinutes();
+	const date = new Date(entry.timestamp * 1000);
+	const dateString = date.getHours() + ":" + date.getMinutes();
 
-		const [expandedImage, setExpandedImage] = useState(false);
-		const [imageUrl, setImageUrl] = useState("");
+	const [expandedImage, setExpandedImage] = useState(false);
+	const [imageUrl, setImageUrl] = useState("");
 
 
-		const onPress = () => {
-			setExpandedImage(!expandedImage);
-			setImageUrl(entry.url)
-		};
+	const onPress = () => {
+		setExpandedImage(!expandedImage);
+		setImageUrl(entry.url)
+	};
 
-		return (
-			<TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
-					<View style={vitalItemStyles.timestampCell}>
-						<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+	return (
+		<TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
+				<View style={vitalItemStyles.timestampCell}>
+					<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+				</View>
+				<View style={vitalItemStyles.valueCell}>
+					<View style={vitalItemStyles.valueCellText}>
+						<Text>
+							{entry.value}
+						</Text>
 					</View>
-					<View style={vitalItemStyles.valueCell}>
-						<View style={vitalItemStyles.valueCellText}>
-							<Text>
-								{entry.value}
-							</Text>
-						</View>
-						{expandedImage && (
-						<View style={vitalItemStyles.valueCellImage}>
-							<Image
-								source={{uri:entry.url}}
-								style={{alignSelf: "center", width: 100, height: 100,resizeMode: 'stretch'}}>
-							</Image>
-						</View>)}
-					</View>
-			</TouchableOpacity>
-		)
+					{expandedImage && (
+					<View style={vitalItemStyles.valueCellImage}>
+						<Image
+							source={{uri:imageUrl}}
+							style={vitalItemStyles.valueImage}>
+						</Image>
+					</View>)}
+				</View>
+		</TouchableOpacity>
+	)
 }
 
 
@@ -103,20 +99,18 @@ const Row = (entry) => {
 
 
 const Table = (data) => {
-	const hasImage = data && data[0] && data[0].url!=null
+	const hasImage = data && data[0] && data[0].url!=null && data[0].url!=""
 
 	return (
-		  <View style={vitalItemStyles.table}>
-				{
-						data.map((entry) => { // This will  a row for each data element.
-								return hasImage ? RowWithImage(entry) : Row(entry)
-						})
-				}
-			</View>
+		<View style={vitalItemStyles.table}>
+			{
+				data.map((entry) => { // This will  a row for each data element.
+					return hasImage ? RowWithImage(entry) : Row(entry)
+				})
+			}
+		</View>
 	)
 }
-
-
 
 const Data = ({ type, data }) => {
 	if (type === "Numerical"){
@@ -129,13 +123,15 @@ const Data = ({ type, data }) => {
 const TimeElapsed = ({ timeElapsed, periodicity }) => {
 	const isOverdue = timeElapsed > periodicity
 
-    return (<Text style={isOverdue ? vitalItemStyles.timeElapsedRedText : vitalItemStyles.timeElapsedGreenText}>
-                {timeElapsed.toString()} min ago
-            </Text>)
+	return (
+		<Text style={[vitalItemStyles.timeElapsedText, {color: isOverdue ? colours.redText : colours.greenText}]}>
+			{ timeElapsed.toString() } min ago
+		</Text>
+	)
 }
 
 
- function VitalItem({ name, periodicity, type, description, data, timeElapsed, onPressInfo, onPressAdd }){
+ function VitalItem({ enabled, name, periodicity, type, description, data, timeElapsed, onPressInfo, onPressAdd }){
     const [expanded, setExpanded] = useState(false);
     const onPress = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -143,37 +139,46 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
     };
     return (
         <View>
-            <TouchableOpacity
-                    onPress={onPress}
-                    style={vitalItemStyles.vitalsHeader}>
-
-
-                {description!=undefined && (<AppButton
-                        title="i"
-                        style={vitalItemStyles.infoButton}
-                        buttonTextStyle={vitalItemStyles.infoButtonText}
-                        onPress={onPressInfo}
-                />)}
+			<TouchableOpacity
+				disabled={!enabled}
+                onPress={onPress}
+				style={[vitalItemStyles.vitalsHeader, {width: enabled ? "80%" : "90%"}]}>
+				{
+					description != undefined && (
+						<AppButton
+							title="i"
+                        	style={vitalItemStyles.infoButton}
+                        	buttonTextStyle={vitalItemStyles.infoButtonText}
+                        	onPress={onPressInfo}
+						/>
+					)
+				}
 
                 <View>
                     <Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
-                    {timeElapsed!=undefined && (
-                        <TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />
-                        )}
+					{
+						timeElapsed != undefined && (
+							<TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />
+						)
+					}
                 </View>
 
-                {onPressAdd && (<AppButton
-                        title="Add"
-                        style={vitalItemStyles.newReadingButton}
-                        buttonTextStyle={vitalItemStyles.newReadingButtonText}
-                        onPress={onPressAdd}
-                    />
-                )}
-
+				{
+					onPressAdd && (
+						<AppButton
+							title="Add"
+							style={vitalItemStyles.newReadingButton}
+							buttonTextStyle={vitalItemStyles.newReadingButtonText}
+							onPress={onPressAdd}
+						/>
+					)
+				}
             </TouchableOpacity>
 
-            {expanded && data && data.length > 0 && (
-                <Data type={type} data={data}/>)
+			{
+				expanded && data && data.length > 0 && (
+					<Data type={type} data={data} />
+				)
              }
     </View>)
 }
@@ -181,21 +186,73 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 export default VitalItem;
 
 export const vitalItemStyles = StyleSheet.create({
+    infoButton: {
+		height: undefined,
+		width: "10%",
+		aspectRatio: 1,
+		backgroundColor: colours.purple,
+		borderRadius: 100,
+		alignSelf: "center",
+		alignItems: "center",
+		justifyContent: "center",
+		position: "absolute",
+		left: "-3%",
+		top: "-20%",
+		shadowColor: colours.primary,
+		shadowOpacity: 0.9,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 4,
+		elevation: 7,
+    },
+	infoButtonText: {
+		alignSelf: "center",
+		height: "100%",
+		width: "100%",
+        fontSize: 25,
+		fontWeight: "300",
+		textAlign: "center",
+    },
+	newReadingButton: {
+		alignSelf: "center",
+		justifyContent: "center",
+		position: "absolute",
+        right: 10,
+        backgroundColor: colours.purple,
+		height: "65%",
+		width: "15%",
+        borderRadius: 10,
+        borderColor: colours.primary,
+        borderWidth: 1,
+    },
+    newReadingButtonText: {
+        fontSize: 15,
+        fontWeight: "300",
+		alignSelf: "center",
+    },
     row: {
 		flex: 1,
-		alignSelf: 'stretch',
+		alignSelf: 'center',
+		width: "80%",
 		flexDirection: 'row',
-		left: 50,
-		marginVertical: "1%",
+		margin: 5,
+		paddingVertical: 5,
 		borderBottomColor: "#737373",
-		borderBottomWidth: StyleSheet.hairlineWidth,
+		borderBottomWidth: 0.5,//StyleSheet.hairlineWidth,
 		maxWidth: 300,
 	},
+    table: {
+        flex: 1,
+        alignItems: 'center',
+		justifyContent: 'center',
+		marginTop: -5,
+		marginBottom: 10,
+    },
+    timeElapsedText: {
+        fontSize: 12,
+		alignSelf: "flex-start"
+    },
 	timestampCell: {
-		paddingRight: 0,
-		marginRight: 0,
-		width: 50,
-		display: "flex",
+		width: "25%",
 		alignItems: "center",
 		alignSelf: "center",
 		justifyContent: "center",
@@ -204,95 +261,54 @@ export const vitalItemStyles = StyleSheet.create({
 		fontWeight: "bold",
 	},
 	valueCell: {
-		maxWidth: 260,
+		paddingLeft: 5,
+		width: "75%",
 	},
 	valueCellText: {
-		flex: 1,
-		paddingLeft: 5,
+		
 	},
 	valueCellImage: {
-		flex: 2,
-		borderWidth: 1,
+		marginVertical: 5,
+		borderRadius: 10,
+		width: "50%",
+		height: undefined,
+		aspectRatio: 1,
+		elevation: 7,
+		shadowColor: colours.primary,
+		shadowOffset: { width: 1, height: 1 },
+		shadowOpacity: 0.5,
+		shadowRadius: 3
 	},
-    table: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+	valueImage: {
+		flex: 1,
+		resizeMode: "cover",
+		borderRadius: 10,
+		margin: 0
+	},
     vitalsHeader: {
-    		flexDirection: "row",
-    		padding: 10,
-    		margin: 10,
-    		marginBottom: 0,
-    		paddingBottom: 0,
-    		paddingLeft: 20,
-    		fontSize: 30,
-    		height: 60,
-    		width: "80%",
-    		alignSelf: "center",
-    		justifyContent: "flex-start",
-    		fontWeight: "900",
-    		backgroundColor: colours.lightBlueBackground,
-    		borderRadius: 20,
-    		shadowColor: colours.primary,
-    		shadowOpacity: 0.8,
-    		shadowOffset: { width: 1, height: 3 },
-    		shadowRadius: 3,
-    		elevation: 10,
-    },
-    infoButton: {
-    		flexDirection: "column",
-    		width: Platform.OS == "ios" ? 30: 20,
-    		aspectRatio: 1,
-    		backgroundColor: colours.purple,
-    		borderRadius: 100,
-    		alignSelf: "center",
-    		alignItems: "center",
-    		justifyContent: "center",
-    		position: "absolute",
-    		left: -5,
-    		top: -5,
-    		shadowColor: colours.primary,
-    		shadowOpacity: 0.9,
-    		shadowOffset: { width: 0, height: 3 },
-    		shadowRadius: 4,
-    		elevation: 7,
-    },
-    infoButtonText: {
-        fontSize: 30,
-        fontWeight: "300",
-        top: Platform.OS == "ios" ? -2 : -6,
-    },
-    timeElapsedRedText: {
-        fontSize: 12,
-        color: colours.redText,
-        alignSelf: "flex-start",
-    },
-    timeElapsedGreenText: {
-        fontSize: 12,
-        color: colours.greenText,
-        alignSelf: "flex-start",
-    },
-    newReadingButton: {
-        backgroundColor: colours.purple,
-        height: "70%",
-        borderRadius: 15,
-        color: colours.primary,
-        position: "absolute",
-        right: 10,
-        alignSelf: "center",
-        borderColor: colours.primary,
-        borderWidth: 1,
-        padding: 6,
-    },
-    newReadingButtonText: {
-        fontSize: 15,
-        fontWeight: "300",
-        top: Platform.OS == "ios" ? -4 : -1,
+		flexDirection: "row",
+		alignSelf: "center",
+		padding: 10,
+		margin: 10,
+		marginBottom: 10,
+		paddingBottom: 0,
+		paddingLeft: "5%",
+		fontSize: 30,
+		height: 60,
+		width: "80%",
+		justifyContent: "flex-start",
+		fontWeight: "900",
+		backgroundColor: colours.lightBlueBackground,
+		borderRadius: 15,
+		shadowColor: colours.primary,
+		shadowOpacity: 0.6,
+		shadowOffset: { width: 1, height: 2 },
+		shadowRadius: 3,
+		elevation: 6,
     },
     vitalItemNameText: {
         fontSize: 20,
         color: colours.primary,
-        alignSelf: "flex-start",
+		alignSelf: "flex-start",
     },
 });

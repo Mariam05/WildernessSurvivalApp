@@ -22,7 +22,6 @@ import {
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
-import { useAuth } from "../../providers/AuthProvider";
 import { usePatients } from "../../providers/PatientProvider";
 import AppButton from "../assets/components/AppButton";
 import PatientItem, {patientItemStyles} from "../assets/components/PatientItem";
@@ -38,8 +37,6 @@ const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
 
 export default function LandingScreen({ navigation }) {
-	const { user, signOut } = useAuth();
-
 	const [PatientFN, setPatientFN] = useState("");
 	const [PatientLN, setPatientLN] = useState("");
 	const [PatientAge, setPatientAge] = useState("");
@@ -47,33 +44,31 @@ export default function LandingScreen({ navigation }) {
 	const [PatientImg, setPatientImg] = useState(0);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const { patients, createPatient, refreshRealm } =
+	const { patients, createPatient, openRealm, closeRealm } =
 		usePatients();
 
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
 	const lastNameRef = createRef<TextInput>();
 
 
-	const onPressPatient = (patient) => {
+	const onPressPatient = (patient: Patient) => {
 		navigation.navigate("Patient", {
 			patientId: patient._id.toString(),
 			patientName: patient.name,
 		});
+		closeRealm();
 	};
+
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		isFocused ? openRealm() : null;
+	}, [isFocused]);
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
 		Oxygen_400Regular,
 		Oxygen_700Bold,
 	});
-
-	const isFocused = useIsFocused();
-
-	useEffect(() => {
-		user.refreshCustomData();
-		refreshRealm();
-	}, [isFocused])
-
 
 	if (!fontsLoaded) {
 		return <AppLoading />;
@@ -82,7 +77,10 @@ export default function LandingScreen({ navigation }) {
 			<SafeAreaView
 				style={[globalStyles.container, {backgroundColor: colours.redBackground}]}
 			>
-				<ProfileHeader statusbarColour={colours.redBackground}/>
+				<ProfileHeader
+					navigation={navigation}
+					statusbarColour={colours.redBackground}
+				/>
 
 				<ScrollView
 					horizontal={false}
@@ -95,16 +93,16 @@ export default function LandingScreen({ navigation }) {
 					{
 						patients.map((patient: Patient, index: number) => (
 							patient.isValid() ?
-							<PatientItem
-								enabled={true}
-								name={patient.name}
-								age={patient.age}
-								sex={patient.sex}
-								style={null}
-								image={images[patient.image]}
-								key={index}
-								onPress={() => onPressPatient(patient)}
-							/> : null
+								<PatientItem
+									enabled={true}
+									name={patient.name}
+									age={patient.age}
+									sex={patient.sex}
+									style={null}
+									image={images[patient.image]}
+									key={index}
+									onPress={() => onPressPatient(patient)}
+								/> : null
 						))
 					}
 				</ScrollView>

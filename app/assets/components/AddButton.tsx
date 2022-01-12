@@ -1,18 +1,16 @@
-import { Platform, StatusBar, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import AppButton from "./AppButton";
 import colours from "../colours";
 
 export default function AddButton({onPress}) {
-	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.redBackground, true);
-
     return (
         <AppButton
-					title="+"
-					style={styles.addButton}
-					buttonTextStyle={styles.addButtonText}
-					onPress={onPress}
-				/>
+			title="+"
+			style={styles.addButton}
+			buttonTextStyle={styles.addButtonText}
+			onPress={onPress}
+		/>
 
     );
 }

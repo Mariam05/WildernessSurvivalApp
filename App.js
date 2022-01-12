@@ -76,7 +76,10 @@ export default function App() {
 							const { patientId } = route.params;
 							return (
 								<VitalsProvider patientId={patientId}>
-									<PatientScreen route={route} navigation={navigation} />
+									<PatientScreen
+										route={route}
+										navigation={navigation}
+									/>
 								</VitalsProvider>
 							);
 						}}

@@ -7,7 +7,7 @@ import defaultVitals from "../app/assets/defaultVitals";
 const PatientsContext = React.createContext(null);
 
 const PatientsProvider = (props) => {
-	const [patients, setPatients] = useState([]);
+	const [patients, setPatients] = useState<Realm.Object[]>([]);
 	const { user } = useAuth();
 
 	// Use a Ref to store the realm rather than the state because it is not
@@ -52,16 +52,11 @@ const PatientsProvider = (props) => {
 			// we observe changes on the Patients, in case Sync informs us of changes
 			// started in other devices (or the cloud)
 			sortedPatients.addListener(() => {
-				console.log("Got new data!");
+				console.log("Got new patients!");
 				setPatients([...sortedPatients]);
 			});
 		});
 	}
-
-	const refreshRealm = () => {
-		closeRealm();
-		openRealm();
-	};
 
 	const createPatient = (image: number, name: string, age: string, sex: string) => {
 		const realm = realmRef.current;
@@ -137,8 +132,8 @@ const PatientsProvider = (props) => {
 			value={{
 				createPatient,
 				deletePatient,
+				openRealm,
 				closeRealm,
-				refreshRealm,
 				patients,
 			}}
 		>
