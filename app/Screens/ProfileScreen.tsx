@@ -26,9 +26,11 @@ import { useNavigation } from "@react-navigation/native";
 import LogoutButton from "../assets/components/LogoutButton";
 import { usePatients } from "../../providers/PatientProvider";
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen() {
     Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.blue);
 
+    const navigation = useNavigation();
+    
     const { user, signOut, updateCustomUserData, changePassword } = useAuth();
     const { closeRealm } = usePatients();
 
@@ -37,8 +39,6 @@ export default function ProfileScreen({ navigation }) {
     const newPassRef = React.createRef<TextInput>();
     const confirmRef = React.createRef<TextInput>();
 
-    const windowHeight = useWindowDimensions().height;
-    
     const [editing, setEditing] = useState(false);
     const [editImg, setEditImg] = useState(false);
     const [editPassword, setEditPassword] = useState(false);
