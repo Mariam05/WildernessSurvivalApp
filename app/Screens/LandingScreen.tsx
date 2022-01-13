@@ -91,8 +91,8 @@ export default function LandingScreen({ navigation }) {
 					}}
 				>
 					{
-						patients.map((patient: Patient, index: number) => (
-							patient.isValid() ?
+						patients ?
+							patients.map((patient: Patient, index: number) => (
 								<PatientItem
 									enabled={true}
 									name={patient.name}
@@ -102,8 +102,8 @@ export default function LandingScreen({ navigation }) {
 									image={images[patient.image]}
 									key={index}
 									onPress={() => onPressPatient(patient)}
-								/> : null
-						))
+								/>
+							)) : null
 					}
 				</ScrollView>
 				<AddButton onPress={handleModal}/>

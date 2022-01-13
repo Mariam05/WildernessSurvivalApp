@@ -73,17 +73,16 @@ class Vital {
 	};
 }
 
-class Patient extends Realm.Object {
-	_partition: string;
-	_id?: ObjectId;
-	image?: number;
-	name?: string;
-	age?: string;
-	sex?: string;
-	vitals: Vital[];
+class Patient {
+	_partition: string = "-1";
+	_id?: ObjectId = new ObjectId();
+	image?: number = 0;
+	name?: string = "New Patient";
+	age?: string = "?";
+	sex?: string = "Other";
+	vitals: Vital[] = [];
 
 	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
-		super();
 		this._partition = partition;
 		this._id = id;
 		this.image = image;
