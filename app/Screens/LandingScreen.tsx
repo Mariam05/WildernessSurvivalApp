@@ -56,12 +56,12 @@ export default function LandingScreen({ navigation }) {
 			patientId: patient._id.toString(),
 			patientName: patient.name,
 		});
-		closeRealm();
 	};
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		isFocused ? openRealm() : null;
+		closeRealm();
+		openRealm();
 	}, [isFocused]);
 
 	let [fontsLoaded] = useFonts({
@@ -91,8 +91,8 @@ export default function LandingScreen({ navigation }) {
 					}}
 				>
 					{
-						patients ?
-							patients.map((patient: Patient, index: number) => (
+						patients.map((patient, index: number) => (
+							patient.isValid() ?
 								<PatientItem
 									enabled={true}
 									name={patient.name}
@@ -102,8 +102,8 @@ export default function LandingScreen({ navigation }) {
 									image={images[patient.image]}
 									key={index}
 									onPress={() => onPressPatient(patient)}
-								/>
-							)) : null
+								/> : null
+						))
 					}
 				</ScrollView>
 				<AddButton onPress={handleModal}/>
