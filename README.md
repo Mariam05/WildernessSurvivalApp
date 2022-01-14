@@ -23,5 +23,4 @@
 7. Closing the app does NOT log you out
 
 ## Known Bugs
-1. IDK whats going on with the statusbar colour and why it doesnt always display properly
-2. No encryption yet, Mongodb does provide services for this and I'll look into it
+1. No encryption yet, Mongodb does provide services for this and I'll look into it
