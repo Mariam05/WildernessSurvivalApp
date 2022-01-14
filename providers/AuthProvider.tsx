@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (!user) {
-			console.warn("NO USER Logged In");
+			anonSignIn();
 			return;
 		}
 
@@ -47,12 +47,19 @@ const AuthProvider = ({ children }) => {
 	// emailPassword authentication provider to log in.
 	// This authentication method should be set up correctly on the MongoDB Realm App
 	// see: https://docs.mongodb.com/realm/authentication/providers/
-	const signIn = async (email, password) => {
+	const emailSignIn = async (email, password) => {
 		const creds = Realm.Credentials.emailPassword(
 			email.toLowerCase(),
 			password
 		);
 		
+		const newUser = await app.logIn(creds);
+		setUser(newUser);
+		return newUser;
+	};
+
+	const anonSignIn = async () => {
+		const creds = Realm.Credentials.anonymous();
 
 		const newUser = await app.logIn(creds);
 		setUser(newUser);
@@ -156,7 +163,8 @@ const AuthProvider = ({ children }) => {
 		<AuthContext.Provider
 			value={{
 				signUp,
-				signIn,
+				anonSignIn,
+				emailSignIn,
 				signOut,
 				user,
 				changePassword,

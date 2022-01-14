@@ -183,7 +183,7 @@ export default function ProfileScreen() {
                 <StatusBar hidden={false} animated={true} backgroundColor={colours.blue} barStyle={"dark-content"} />               
             
                 <Text style={profileStyles.titleText}>Profile</Text>
-
+                
                 <KeyboardAvoidingView style={{flex:1, width: "100%", top: 10}} behavior={"padding"}>
                        
                     <ScrollView style={profileStyles.containerScrollView}> 

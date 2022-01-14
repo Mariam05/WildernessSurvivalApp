@@ -33,7 +33,7 @@ export default function LoginScreen({ navigation }) {
 	
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const { user, signIn } = useAuth();
+	const { user, emailSignIn, anonSignIn } = useAuth();
 
 	const windowHeight = useWindowDimensions().height;
 	const titleText = "Wilderness\nVital Tracking";
@@ -44,17 +44,25 @@ export default function LoginScreen({ navigation }) {
 		Oxygen_700Bold,
 	});
 
-	useEffect(() => {
-		// If there is a user logged in, go to the Landing page.
-		if (user != null) {
-			navigation.navigate("Landing");
-		}
-	}, [user]);
-
 	const onPressSignIn = async () => {
 		console.log("Trying sign in with user: " + username);
 		try {
-			await signIn(username, password);
+			await emailSignIn(username, password);
+			navigation.navigate("Landing");
+		} catch (error) {
+			const errorMessage = `Failed to sign in: ${error.message}`;
+			console.error(errorMessage);
+			Alert.alert(errorMessage);
+		}
+		setUsername("");
+		setPassword("");
+	};
+
+	const onPressSkip = async () => {
+		console.log("Anonymously signing in user!");
+		try {
+			await anonSignIn();
+			navigation.navigate("Landing");
 		} catch (error) {
 			const errorMessage = `Failed to sign in: ${error.message}`;
 			console.error(errorMessage);
@@ -72,13 +80,8 @@ export default function LoginScreen({ navigation }) {
 				<SafeAreaView
 					style={[globalStyles.container, {minHeight: windowHeight}]}
 				>
-					<StatusBar hidden={false} animated={true} backgroundColor={colours.pinkBackground} barStyle={"dark-content"}/>
-					<AppButton
-						title="Register"
-						style={loginStyles.registerButton}
-						buttonTextStyle={loginStyles.registerButtonText}
-						onPress={() => navigation.navigate("Register")}
-					/>
+					<StatusBar hidden={false} animated={true} backgroundColor={colours.pinkBackground} barStyle={"dark-content"} />
+					
 					<Text style={loginStyles.titleText}>{titleText}</Text>
 					<View style={globalStyles.separator} />
 					<TextInput
@@ -108,12 +111,28 @@ export default function LoginScreen({ navigation }) {
 						onSubmitEditing={onPressSignIn}
 					/>
 					<View style={globalStyles.separator} />
+
+					<AppButton
+						title="Skip"
+						style={loginStyles.skipButton}
+						buttonTextStyle={loginStyles.skipButtonText}
+						onPress={onPressSkip}
+					/>
+
 					<AppButton
 						title="Login"
 						style={loginStyles.loginButton}
 						buttonTextStyle={loginStyles.loginButtonText}
 						onPress={onPressSignIn}
 					/>
+
+					<AppButton
+						title="Register"
+						style={loginStyles.registerButton}
+						buttonTextStyle={loginStyles.registerButtonText}
+						onPress={() => navigation.navigate("Register")}
+					/>
+
 					<View style={globalStyles.separator} />
 					<View style={loginStyles.baseline}>
 						<Image
@@ -192,11 +211,33 @@ const loginStyles = StyleSheet.create({
 	},
 	registerButton: {
 		flexDirection: "column",
+		height: 50,
+		width: "85%",
+		maxWidth: 350,
+		margin: 12,
+		backgroundColor: colours.blue,
+		borderWidth: 0,
+		borderRadius: 25,
+		alignContent: "center",
+		justifyContent: "center",
+		shadowColor: colours.primary,
+		shadowOpacity: 0.5,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 4,
+	},
+	registerButtonText: {
+		fontSize: 20,
+		color: colours.primary,
+		alignSelf: "center",
+	},
+	skipButton: {
+		flexDirection: "column",
 		height: 40,
 		width: "25%",
 		maxWidth: 100,
 		margin: 12,
-		backgroundColor: colours.blue,
+		backgroundColor: "white",
 		borderWidth: 0,
 		borderRadius: 20,
 		alignContent: "center",
@@ -210,7 +251,7 @@ const loginStyles = StyleSheet.create({
 		shadowRadius: 3,
 		elevation: 6,
 	},
-	registerButtonText: {
+	skipButtonText: {
 		fontSize: 17,
 		color: colours.primary,
 		alignSelf: "center",

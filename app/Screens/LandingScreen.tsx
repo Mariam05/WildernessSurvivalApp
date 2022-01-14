@@ -50,7 +50,6 @@ export default function LandingScreen({ navigation }) {
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
 	const lastNameRef = createRef<TextInput>();
 
-
 	const onPressPatient = (patient: Patient) => {
 		navigation.navigate("Patient", {
 			patientId: patient._id.toString(),
@@ -60,8 +59,7 @@ export default function LandingScreen({ navigation }) {
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		closeRealm();
-		openRealm();
+		isFocused ? openRealm() : closeRealm();
 	}, [isFocused]);
 
 	let [fontsLoaded] = useFonts({
@@ -91,6 +89,7 @@ export default function LandingScreen({ navigation }) {
 					}}
 				>
 					{
+						patients ?
 						patients.map((patient, index: number) => (
 							patient.isValid() ?
 								<PatientItem
@@ -98,12 +97,13 @@ export default function LandingScreen({ navigation }) {
 									name={patient.name}
 									age={patient.age}
 									sex={patient.sex}
+									timestamp={patient.timestamp}
 									style={null}
 									image={images[patient.image]}
 									key={index}
 									onPress={() => onPressPatient(patient)}
 								/> : null
-						))
+						)) : null
 					}
 				</ScrollView>
 				<AddButton onPress={handleModal}/>

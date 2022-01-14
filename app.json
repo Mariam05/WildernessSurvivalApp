@@ -4,7 +4,7 @@
     "slug": "WildernessSurvivalApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./app/assets/images/icon.png",
+    "icon": "./app/assets/images/grass.png",
     "splash": {
       "image": "./app/assets/images/splash.png",
       "resizeMode": "contain",
@@ -17,13 +17,13 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.thereelrg.WildernessSurvivalApp"
     },
     "android": {
       "softwareKeyboardLayoutMode":"pan",
       "adaptiveIcon": {
-        "foregroundImage": "./app/assets/images/adaptive-icon.png",
+        "foregroundImage": "./app/assets/images/grass.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.thereelrg.WildernessSurvivalApp"

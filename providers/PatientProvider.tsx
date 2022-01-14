@@ -40,13 +40,9 @@ const PatientsProvider = (props) => {
 		// open a realm for this particular project and get all Patients
 		Realm.open(config).then((realm) => {
 			realmRef.current = realm;
-			/*realm.write(() => {
-				realm.deleteAll();
-				console.log("deleting all");
-			});*/
 
 			const syncPatients = realm.objects("Patient");
-			let sortedPatients = syncPatients.sorted("name");
+			let sortedPatients = syncPatients.sorted("timestamp", true);
 			setPatients([...sortedPatients]);
 
 			// we observe changes on the Patients, in case Sync informs us of changes
@@ -56,6 +52,7 @@ const PatientsProvider = (props) => {
 				setPatients([...sortedPatients]);
 			});
 		});
+		console.log("Opening Patient Provider Realm!");
 	}
 
 	const createPatient = (image: number, name: string, age: string, sex: string) => {
@@ -79,7 +76,6 @@ const PatientsProvider = (props) => {
 		age = age && age.length > 1 ? age : "?";
 		sex = sex && sex.length > 1 ? sex : "?";
 
-
 		try {
 			realm.write(() => {
 				// Create a new patient in the same partition -- that is, using the same user id.
@@ -100,8 +96,8 @@ const PatientsProvider = (props) => {
 				}
 			});
 		} catch (error) {
-			console.log(error.message)
-			console.log("Failed to write:\n" + name + "\n" + age + "\n" + sex + "\n" + image);
+			console.error(error.message)
+			console.error("Failed to write:\n" + name + "\n" + age + "\n" + sex + "\n" + image);
 		}
 	};
 
@@ -121,6 +117,7 @@ const PatientsProvider = (props) => {
 			realm.close();
 			realmRef.current = null;
 			setPatients([]);
+			console.log("Closing Patient Provider Realm!");
 		}
 	};
 

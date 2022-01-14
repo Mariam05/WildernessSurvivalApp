@@ -6,9 +6,11 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
+import Moment from "moment";
+
 import colours from "../colours";
 
-function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
+function PatientItem({ enabled, onPress, name, sex, age, timestamp, image, style }) {
 	
 	if (enabled) {
 		return (
@@ -37,6 +39,7 @@ function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
 					</Text>
 					<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
 					<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
+					<Text style={patientItemStyles.patientItemDetailsText}>{Moment(new Date(timestamp)).format('DD-MM-YYYY')}</Text>
 				</View>
 			</TouchableOpacity>
 		);

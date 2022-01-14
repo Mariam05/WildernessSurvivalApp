@@ -21,6 +21,22 @@ export default function App() {
 			<NavigationContainer>
 				<Stack.Navigator>
 					<Stack.Screen
+						name="Landing"
+						options={{
+							headerShown: false,
+							gestureEnabled: false,
+						}}
+					>
+						{(props) => {
+							const { navigation } = props;
+							return (
+								<PatientsProvider>
+									<LandingScreen navigation={navigation} />
+								</PatientsProvider>
+							);
+						}}
+					</Stack.Screen>
+					<Stack.Screen
 						name="Login"
 						component={LoginScreen}
 						options={{
@@ -47,22 +63,6 @@ export default function App() {
 							return (
 								<PatientsProvider>
 									<ProfileScreen />
-								</PatientsProvider>
-							);
-						}}
-					</Stack.Screen>
-					<Stack.Screen
-						name="Landing"
-						options={{
-							headerShown: false,
-							gestureEnabled: false,
-						}}
-					>
-						{(props) => {
-							const { navigation } = props;
-							return (
-								<PatientsProvider>
-									<LandingScreen navigation={navigation} />
 								</PatientsProvider>
 							);
 						}}
