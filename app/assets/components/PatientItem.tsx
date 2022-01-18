@@ -7,6 +7,7 @@ import {
 	View
 } from "react-native";
 import colours from "../colours";
+import AppButton from "./AppButton";
 
 function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
 	
@@ -38,6 +39,11 @@ function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
 					<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
 					<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
 				</View>
+				<AppButton 
+					onPress={() => console.log("quick record vitals")} 
+					title="GO"
+					style={patientItemStyles.recordVitalsButton} 
+					buttonTextStyle={patientItemStyles.addButtonText} />
 			</TouchableOpacity>
 		);
 	}
@@ -67,12 +73,27 @@ function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
 			</Text>
 			<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
 			<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
+			
+			<AppButton 
+					onPress={() => console.log("quick record vitals")} 
+					title="GO"
+					style={patientItemStyles.recordVitalsButton} 
+					buttonTextStyle={patientItemStyles.addButtonText} />
+			
 		</View>
 	</View>);
 
 }
 
+
 const patientItemStyles = StyleSheet.create({
+	addButtonText: {
+		fontSize: 30,
+		fontWeight: "700",
+		alignSelf: "center",
+		top: "-7%",
+		color: colours.primary,
+	},
 	patientPicture: {
 		alignContent: "center",
 		justifyContent: "center",
@@ -115,6 +136,21 @@ const patientItemStyles = StyleSheet.create({
 		fontSize: 20,
 		color: colours.primary,
 		alignSelf: "flex-start",
+	},
+	recordVitalsButton: {
+		alignContent: "center",
+		justifyContent: "center",
+		marginLeft: "auto",
+		marginRight: 0,
+		borderRadius: 100,
+		backgroundColor: 'palegoldenrod',
+		height: "100%",
+		aspectRatio: 1.5,
+		shadowColor: colours.primary,
+		shadowOpacity: 0.8,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 6,
 	},
 });
 
