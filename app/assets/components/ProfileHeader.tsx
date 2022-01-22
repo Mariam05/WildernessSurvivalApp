@@ -21,17 +21,7 @@ export default function ProfileHeader({statusbarColour, navigation}) {
     return (
         <View style={styles.header}>
 			<View style={styles.profileView}>
-				{user && user.customData ?
-					<TouchableOpacity onPress={() => {
-						user.refreshCustomData();
-						navigation.navigate("Profile");
-					}}>
-						<Image
-							style={styles.profilePicture}
-							source={images[user.customData.image]}
-						/>
-					</TouchableOpacity>
-					:
+				{user && user.providerType === "anon-user" ?
 					<AppButton
 						title={"Login"}
 						style={{
@@ -53,6 +43,16 @@ export default function ProfileHeader({statusbarColour, navigation}) {
 						}}
 						onPress={() => navigation.navigate("Login")}
 					/>
+					:
+					<TouchableOpacity onPress={() => {
+						user.refreshCustomData();
+						navigation.navigate("Profile");
+					}}>
+						<Image
+							style={styles.profilePicture}
+							source={user.customData ? images[user.customData.image] : null}
+						/>
+					</TouchableOpacity>
 				}
             </View>
         </View>

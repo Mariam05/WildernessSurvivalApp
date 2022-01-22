@@ -131,6 +131,7 @@ const AuthProvider = ({ children }) => {
 
 			custom_data_collection.insertOne(customData)
 				.then((result) => console.log(`Successfully inserted custom data with _id: ${result.insertedId}`))
+				.then(() => user.refreshCustomData())
 				.catch((err) => console.error(`Failed to insert custom data: ${err}`));
 		} else {
 			console.log("NULL USER");
