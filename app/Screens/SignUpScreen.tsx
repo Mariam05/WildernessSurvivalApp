@@ -13,7 +13,6 @@ import {
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    useWindowDimensions,
     View
 } from "react-native";
 
@@ -30,7 +29,6 @@ export default function SignUpScreen() {
     const passwordRef = React.createRef<TextInput>();
     const confirmRef = React.createRef<TextInput>();
 
-    const windowHeight = useWindowDimensions().height;
     const navigation = useNavigation();
     
     const [profileImg, setProfileImg] = useState(0);
@@ -46,17 +44,61 @@ export default function SignUpScreen() {
     const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState("");
     
-    const { signIn, signUp, insertCustomUserData } = useAuth();
+    const { user, emailSignIn, signUp, insertCustomUserData } = useAuth();
+
+    const asyncSignUpWarning = async () => {
+        return new Promise<boolean>((response) => {
+            Alert.alert("Keep Data?", "Would you like to keep the data thats currently on the device or erase it and start fresh?", [
+                {
+                    text: "Start Fresh",
+                    style: "destructive",
+                    onPress: () => {
+                        console.log("Losing data");
+                        response(false);
+                    }
+                },
+                {
+                    text: "Keep Data",
+                    style: "default",
+                    onPress: () => {
+                        console.log("Merging accounts");
+                        response(true);
+                    }
+                },
+            ]);
+        });
+    }
 
     const onPressSignUp = async () => {
         if (validateInput()) {
             console.log("Trying Sign Up with user: " + username);
+            let response = await asyncSignUpWarning();
             try {
                 await signUp(username, password);
-                const newUser = await signIn(username, password);
-                insertCustomUserData(newUser, profileImg, firstName, lastName);
             } catch (error) {
                 const errorMessage = `Failed to sign up: ${error.message}`;
+                console.error(errorMessage);
+                Alert.alert(errorMessage);
+            }
+            try {
+                response ? await user.linkCredentials(Realm.Credentials.emailPassword(username, password)) : null;
+            } catch (error) {
+                const errorMessage = `Failed to link: ${error.message}`;
+                console.error(errorMessage);
+                Alert.alert(errorMessage);
+            }
+            try {
+                const newUser = await emailSignIn(username, password);
+                await insertCustomUserData(newUser, profileImg, firstName, lastName);
+            } catch (error) {
+                const errorMessage = `Failed to sign in: ${error.message}`;
+                console.error(errorMessage);
+                Alert.alert(errorMessage);
+            }
+            try {
+                navigation.navigate("Landing");
+            } catch (error) {
+                const errorMessage = `Failed to navigate: ${error.message}`;
                 console.error(errorMessage);
                 Alert.alert(errorMessage);
             }
@@ -176,7 +218,7 @@ export default function SignUpScreen() {
                                 setFirstName(text);
                             }}
                             value={firstName}
-                            autoCapitalize="none"
+                            autoCapitalize="words"
                             autoCorrect={false}
                             autoCompleteType="name"
                             onSubmitEditing={() => { lastNameRef.current.focus(); }}
@@ -196,7 +238,7 @@ export default function SignUpScreen() {
                                 setLastName(text);
                             }}
                             value={lastName}
-                            autoCapitalize="none"
+                            autoCapitalize="words"
                             autoCorrect={false}
                             autoCompleteType="name"
                             onSubmitEditing={() => { emailRef.current.focus(); }}

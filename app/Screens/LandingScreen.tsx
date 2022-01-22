@@ -27,11 +27,11 @@ import AppButton from "../assets/components/AppButton";
 import PatientItem, {patientItemStyles} from "../assets/components/PatientItem";
 import { PatientModal } from "../assets/components/PatientModal";
 import globalStyles from "../assets/stylesheet";
-import { images } from "../assets/ProfilePics";
 import colours from "../assets/colours";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import { Patient } from "../../schemas";
+import { useAuth } from "../../providers/AuthProvider";
 
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
@@ -44,12 +44,11 @@ export default function LandingScreen({ navigation }) {
 	const [PatientImg, setPatientImg] = useState(0);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const { patients, createPatient, openRealm, closeRealm } =
+	const { patients, createPatient, openPatientRealm, closePatientRealm } =
 		usePatients();
 
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
 	const lastNameRef = createRef<TextInput>();
-
 
 	const onPressPatient = (patient: Patient) => {
 		navigation.navigate("Patient", {
@@ -60,8 +59,9 @@ export default function LandingScreen({ navigation }) {
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		closeRealm();
-		openRealm();
+		if (isFocused)
+			openPatientRealm();
+		return () => closePatientRealm();
 	}, [isFocused]);
 
 	let [fontsLoaded] = useFonts({
@@ -91,6 +91,7 @@ export default function LandingScreen({ navigation }) {
 					}}
 				>
 					{
+						patients ?
 						patients.map((patient, index: number) => (
 							patient.isValid() ?
 								<PatientItem
@@ -98,12 +99,13 @@ export default function LandingScreen({ navigation }) {
 									name={patient.name}
 									age={patient.age}
 									sex={patient.sex}
+									timestamp={patient.timestamp}
 									style={null}
-									image={images[patient.image]}
 									key={index}
-									onPress={() => onPressPatient(patient)}
+									infoPress={() => onPressPatient(patient)}
+									onPress={() => console.log("Start vital recording!")}
 								/> : null
-						))
+						)) : null
 					}
 				</ScrollView>
 				<AddButton onPress={handleModal}/>
@@ -122,47 +124,15 @@ export default function LandingScreen({ navigation }) {
 									<PatientItem
 										enabled={false}
 										onPress={null}
+										infoPress={null}
 										name={PatientFN + " " + PatientLN}
 										age={PatientAge}
 										sex={PatientSex}
-										image={images[PatientImg]}
+										timestamp={Date.now()}
 										style={{width: "90%"}}
 									/>
 									<View style={{marginVertical: "3%"}} />
-									<Text style={modalStyles.modalSubHeadingText}>
-										Profile Picture
-									</Text>
-									<ScrollView
-										horizontal={true}
-										style={{
-											padding: 10,
-											height: "10%",
-											marginHorizontal: "-4%",
-										}}
-									>
-										{images.map((image, index) => (
-											<TouchableOpacity
-												onPress={() => setPatientImg(index)}
-												key={index}
-											>
-												<View
-													style={[patientItemStyles.patientPicture, { elevation: 2 }]} 
-												>
-													<Image
-														style={{
-															width: "100%",
-															height: undefined,
-															aspectRatio: 1,
-															resizeMode: "cover",
-															borderRadius: 100,
-														}}
-														source={image}
-													/>
-												</View>
-											</TouchableOpacity>
-										))}
-									</ScrollView>
-									<View style={{marginVertical: "3%"}} />
+									<Text style={modalStyles.modalSubHeadingText}>Name</Text>
 									<TextInput
 										style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
 										clearButtonMode="while-editing"

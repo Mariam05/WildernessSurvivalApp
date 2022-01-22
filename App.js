@@ -1,4 +1,3 @@
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -29,6 +28,22 @@ export default function App() {
 						}}
 					/>
 					<Stack.Screen
+						name="Landing"
+						options={{
+							headerShown: false,
+							gestureEnabled: false,
+						}}
+					>
+						{(props) => {
+							const { navigation } = props;
+							return (
+								<PatientsProvider>
+									<LandingScreen navigation={navigation} />
+								</PatientsProvider>
+							);
+						}}
+					</Stack.Screen>
+					<Stack.Screen
 						name="Register"
 						component={SignUpScreen}
 						options={{
@@ -47,22 +62,6 @@ export default function App() {
 							return (
 								<PatientsProvider>
 									<ProfileScreen />
-								</PatientsProvider>
-							);
-						}}
-					</Stack.Screen>
-					<Stack.Screen
-						name="Landing"
-						options={{
-							headerShown: false,
-							gestureEnabled: false,
-						}}
-					>
-						{(props) => {
-							const { navigation } = props;
-							return (
-								<PatientsProvider>
-									<LandingScreen navigation={navigation} />
 								</PatientsProvider>
 							);
 						}}
