@@ -16,14 +16,14 @@ const PatientsProvider = (props) => {
 	const realmRef = useRef(null);
 
 	useEffect(() => {
-		openRealm();
+		openPatientRealm();
 		return () => {
 			// cleanup function
-			closeRealm();
+			closePatientRealm();
 		};
 	}, [user]);
 
-	const openRealm = () => {
+	const openPatientRealm = () => {
 		if (user == null) {
 			console.error("Null user? Needs to log in!");
 			return;
@@ -111,7 +111,7 @@ const PatientsProvider = (props) => {
 		});
 	};
 
-	const closeRealm = () => {
+	const closePatientRealm = () => {
 		const realm = realmRef.current;
 		if (realm) {
 			realm.close();
@@ -129,8 +129,8 @@ const PatientsProvider = (props) => {
 			value={{
 				createPatient,
 				deletePatient,
-				openRealm,
-				closeRealm,
+				openPatientRealm,
+				closePatientRealm,
 				patients,
 			}}
 		>

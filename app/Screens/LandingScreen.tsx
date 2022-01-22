@@ -31,6 +31,7 @@ import colours from "../assets/colours";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import { Patient } from "../../schemas";
+import { useAuth } from "../../providers/AuthProvider";
 
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
@@ -43,7 +44,7 @@ export default function LandingScreen({ navigation }) {
 	const [PatientImg, setPatientImg] = useState(0);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const { patients, createPatient, openRealm, closeRealm } =
+	const { patients, createPatient, openPatientRealm, closePatientRealm } =
 		usePatients();
 
 	const handleModal = () => setIsModalVisible(() => !isModalVisible);
@@ -58,7 +59,9 @@ export default function LandingScreen({ navigation }) {
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		isFocused ? openRealm() : closeRealm();
+		if (isFocused)
+			openPatientRealm();
+		return () => closePatientRealm();
 	}, [isFocused]);
 
 	let [fontsLoaded] = useFonts({

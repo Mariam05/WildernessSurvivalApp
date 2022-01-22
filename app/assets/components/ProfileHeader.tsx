@@ -4,6 +4,8 @@ import colours from "../colours";
 import { useAuth } from "../../../providers/AuthProvider";
 import { images } from "../ProfilePics";
 import AppButton from "./AppButton";
+import { useIsFocused } from "@react-navigation/native";
+import { useEffect } from "react";
 
 
 export default function ProfileHeader({statusbarColour, navigation}) {
@@ -11,6 +13,11 @@ export default function ProfileHeader({statusbarColour, navigation}) {
 
     const { user } = useAuth();
     
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		user.refreshCustomData();
+	}, [isFocused]);
+
     return (
         <View style={styles.header}>
 			<View style={styles.profileView}>

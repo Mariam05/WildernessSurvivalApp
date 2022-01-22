@@ -1,4 +1,3 @@
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -21,6 +20,14 @@ export default function App() {
 			<NavigationContainer>
 				<Stack.Navigator>
 					<Stack.Screen
+						name="Login"
+						component={LoginScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: false,
+						}}
+					/>
+					<Stack.Screen
 						name="Landing"
 						options={{
 							headerShown: false,
@@ -36,14 +43,6 @@ export default function App() {
 							);
 						}}
 					</Stack.Screen>
-					<Stack.Screen
-						name="Login"
-						component={LoginScreen}
-						options={{
-							headerShown: false,
-							gestureEnabled: false,
-						}}
-					/>
 					<Stack.Screen
 						name="Register"
 						component={SignUpScreen}

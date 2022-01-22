@@ -32,7 +32,7 @@ export default function ProfileScreen() {
     const navigation = useNavigation();
     
     const { user, signOut, updateCustomUserData, changePassword } = useAuth();
-    const { closeRealm } = usePatients();
+    const { closePatientRealm } = usePatients();
 
 	const lastNameRef = React.createRef<TextInput>();
     const emailRef = React.createRef<TextInput>();
@@ -77,7 +77,7 @@ export default function ProfileScreen() {
                         try {
                             await changePassword(email, oldPassword, newPassword);
                             navigation.popToTop();
-                            closeRealm();
+                            closePatientRealm();
                             signOut();
                         } catch (error) {
                             Alert.alert("There was an error", error.message, [{ text: "Ok", style: "default" }])
@@ -438,7 +438,7 @@ export default function ProfileScreen() {
                                     
                                     <LogoutButton
                                         navigation={navigation}
-                                        closeRealm={closeRealm}
+                                        closeRealm={closePatientRealm}
                                         signOut={signOut} />
                                 </>
                         }
