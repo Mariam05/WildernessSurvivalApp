@@ -3,26 +3,57 @@ import { Image, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from "
 import colours from "../colours";
 import { useAuth } from "../../../providers/AuthProvider";
 import { images } from "../ProfilePics";
+import AppButton from "./AppButton";
+import { useIsFocused } from "@react-navigation/native";
+import { useEffect } from "react";
 
 
 export default function ProfileHeader({statusbarColour, navigation}) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(statusbarColour, true);
 
-    const {user} = useAuth();
+    const { user } = useAuth();
     
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		user.refreshCustomData();
+	}, [isFocused]);
+
     return (
         <View style={styles.header}>
-            <View style={styles.profileView}>
-				<TouchableOpacity onPress={() => {
-					user.refreshCustomData();
-					console.log(user.profile);
-					navigation.navigate("Profile");
-				}}>
-                    <Image
-						style={styles.profilePicture}
-						source={user.customData ? images[user.customData.image] : null}
-                    />
-                </TouchableOpacity>
+			<View style={styles.profileView}>
+				{user && user.providerType === "anon-user" ?
+					<AppButton
+						title={"Login"}
+						style={{
+							backgroundColor: colours.pinkBackground,
+							borderRadius: 100,
+							alignItems: "center",
+							justifyContent: "center",
+							width: 75,
+							shadowColor: colours.primary,
+							shadowOpacity: 0.4,
+							shadowOffset: { width: 0, height: 3 },
+							shadowRadius: 3,
+							elevation: 6,
+						}}
+						buttonTextStyle={{
+							fontSize: 17,
+							color: colours.primary,
+							alignSelf: "center",
+						}}
+						onPress={() => navigation.navigate("Login")}
+					/>
+					:
+					<TouchableOpacity onPress={() => {
+						user.refreshCustomData();
+						navigation.navigate("Profile");
+					}}>
+						<Image
+							style={styles.profilePicture}
+							source={user.customData ? images[user.customData.image] : null}
+						/>
+					</TouchableOpacity>
+				}
             </View>
         </View>
 

@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (!user) {
-			console.warn("NO USER Logged In");
+			console.error("Null user? Needs to log in!");
 			return;
 		}
 
@@ -47,12 +47,25 @@ const AuthProvider = ({ children }) => {
 	// emailPassword authentication provider to log in.
 	// This authentication method should be set up correctly on the MongoDB Realm App
 	// see: https://docs.mongodb.com/realm/authentication/providers/
-	const signIn = async (email, password) => {
+	const emailSignIn = async (email: string, password: string) => {
+
+		if (user) { // if there is a user signed in, sign them out 
+			console.log("Signing out user before sigining in")
+			await signOut();
+		}
+
 		const creds = Realm.Credentials.emailPassword(
 			email.toLowerCase(),
 			password
 		);
 		
+		const newUser = await app.logIn(creds);
+		setUser(newUser);
+		return newUser;
+	};
+
+	const anonSignIn = async () => {
+		const creds = Realm.Credentials.anonymous();
 
 		const newUser = await app.logIn(creds);
 		setUser(newUser);
@@ -70,12 +83,12 @@ const AuthProvider = ({ children }) => {
 
 	// The signOut function calls the logOut function on the currently
 	// logged in user
-	const signOut = () => {
+	const signOut = async () => {
 		if (user == null) {
 			console.warn("Not logged in, can't log out!");
 			return;
 		}
-		user.logOut();
+		await user.logOut();
 		setUser(null);
 	};
 
@@ -118,6 +131,7 @@ const AuthProvider = ({ children }) => {
 
 			custom_data_collection.insertOne(customData)
 				.then((result) => console.log(`Successfully inserted custom data with _id: ${result.insertedId}`))
+				.then(() => user.refreshCustomData())
 				.catch((err) => console.error(`Failed to insert custom data: ${err}`));
 		} else {
 			console.log("NULL USER");
@@ -156,7 +170,8 @@ const AuthProvider = ({ children }) => {
 		<AuthContext.Provider
 			value={{
 				signUp,
-				signIn,
+				anonSignIn,
+				emailSignIn,
 				signOut,
 				user,
 				changePassword,

@@ -76,15 +76,17 @@ class Vital {
 class Patient {
 	_partition: string = "-1";
 	_id?: ObjectId = new ObjectId();
+	timestamp?: number = Date.now();
 	image?: number = 0;
 	name?: string = "New Patient";
 	age?: string = "?";
 	sex?: string = "Other";
 	vitals: Vital[] = [];
 
-	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId() }) {
+	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId(), timestamp = Date.now() }) {
 		this._partition = partition;
 		this._id = id;
+		this.timestamp = timestamp;
 		this.image = image;
 		this.name = name;
 		this.age = age;
@@ -97,6 +99,7 @@ class Patient {
 		properties: {
 			_id: "objectId?",
 			_partition: "string",
+			timestamp: "int?",
 			image: "int?",
 			name: "string?",
 			age: "string?",

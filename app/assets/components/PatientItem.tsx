@@ -1,93 +1,47 @@
 import React from "react";
 import {
-	Image,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View
 } from "react-native";
+import Moment from "moment";
+
 import colours from "../colours";
 import AppButton from "./AppButton";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 
-function PatientItem({ enabled, onPress, name, sex, age, image, style, navigation }) {
+function PatientItem({ enabled, infoPress, onPress, name, sex, age, timestamp, style, navigation }) {
 	const onPressQuickVitals = () => {
 		console.log("quick record vitals");
 		navigation.push("RecordVitals");
 	};
-
-	if (enabled) {
-		return (
-			<TouchableOpacity style={[patientItemStyles.patientItem, style]} onPress={onPress}>
-				<View style={patientItemStyles.patientPicture}>
-					<Image
-						style={{
-							width: "100%",
-							height: undefined,
-							aspectRatio: 1,
-							resizeMode: "cover",
-							borderRadius: 100,
-						}}
-						source={image}
-					/>
-				</View>
-				<View>
-					<Text style={patientItemStyles.patientItemNameText}>
-						{name
-							.toLowerCase()
-							.split(" ")
-							.map((word) =>
-								word.replace(word[0], word[0].toUpperCase())
-							)
-							.join(" ")}
-					</Text>
-					<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
-					<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
-				</View>
-				<AppButton
-					onPress={() => onPressQuickVitals()}
-					title="GO"
-					style={patientItemStyles.recordVitalsButton}
-					buttonTextStyle={patientItemStyles.addButtonText} />
-			</TouchableOpacity>
-		);
-	}
 	return (
-		<View style={[patientItemStyles.patientItem, style]} >
-			<View style={patientItemStyles.patientPicture} >
-				<Image
-					style={{
-						width: "100%",
-						height: undefined,
-						aspectRatio: 1,
-						resizeMode: "cover",
-						borderRadius: 100,
-					}}
-					source={image}
-				/>
-			</View>
-			<View>
+		<TouchableOpacity style={[patientItemStyles.patientItem, style]} onPress={onPress} disabled={!enabled}>
+			<TouchableOpacity onPress={infoPress} style={patientItemStyles.infoButton} disabled={!enabled}>
+				<Text style={patientItemStyles.infoButtonText}>i</Text>
+			</TouchableOpacity>
+			<View style={{ borderWidth: 0, flex: 1 }}>
 				<Text style={patientItemStyles.patientItemNameText}>
-					{(name && name.length > 1) ? name
+					{name
 						.toLowerCase()
 						.split(" ")
 						.map((word) =>
-							word ? word.replace(word[0], word[0].toUpperCase()) : null
+							word != "" ? word.replace(word[0], word[0].toUpperCase()) : null
 						)
-						.join(" ") : "New Patient"}
+						.join(" ")}
 				</Text>
 				<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
 				<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
-
-				<AppButton
-					onPress={() => console.log("quick record vitals")}
-					title="GO"
-					style={patientItemStyles.recordVitalsButton}
-					buttonTextStyle={patientItemStyles.addButtonText} />
-
+				<Text style={patientItemStyles.patientItemDetailsText}>{Moment(new Date(timestamp)).format('DD-MM-YYYY')}</Text>
 			</View>
-		</View>);
-
+			<AppButton
+				onPress={() => onPressQuickVitals()}
+				title="GO"
+				style={patientItemStyles.recordVitalsButton}
+				buttonTextStyle={patientItemStyles.addButtonText} />
+		</TouchableOpacity>
+	);
 }
 
 
@@ -99,13 +53,13 @@ const patientItemStyles = StyleSheet.create({
 		top: "-7%",
 		color: colours.primary,
 	},
-	patientPicture: {
+	infoButton: {
 		alignContent: "center",
 		justifyContent: "center",
 		marginLeft: 0,
 		marginRight: 15,
 		borderRadius: 100,
-		backgroundColor: colours.secondary,
+		backgroundColor: colours.purple,
 		height: "100%",
 		aspectRatio: 1,
 		shadowColor: colours.primary,
@@ -113,6 +67,11 @@ const patientItemStyles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 3,
 		elevation: 6,
+	},
+	infoButtonText: {
+		fontSize: 40,
+		fontWeight: "normal",
+		textAlign: "center",
 	},
 	patientItem: {
 		flexDirection: "row",
@@ -124,6 +83,7 @@ const patientItemStyles = StyleSheet.create({
 		width: "75%",
 		alignSelf: "center",
 		justifyContent: "flex-start",
+		alignItems: "center",
 		backgroundColor: colours.blue,
 		borderRadius: 100,
 		shadowColor: colours.primary,

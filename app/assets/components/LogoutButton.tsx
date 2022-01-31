@@ -1,9 +1,13 @@
 import React from "react";
 import { Alert, StyleSheet } from "react-native";
+import { useAuth } from "../../../providers/AuthProvider";
 import colours from "../colours";
 import AppButton from "./AppButton";
 
 export default function LogoutButton({ closeRealm, navigation, signOut }) {
+
+	const { anonSignIn } = useAuth();
+
 	return (
 		<AppButton
 			style={styles.logoutButton}
@@ -18,6 +22,7 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 							navigation.popToTop();
 							closeRealm();
 							signOut();
+							anonSignIn();
 						},
 					},
 					{ text: "Cancel", style: "cancel" },

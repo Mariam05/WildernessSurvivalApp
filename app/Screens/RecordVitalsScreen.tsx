@@ -269,22 +269,22 @@ export default function RecordVitalsStack() {
       <Stack.Screen
         name="Pulse"
         component={PulseScreen}
-      // options={{ headerShown: false, gestureEnabled: false }} 
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="Respiration"
         component={RespScreen}
-      // options={{ headerShown: false, gestureEnabled: false }} 
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="Skin"
         component={SkinScreen}
-      // options={{ headerShown: false, gestureEnabled: false }} 
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="Temperature"
         component={TempScreen}
-      // options={{ headerShown: false, gestureEnabled: false }} 
+        options={{ headerShown: false, gestureEnabled: false }}
       />
 
     </Stack.Navigator>
