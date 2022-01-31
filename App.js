@@ -12,80 +12,83 @@ import { VitalsProvider } from "./providers/VitalProvider";
 import SignUpScreen from "./app/Screens/SignUpScreen";
 import ProfileScreen from "./app/Screens/ProfileScreen";
 import PatientScreen from "./app/Screens/PatientScreen";
+import RecordVitalsStack from "./app/Screens/RecordVitalsScreen";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-	return (
-		<AuthProvider>
-			<NavigationContainer>
-				<Stack.Navigator>
-					<Stack.Screen
-						name="Login"
-						component={LoginScreen}
-						options={{
-							headerShown: false,
-							gestureEnabled: false,
-						}}
-					/>
-					<Stack.Screen
-						name="Register"
-						component={SignUpScreen}
-						options={{
-							headerShown: false,
-							gestureEnabled: true,
-						}}
-					/>
-					<Stack.Screen
-						name="Profile"
-						options={{
-							headerShown: false,
-							gestureEnabled: true,
-						}}
-					>
-						{() => {
-							return (
-								<PatientsProvider>
-									<ProfileScreen />
-								</PatientsProvider>
-							);
-						}}
-					</Stack.Screen>
-					<Stack.Screen
-						name="Landing"
-						options={{
-							headerShown: false,
-							gestureEnabled: false,
-						}}
-					>
-						{(props) => {
-							const { navigation } = props;
-							return (
-								<PatientsProvider>
-									<LandingScreen navigation={navigation} />
-								</PatientsProvider>
-							);
-						}}
-					</Stack.Screen>
-					<Stack.Screen
-						name="Patient"
-						options={{ headerShown: false, gestureEnabled: false }}
-					>
-						{(props) => {
-							const { navigation, route } = props;
-							const { patientId } = route.params;
-							return (
-								<VitalsProvider patientId={patientId}>
-									<PatientScreen
-										route={route}
-										navigation={navigation}
-									/>
-								</VitalsProvider>
-							);
-						}}
-					</Stack.Screen>
-				</Stack.Navigator>
-			</NavigationContainer>
-		</AuthProvider>
-	);
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={SignUpScreen}
+            options={{
+              headerShown: false,
+              gestureEnabled: true,
+            }}
+          />
+          <Stack.Screen
+            name="Profile"
+            options={{
+              headerShown: false,
+              gestureEnabled: true,
+            }}
+          >
+            {() => {
+              return (
+                <PatientsProvider>
+                  <ProfileScreen />
+                </PatientsProvider>
+              );
+            }}
+          </Stack.Screen>
+          <Stack.Screen
+            name="Landing"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          >
+            {(props) => {
+              const { navigation } = props;
+              return (
+                <PatientsProvider>
+                  <LandingScreen navigation={navigation} />
+                </PatientsProvider>
+              );
+            }}
+          </Stack.Screen>
+          <Stack.Screen
+            name="Patient"
+            options={{ headerShown: false, gestureEnabled: false }}
+          >
+            {(props) => {
+              const { navigation, route } = props;
+              const { patientId } = route.params;
+              return (
+                <VitalsProvider patientId={patientId}>
+                  <PatientScreen route={route} navigation={navigation} />
+                </VitalsProvider>
+              );
+            }}
+          </Stack.Screen>
+          <Stack.Screen
+            name="RecordVitals"
+            component={RecordVitalsStack}
+            options={{ headerShown: false, gestureEnabled: false }}
+          ></Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
+  );
 }

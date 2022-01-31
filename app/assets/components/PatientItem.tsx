@@ -8,9 +8,14 @@ import {
 } from "react-native";
 import colours from "../colours";
 import AppButton from "./AppButton";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 
-function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
-	
+function PatientItem({ enabled, onPress, name, sex, age, image, style, navigation }) {
+	const onPressQuickVitals = () => {
+		console.log("quick record vitals");
+		navigation.push("RecordVitals");
+	};
+
 	if (enabled) {
 		return (
 			<TouchableOpacity style={[patientItemStyles.patientItem, style]} onPress={onPress}>
@@ -39,49 +44,49 @@ function PatientItem({ enabled, onPress, name, sex, age, image, style }) {
 					<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
 					<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
 				</View>
-				<AppButton 
-					onPress={() => console.log("quick record vitals")} 
+				<AppButton
+					onPress={() => onPressQuickVitals()}
 					title="GO"
-					style={patientItemStyles.recordVitalsButton} 
+					style={patientItemStyles.recordVitalsButton}
 					buttonTextStyle={patientItemStyles.addButtonText} />
 			</TouchableOpacity>
 		);
 	}
 	return (
 		<View style={[patientItemStyles.patientItem, style]} >
-		<View style={patientItemStyles.patientPicture} >
-			<Image
-				style={{
-					width: "100%",
-					height: undefined,
-					aspectRatio: 1,
-					resizeMode: "cover",
-					borderRadius: 100,
-				}}
-				source={image}
-			/>
-		</View>
-		<View>
-			<Text style={patientItemStyles.patientItemNameText}>
-				{(name && name.length > 1) ? name
-					.toLowerCase()
-					.split(" ")
-					.map((word) =>
-						word ? word.replace(word[0], word[0].toUpperCase()) : null
-					)
-					.join(" ") : "New Patient"}
-			</Text>
-			<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
-			<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
-			
-			<AppButton 
-					onPress={() => console.log("quick record vitals")} 
+			<View style={patientItemStyles.patientPicture} >
+				<Image
+					style={{
+						width: "100%",
+						height: undefined,
+						aspectRatio: 1,
+						resizeMode: "cover",
+						borderRadius: 100,
+					}}
+					source={image}
+				/>
+			</View>
+			<View>
+				<Text style={patientItemStyles.patientItemNameText}>
+					{(name && name.length > 1) ? name
+						.toLowerCase()
+						.split(" ")
+						.map((word) =>
+							word ? word.replace(word[0], word[0].toUpperCase()) : null
+						)
+						.join(" ") : "New Patient"}
+				</Text>
+				<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
+				<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
+
+				<AppButton
+					onPress={() => console.log("quick record vitals")}
 					title="GO"
-					style={patientItemStyles.recordVitalsButton} 
+					style={patientItemStyles.recordVitalsButton}
 					buttonTextStyle={patientItemStyles.addButtonText} />
-			
-		</View>
-	</View>);
+
+			</View>
+		</View>);
 
 }
 

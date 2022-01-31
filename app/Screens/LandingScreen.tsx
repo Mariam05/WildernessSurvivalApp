@@ -102,6 +102,7 @@ export default function LandingScreen({ navigation }) {
 									image={images[patient.image]}
 									key={index}
 									onPress={() => onPressPatient(patient)}
+									navigation={navigation}
 								/> : null
 						))
 					}
@@ -127,6 +128,7 @@ export default function LandingScreen({ navigation }) {
 										sex={PatientSex}
 										image={images[PatientImg]}
 										style={{width: "90%"}}
+										navigation={navigation}
 									/>
 									<View style={{marginVertical: "3%"}} />
 									<Text style={modalStyles.modalSubHeadingText}>
