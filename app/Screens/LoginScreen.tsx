@@ -4,7 +4,6 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
-import AppLoading from "expo-app-loading";
 import React, { createRef, useEffect, useState } from "react";
 import {
 	Alert,
@@ -27,10 +26,12 @@ import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 
 export default function LoginScreen({ navigation }) {
-	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.pinkBackground, true);
+	Platform.OS === "ios"
+		? null
+		: StatusBar.setBackgroundColor(colours.pinkBackground, true);
 
 	const passwordRef = React.createRef<TextInput>();
-	
+
 	const [loggingIn, setLoggingIn] = useState<boolean>(false);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
@@ -45,37 +46,50 @@ export default function LoginScreen({ navigation }) {
 		Oxygen_700Bold,
 	});
 
+	useEffect(() => {
+		// If there is a user logged in, go to the Landing page.
+		if (user != null) {
+			navigation.navigate("Landing");
+		}
+	}, [user]);
+
 	const asyncSignInWarning = async () => {
 		return new Promise<boolean>((response) => {
-			Alert.alert("Login?", "Logging in will lose all patient data currently stored in the app", [
-				{
-					text: "Login",
-					style: "destructive",
-					onPress: () => {
-						console.log("Logging in");
-						response(true);
-					}
-				},
-				{
-					text: "Cancel",
-					style: "cancel",
-					onPress: () => {
-						console.log("Cancelling");
-						response(false);
-					}
-				}
-			]);
+			Alert.alert(
+				"Login?",
+				"Logging in will lose all patient data currently stored in the app",
+				[
+					{
+						text: "Login",
+						style: "destructive",
+						onPress: () => {
+							console.log("Logging in");
+							response(true);
+						},
+					},
+					{
+						text: "Cancel",
+						style: "cancel",
+						onPress: () => {
+							console.log("Cancelling");
+							response(false);
+						},
+					},
+				]
+			);
 		});
-	}
+	};
 
 	const onPressSignIn = async () => {
 		if (loggingIn == false) {
-			setLoggingIn(true)
+			setLoggingIn(true);
 		} else {
 			console.log("Trying sign in with user: " + username);
-			try { 
+			try {
 				let response = null; // default they want to sign in
-				user ? response = await asyncSignInWarning() : response = true; // Warn user if they have already "Continued without an account"
+				user
+					? (response = await asyncSignInWarning())
+					: (response = true); // Warn user if they have already "Continued without an account"
 				if (response) {
 					console.log("Signing in user");
 					await emailSignIn(username, password);
@@ -109,18 +123,29 @@ export default function LoginScreen({ navigation }) {
 	};
 
 	if (!fontsLoaded) {
-		return <AppLoading />;
+		return <View />;
 	} else {
 		return (
-			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}> 
+			<TouchableWithoutFeedback
+				onPress={Keyboard.dismiss}
+				accessible={false}
+			>
 				<SafeAreaView
-					style={[globalStyles.container, {minHeight: windowHeight}]}
+					style={[
+						globalStyles.container,
+						{ minHeight: windowHeight },
+					]}
 				>
-					<StatusBar hidden={false} animated={true} backgroundColor={colours.pinkBackground} barStyle={"dark-content"} />
-					
+					<StatusBar
+						hidden={false}
+						animated={true}
+						backgroundColor={colours.pinkBackground}
+						barStyle={"dark-content"}
+					/>
+
 					<Text style={loginStyles.titleText}>{titleText}</Text>
 					<View style={globalStyles.separator} />
-					{loggingIn ?
+					{loggingIn ? (
 						<>
 							<TextInput
 								style={globalStyles.credentialInput}
@@ -133,9 +158,11 @@ export default function LoginScreen({ navigation }) {
 								value={username}
 								autoCapitalize="none"
 								autoCorrect={false}
-								onSubmitEditing={() => { passwordRef.current.focus(); }}
+								onSubmitEditing={() => {
+									passwordRef.current.focus();
+								}}
 							/>
-					
+
 							<TextInput
 								ref={passwordRef}
 								style={globalStyles.credentialInput}
@@ -149,57 +176,81 @@ export default function LoginScreen({ navigation }) {
 								onChangeText={(text) => setPassword(text)}
 								onSubmitEditing={onPressSignIn}
 							/>
-						</> : null
-					}
+						</>
+					) : null}
 					<View style={globalStyles.separator} />
 
-					{!loggingIn ?
+					{!loggingIn ? (
 						<>
-							<Text style={[loginStyles.subHeader, { left: "5%" }]}>Need access now?</Text>
+							<Text
+								style={[loginStyles.subHeader, { left: "5%" }]}
+							>
+								Need access now?
+							</Text>
 							<AppButton
 								title="Continue Without Account"
 								style={loginStyles.skipButton}
 								buttonTextStyle={loginStyles.skipButtonText}
 								onPress={onPressSkip}
 							/>
-						</> : null
-					}
+						</>
+					) : null}
 
 					<View style={globalStyles.separator} />
 
 					<View style={{ width: "90%", flexDirection: "row" }}>
-						<View style={{flex: 10}}>
-							{!loggingIn ?
-								<Text style={loginStyles.subHeader}>Have an account?</Text>
-								: null}
-								<AppButton
-									title="Login"
-									style={loginStyles.loginButton}
-									buttonTextStyle={loginStyles.loginButtonText}
-									onPress={onPressSignIn}
-								/>
-							{loggingIn ? 
+						<View style={{ flex: 10 }}>
+							{!loggingIn ? (
+								<Text style={loginStyles.subHeader}>
+									Have an account?
+								</Text>
+							) : null}
+							<AppButton
+								title="Login"
+								style={loginStyles.loginButton}
+								buttonTextStyle={loginStyles.loginButtonText}
+								onPress={onPressSignIn}
+							/>
+							{loggingIn ? (
 								<AppButton
 									title="Cancel"
-									style={[loginStyles.loginButton, {backgroundColor: "tomato", marginTop: 15}]}
-									buttonTextStyle={loginStyles.loginButtonText}
+									style={[
+										loginStyles.loginButton,
+										{
+											backgroundColor: "tomato",
+											marginTop: 15,
+										},
+									]}
+									buttonTextStyle={
+										loginStyles.loginButtonText
+									}
 									onPress={() => setLoggingIn(false)}
-								/> : null}
+								/>
+							) : null}
 						</View>
 
-						{!loggingIn ?
+						{!loggingIn ? (
 							<>
-								<View style={{ flex: 1 }} /><View style={{ flex: 10 }}>
-									<Text style={loginStyles.subHeader}>Want an account?</Text>
+								<View style={{ flex: 1 }} />
+								<View style={{ flex: 10 }}>
+									<Text style={loginStyles.subHeader}>
+										Want an account?
+									</Text>
 									<AppButton
 										title="Register"
 										style={loginStyles.registerButton}
-										buttonTextStyle={loginStyles.registerButtonText}
-										onPress={() => navigation.navigate("Register")} />
+										buttonTextStyle={
+											loginStyles.registerButtonText
+										}
+										onPress={() =>
+											navigation.navigate("Register")
+										}
+									/>
 								</View>
-							</> : null}
+							</>
+						) : null}
 					</View>
-					
+
 					<View style={globalStyles.separator} />
 					<View style={loginStyles.baseline}>
 						<Image
@@ -235,8 +286,8 @@ export default function LoginScreen({ navigation }) {
 							source={require("../assets/images/grass.png")}
 						/>
 					</View>
-					</SafeAreaView>
-				</TouchableWithoutFeedback>
+				</SafeAreaView>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
@@ -319,13 +370,13 @@ const loginStyles = StyleSheet.create({
 		fontSize: 20,
 		color: colours.primary,
 		alignSelf: "center",
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	subHeader: {
 		fontSize: 17,
 		fontWeight: "bold",
 		color: "grey",
-		alignSelf: "flex-start"
+		alignSelf: "flex-start",
 	},
 	titleText: {
 		fontSize: 50,

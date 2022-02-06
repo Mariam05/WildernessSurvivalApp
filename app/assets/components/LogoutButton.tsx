@@ -5,7 +5,6 @@ import colours from "../colours";
 import AppButton from "./AppButton";
 
 export default function LogoutButton({ closeRealm, navigation, signOut }) {
-
 	const { anonSignIn } = useAuth();
 
 	return (
@@ -34,11 +33,11 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 
 const styles = StyleSheet.create({
 	logoutButton: {
-        alignSelf: "center",
+		alignSelf: "center",
 		flexDirection: "column",
 		alignContent: "center",
 		justifyContent: "center",
-		height: "5%",
+		height: "10%",
 		width: "50%",
 		maxWidth: 350,
 		margin: 12,
@@ -49,11 +48,11 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.5,
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 3,
-        elevation: 4,
+		elevation: 4,
 	},
 	logoutButtonText: {
 		fontSize: 20,
 		fontWeight: "600",
-		alignSelf: "center"
+		alignSelf: "center",
 	},
-})
+});

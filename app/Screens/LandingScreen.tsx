@@ -4,16 +4,12 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
-import AppLoading from "expo-app-loading";
 import React, { createRef, useEffect, useState } from "react";
 import {
-	Image,
 	SafeAreaView,
 	ScrollView,
-	StatusBar,
 	StyleSheet,
 	Text,
-	TouchableOpacity,
 	TextInput,
 	View,
 	KeyboardAvoidingView,
@@ -24,14 +20,13 @@ import SegmentedControl from "@react-native-segmented-control/segmented-control"
 
 import { usePatients } from "../../providers/PatientProvider";
 import AppButton from "../assets/components/AppButton";
-import PatientItem, {patientItemStyles} from "../assets/components/PatientItem";
 import { PatientModal } from "../assets/components/PatientModal";
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import { Patient } from "../../schemas";
-import { useAuth } from "../../providers/AuthProvider";
+import PatientItem from "../assets/components/PatientItem";
 
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
@@ -59,8 +54,7 @@ export default function LandingScreen({ navigation }) {
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		if (isFocused)
-			openPatientRealm();
+		if (isFocused) openPatientRealm();
 		return () => closePatientRealm();
 	}, [isFocused]);
 
@@ -71,11 +65,14 @@ export default function LandingScreen({ navigation }) {
 	});
 
 	if (!fontsLoaded) {
-		return <AppLoading />;
+		return <View />;
 	} else {
 		return (
 			<SafeAreaView
-				style={[globalStyles.container, {backgroundColor: colours.redBackground}]}
+				style={[
+					globalStyles.container,
+					{ backgroundColor: colours.redBackground },
+				]}
 			>
 				<ProfileHeader
 					navigation={navigation}
@@ -84,43 +81,54 @@ export default function LandingScreen({ navigation }) {
 
 				<ScrollView
 					horizontal={false}
-					style={[globalStyles.patientScrollView, {backgroundColor: colours.yellowBackground}]}
+					style={[
+						globalStyles.patientScrollView,
+						{ backgroundColor: colours.yellowBackground },
+					]}
 					contentContainerStyle={{
 						alignSelf: "stretch",
 						paddingBottom: "30%",
 					}}
 				>
-					{
-						patients ?
-						patients.map((patient, index: number) => (
-							patient.isValid() ?
-								<PatientItem
-									enabled={true}
-									name={patient.name}
-									age={patient.age}
-									sex={patient.sex}
-									timestamp={patient.timestamp}
-									style={null}
-									key={index}
-									infoPress={() => onPressPatient(patient)}
-									onPress={() => console.log("Start vital recording!")}
-								/> : null
-						)) : null
-					}
+					{patients
+						? patients.map((patient, index: number) =>
+								patient.isValid() ? (
+									<PatientItem
+										enabled={true}
+										name={patient.name}
+										age={patient.age}
+										sex={patient.sex}
+										timestamp={patient.timestamp}
+										style={null}
+										key={index}
+										infoPress={() =>
+											onPressPatient(patient)
+										}
+										onPress={() =>
+											console.log(
+												"Start vital recording!"
+											)
+										}
+									/>
+								) : null
+						  )
+						: null}
 				</ScrollView>
-				<AddButton onPress={handleModal}/>
+				<AddButton onPress={handleModal} />
 
 				<PatientModal isVisible={isModalVisible}>
-					<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+					<KeyboardAvoidingView
+						behavior={Platform.OS === "ios" ? "padding" : "height"}
+					>
 						<ScrollView
-							style={{ top: Platform.OS == "ios" ? "5%" : 0, }}
+							style={{ top: Platform.OS == "ios" ? "5%" : 0 }}
 							keyboardDismissMode="on-drag"
 							keyboardShouldPersistTaps="never"
 						>
 							<PatientModal.Container>
 								<PatientModal.Header />
 								<PatientModal.Body>
-									<View style={{marginVertical: "3%"}} />
+									<View style={{ marginVertical: "3%" }} />
 									<PatientItem
 										enabled={false}
 										onPress={null}
@@ -129,12 +137,19 @@ export default function LandingScreen({ navigation }) {
 										age={PatientAge}
 										sex={PatientSex}
 										timestamp={Date.now()}
-										style={{width: "90%"}}
+										style={{ width: "90%" }}
 									/>
-									<View style={{marginVertical: "3%"}} />
-									<Text style={modalStyles.modalSubHeadingText}>Name</Text>
+									<View style={{ marginVertical: "3%" }} />
+									<Text
+										style={modalStyles.modalSubHeadingText}
+									>
+										Name
+									</Text>
 									<TextInput
-										style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+										style={[
+											globalStyles.credentialInput,
+											{ width: "100%", margin: 0 },
+										]}
 										clearButtonMode="while-editing"
 										returnKeyType="next"
 										textContentType="username"
@@ -143,12 +158,17 @@ export default function LandingScreen({ navigation }) {
 										autoCorrect={false}
 										value={PatientFN}
 										onChangeText={setPatientFN}
-										onSubmitEditing={() => { lastNameRef.current.focus(); }}
+										onSubmitEditing={() => {
+											lastNameRef.current.focus();
+										}}
 									/>
-									<View style={{marginVertical: "3%"}} />
+									<View style={{ marginVertical: "3%" }} />
 									<TextInput
 										ref={lastNameRef}
-										style={[globalStyles.credentialInput, {width: "100%", margin:0}]}
+										style={[
+											globalStyles.credentialInput,
+											{ width: "100%", margin: 0 },
+										]}
 										clearButtonMode="while-editing"
 										returnKeyType="next"
 										textContentType="username"
@@ -158,14 +178,22 @@ export default function LandingScreen({ navigation }) {
 										value={PatientLN}
 										onChangeText={setPatientLN}
 									/>
-									<View style={{marginVertical: "3%"}} />
-									<Text style={modalStyles.modalSubHeadingText}>Age</Text>
+									<View style={{ marginVertical: "3%" }} />
+									<Text
+										style={modalStyles.modalSubHeadingText}
+									>
+										Age
+									</Text>
 									<SegmentedControl
 										values={ages}
 										onValueChange={setPatientAge}
 									/>
-									<View style={{marginVertical: "3%"}} />
-									<Text style={modalStyles.modalSubHeadingText}>Sex</Text>
+									<View style={{ marginVertical: "3%" }} />
+									<Text
+										style={modalStyles.modalSubHeadingText}
+									>
+										Sex
+									</Text>
 									<SegmentedControl
 										values={sexes}
 										onValueChange={setPatientSex}
@@ -175,7 +203,9 @@ export default function LandingScreen({ navigation }) {
 									<AppButton
 										title="Cancel"
 										style={modalStyles.modalCancelButton}
-										buttonTextStyle={modalStyles.modalButtonText}
+										buttonTextStyle={
+											modalStyles.modalButtonText
+										}
 										onPress={() => {
 											setPatientImg(0);
 											setPatientFN("");
@@ -188,7 +218,9 @@ export default function LandingScreen({ navigation }) {
 									<AppButton
 										title="Submit"
 										style={modalStyles.modalSubmitButton}
-										buttonTextStyle={modalStyles.modalButtonText}
+										buttonTextStyle={
+											modalStyles.modalButtonText
+										}
 										onPress={() => {
 											createPatient(
 												PatientImg,
@@ -214,9 +246,7 @@ export default function LandingScreen({ navigation }) {
 	}
 }
 
-const landingStyles = StyleSheet.create({
-
-});
+const landingStyles = StyleSheet.create({});
 
 const modalStyles = StyleSheet.create({
 	modalButtonText: {

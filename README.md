@@ -14,12 +14,12 @@
 4. Once succeeded, it should automatically open an iOS simulator and run
 
 ## Using the app
-1. Enter email (dummy or real) and password
-2. If you haven't created an account yet, login should fail, click the "Register" button instead, this will create an account with the entered credentials
-3. Login
-4. Add patients with the "+" button, no fields are required
-5. Pressing "logout" will log you out. 
-6. Pressing the profile icon (top right) will print your userID (from DB) in the log, we will probably need this later
+1. Click on option in login screen
+2. Enter info when prompted if "Login" or "Register" was clicked
+3. Add patients with the "+" button, no fields are required
+4. Pressing the gear in the top right will take you to the settings menu.
+5. Pressing the "i" on a patient item will take you to their detailed patient page
+6. Pressing any other part of the patient will initiate the "quick vitals" process 
 7. Closing the app does NOT log you out
 
 ## Known Bugs

@@ -5,9 +5,9 @@ import RNModal from "react-native-modal";
 import colours from "../colours";
 
 type ModalProps = {
-	isVisible: boolean,
-	children: React.ReactNode,
-	[x: string]: any,
+	isVisible: boolean;
+	children: React.ReactNode;
+	[x: string]: any;
 };
 export const VitalModal = ({
 	isVisible = false,
@@ -50,7 +50,6 @@ VitalModal.Header = ModalHeader;
 VitalModal.Container = ModalContainer;
 VitalModal.Body = ModalBody;
 VitalModal.Footer = ModalFooter;
-
 
 const styles = StyleSheet.create({
 	modalBody: {

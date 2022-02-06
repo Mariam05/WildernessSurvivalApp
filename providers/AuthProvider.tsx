@@ -48,9 +48,9 @@ const AuthProvider = ({ children }) => {
 	// This authentication method should be set up correctly on the MongoDB Realm App
 	// see: https://docs.mongodb.com/realm/authentication/providers/
 	const emailSignIn = async (email: string, password: string) => {
-
-		if (user) { // if there is a user signed in, sign them out 
-			console.log("Signing out user before sigining in")
+		if (user) {
+			// if there is a user signed in, sign them out
+			console.log("Signing out user before sigining in");
 			await signOut();
 		}
 
@@ -58,7 +58,7 @@ const AuthProvider = ({ children }) => {
 			email.toLowerCase(),
 			password
 		);
-		
+
 		const newUser = await app.logIn(creds);
 		setUser(newUser);
 		return newUser;
@@ -93,78 +93,112 @@ const AuthProvider = ({ children }) => {
 	};
 
 	/**
-	 * Changes the password of a user. 
+	 * Changes the password of a user.
 	 * Assumes the email is checked and is a match with the current user's email.
 	 * Assumes that the password entry is validated.
 	 */
-	const changePassword = async (email: string, oldPass: string, newPass: string) => {
+	const changePassword = async (
+		email: string,
+		oldPass: string,
+		newPass: string
+	) => {
 		email = email.toLowerCase();
-		const oldCreds = Realm.Credentials.emailPassword(
-			email,
-			oldPass
-		);
+		const oldCreds = Realm.Credentials.emailPassword(email, oldPass);
 
 		await app.logIn(oldCreds);
-		
-		await app.emailPasswordAuth.callResetPasswordFunction({
-			email: email,
-			password: newPass
-		}, []);
+
+		await app.emailPasswordAuth.callResetPasswordFunction(
+			{
+				email: email,
+				password: newPass,
+			},
+			[]
+		);
 	};
 
 	/*
 	 * Insert custom data for the specified user
 	 */
-	const insertCustomUserData = (newUser: Realm.User<Realm.DefaultFunctionsFactory, SimpleObject, Realm.DefaultUserProfileData>,
-		image: number, firstName: string, lastName: string) => {
-		firstName = firstName.toLowerCase().replace(firstName[0], firstName[0].toUpperCase());
-		lastName = lastName.toLowerCase().replace(lastName[0], lastName[0].toUpperCase());
+	const insertCustomUserData = (
+		newUser: Realm.User<
+			Realm.DefaultFunctionsFactory,
+			SimpleObject,
+			Realm.DefaultUserProfileData
+		>,
+		firstName: string,
+		lastName: string
+	) => {
+		firstName = firstName
+			.toLowerCase()
+			.replace(firstName[0], firstName[0].toUpperCase());
+		lastName = lastName
+			.toLowerCase()
+			.replace(lastName[0], lastName[0].toUpperCase());
 		if (newUser) {
 			const mongodb = newUser.mongoClient("mongodb-atlas");
-			const custom_data_collection = mongodb.db("wilderness").collection("User");
+			const custom_data_collection = mongodb
+				.db("wilderness")
+				.collection("User");
 			const customData = {
-				"_partition": newUser.id,
-				"image": image,
-				"firstName": firstName,
-				"lastName": lastName,
-			}
+				_partition: newUser.id,
+				firstName: firstName,
+				lastName: lastName,
+			};
 
-			custom_data_collection.insertOne(customData)
-				.then((result) => console.log(`Successfully inserted custom data with _id: ${result.insertedId}`))
+			custom_data_collection
+				.insertOne(customData)
+				.then((result) =>
+					console.log(
+						`Successfully inserted custom data with _id: ${result.insertedId}`
+					)
+				)
 				.then(() => user.refreshCustomData())
-				.catch((err) => console.error(`Failed to insert custom data: ${err}`));
+				.catch((err) =>
+					console.error(`Failed to insert custom data: ${err}`)
+				);
 		} else {
 			console.log("NULL USER");
 		}
-	}
+	};
 
 	/*
 	 * Update the current user's custom data, no user passed because the user must be logged in
-   	 */
-	const updateCustomUserData = async (newImage: number, newFirstName: string, newLastName: string) => {
+	 */
+	const updateCustomUserData = async (
+		newFirstName: string,
+		newLastName: string
+	) => {
 		if (user) {
 			const mongodb = user.mongoClient("mongodb-atlas");
-			const custom_data_collection = mongodb.db("wilderness").collection("User");
+			const custom_data_collection = mongodb
+				.db("wilderness")
+				.collection("User");
 			const filter = {
 				_partition: user.id,
 			};
 
 			const updateData = {
 				$set: {
-					image: newImage,
 					firstName: newFirstName,
 					lastName: newLastName,
-				}
-			}
+				},
+			};
 
-			await custom_data_collection.updateOne(filter, updateData)
-				.then((result) => console.log(`Successfully updated custom data with _id: ${result.upsertedId}`))
+			await custom_data_collection
+				.updateOne(filter, updateData)
+				.then((result) =>
+					console.log(
+						`Successfully updated custom data with _id: ${result.upsertedId}`
+					)
+				)
 				.then(() => user.refreshCustomData())
-				.catch((err) => console.error(`Failed to update custom data: ${err}`));
+				.catch((err) =>
+					console.error(`Failed to update custom data: ${err}`)
+				);
 		} else {
 			console.log("NULL USER");
 		}
-	}
+	};
 
 	return (
 		<AuthContext.Provider

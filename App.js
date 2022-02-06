@@ -11,6 +11,7 @@ import { VitalsProvider } from "./providers/VitalProvider";
 import SignUpScreen from "./app/Screens/SignUpScreen";
 import ProfileScreen from "./app/Screens/ProfileScreen";
 import PatientScreen from "./app/Screens/PatientScreen";
+import MenuScreen from "./app/Screens/MenuScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,14 @@ export default function App() {
 						options={{
 							headerShown: false,
 							gestureEnabled: false,
+						}}
+					/>
+					<Stack.Screen
+						name="Menu"
+						component={MenuScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
 						}}
 					/>
 					<Stack.Screen
