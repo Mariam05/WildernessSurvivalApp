@@ -18,7 +18,7 @@ const globalStyles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 3,
 		elevation: 6,
-		alignSelf: "center"
+		alignSelf: "center",
 	},
 	container: {
 		flex: 1,
@@ -26,11 +26,11 @@ const globalStyles = StyleSheet.create({
 		justifyContent: "center",
 		backgroundColor: colours.pinkBackground,
 	},
-	patientScrollView: {
+	scrollView: {
 		flex: 1,
 		top: Platform.OS === "ios" ? 0 : -10,
 		width: "100%",
-		marginBottom: Platform.OS === "ios" ? -35 : -10
+		marginBottom: Platform.OS === "ios" ? -35 : -10,
 	},
 	separator: {
 		marginVertical: "5%",

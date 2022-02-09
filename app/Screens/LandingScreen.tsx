@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import Icon from "react-native-vector-icons/Ionicons";
 
 import { usePatients } from "../../providers/PatientProvider";
 import AppButton from "../assets/components/AppButton";
@@ -79,41 +80,69 @@ export default function LandingScreen({ navigation }) {
 					statusbarColour={colours.redBackground}
 				/>
 
-				<ScrollView
-					horizontal={false}
-					style={[
-						globalStyles.patientScrollView,
-						{ backgroundColor: colours.yellowBackground },
-					]}
-					contentContainerStyle={{
-						alignSelf: "stretch",
-						paddingBottom: "30%",
-					}}
-				>
-					{patients
-						? patients.map((patient, index: number) =>
-								patient.isValid() ? (
-									<PatientItem
-										enabled={true}
-										name={patient.name}
-										age={patient.age}
-										sex={patient.sex}
-										timestamp={patient.timestamp}
-										style={null}
-										key={index}
-										infoPress={() =>
-											onPressPatient(patient)
-										}
-										onPress={() =>
-											console.log(
-												"Start vital recording!"
-											)
-										}
-									/>
-								) : null
-						  )
-						: null}
-				</ScrollView>
+				{patients.length > 0 ? (
+					<ScrollView
+						horizontal={false}
+						style={[
+							globalStyles.scrollView,
+							{ backgroundColor: colours.yellowBackground },
+						]}
+						contentContainerStyle={{
+							alignSelf: "stretch",
+							paddingBottom: "30%",
+						}}
+					>
+						{patients.map((patient, index: number) =>
+							patient.isValid() ? (
+								<PatientItem
+									enabled={true}
+									name={patient.name}
+									age={patient.age}
+									sex={patient.sex}
+									timestamp={patient.timestamp}
+									style={null}
+									key={index}
+									infoPress={() => onPressPatient(patient)}
+									onPress={() =>
+										console.log("Start vital recording!")
+									}
+								/>
+							) : null
+						)}
+					</ScrollView>
+				) : (
+					<View
+						style={[
+							globalStyles.scrollView,
+							{
+								backgroundColor: colours.yellowBackground,
+								alignItems: "center",
+								justifyContent: "flex-end",
+								paddingBottom: "7.5%",
+							},
+						]}
+					>
+						<Text
+							style={{
+								fontSize: 35,
+								fontWeight: "bold",
+								textAlign: "center",
+							}}
+						>
+							{"Add your\nfirst patient!"}
+						</Text>
+						<Icon name="arrow-down" size={80} />
+						<View
+							style={{
+								width: "25%",
+								backgroundColor: colours.redBackground,
+								height: undefined,
+								aspectRatio: 1,
+								borderRadius: 100,
+							}}
+						/>
+					</View>
+				)}
 				<AddButton onPress={handleModal} />
 
 				<PatientModal isVisible={isModalVisible}>

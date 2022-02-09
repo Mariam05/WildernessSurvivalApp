@@ -79,7 +79,7 @@ export default function MenuScreen() {
 						justifyContent: "center",
 					}}
 				>
-					<Text style={[profileStyles.titleText, { fontSize: 35 }]}>
+					<Text style={[menuStyles.titleText, { fontSize: 35 }]}>
 						{isAnon
 							? "A"
 							: user.customData.firstName[0] +
@@ -93,23 +93,21 @@ export default function MenuScreen() {
 						marginHorizontal: 10,
 					}}
 				>
-					<Text style={profileStyles.titleText}>
+					<Text style={menuStyles.titleText}>
 						{isAnon
 							? "Anonymous"
 							: user.customData.firstName +
 							  " " +
 							  user.customData.lastName}
 					</Text>
-					<Text style={profileStyles.subHeading}>
-						ID: 0x{user.id}
-					</Text>
+					<Text style={menuStyles.subHeading}>ID: 0x{user.id}</Text>
 					{!isAnon ? (
 						<AppButton
 							title="Edit Profile"
 							onPress={() => navigation.navigate("Profile")}
 							style={undefined}
 							buttonTextStyle={[
-								profileStyles.subHeading,
+								menuStyles.subHeading,
 								{ color: "white", fontStyle: "normal" },
 							]}
 						/>
@@ -119,7 +117,7 @@ export default function MenuScreen() {
 							onPress={() => navigation.navigate("Login")}
 							style={undefined}
 							buttonTextStyle={[
-								profileStyles.subHeading,
+								menuStyles.subHeading,
 								{ color: "white", fontStyle: "normal" },
 							]}
 						/>
@@ -128,15 +126,15 @@ export default function MenuScreen() {
 			</View>
 
 			<ScrollView
-				contentContainerStyle={profileStyles.containerScrollView}
+				contentContainerStyle={menuStyles.containerScrollView}
 				style={{ width: "100%" }}
 				scrollEnabled={false}
 			>
 				<TouchableOpacity
-					style={profileStyles.optionItem}
+					style={menuStyles.optionItem}
 					onPress={() => console.log("App settings clicked")}
 				>
-					<Text style={profileStyles.optionText}>
+					<Text style={menuStyles.optionText}>
 						<Icon
 							size={35}
 							name="settings-outline"
@@ -152,10 +150,10 @@ export default function MenuScreen() {
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={profileStyles.optionItem}
+					style={menuStyles.optionItem}
 					onPress={() => console.log("Resources clicked")}
 				>
-					<Text style={profileStyles.optionText}>
+					<Text style={menuStyles.optionText}>
 						<Icon
 							size={35}
 							name="book-outline"
@@ -171,10 +169,10 @@ export default function MenuScreen() {
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={profileStyles.optionItem}
+					style={menuStyles.optionItem}
 					onPress={() => console.log("Help and Support clicked")}
 				>
-					<Text style={profileStyles.optionText}>
+					<Text style={menuStyles.optionText}>
 						<Icon
 							size={35}
 							name="help"
@@ -190,10 +188,10 @@ export default function MenuScreen() {
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={profileStyles.optionItem}
+					style={menuStyles.optionItem}
 					onPress={() => console.log("Invite Friends clicked")}
 				>
-					<Text style={profileStyles.optionText}>
+					<Text style={menuStyles.optionText}>
 						<Icon
 							size={35}
 							name="person-add-outline"
@@ -209,10 +207,10 @@ export default function MenuScreen() {
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={profileStyles.optionItem}
+					style={menuStyles.optionItem}
 					onPress={() => console.log("Feedback clicked")}
 				>
-					<Text style={profileStyles.optionText}>
+					<Text style={menuStyles.optionText}>
 						<Icon
 							size={35}
 							name="mail-outline"
@@ -231,7 +229,7 @@ export default function MenuScreen() {
 	);
 }
 
-const profileStyles = StyleSheet.create({
+const menuStyles = StyleSheet.create({
 	containerScrollView: {
 		top: 0,
 		bottom: 0,
