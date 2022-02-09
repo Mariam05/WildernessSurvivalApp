@@ -4,7 +4,7 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
-import React, { createRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Alert,
 	Image,

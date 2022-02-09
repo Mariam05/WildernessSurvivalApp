@@ -1,17 +1,19 @@
 import React from "react";
-import { Alert, StyleSheet } from "react-native";
-import { useAuth } from "../../../providers/AuthProvider";
+import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+
 import colours from "../colours";
-import AppButton from "./AppButton";
 
-export default function LogoutButton({ closeRealm, navigation, signOut }) {
-	const { anonSignIn } = useAuth();
-
+export default function LogoutButton({
+	closeRealm,
+	navigation,
+	signOut,
+	style,
+	textStyle,
+}) {
 	return (
-		<AppButton
-			style={styles.logoutButton}
-			title={"Logout"}
-			buttonTextStyle={styles.logoutButtonText}
+		<TouchableOpacity
+			style={style}
 			onPress={() => {
 				Alert.alert("Log Out?", null, [
 					{
@@ -19,14 +21,25 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 						style: "destructive",
 						onPress: () => {
 							navigation.popToTop();
-							closeRealm();
+							//closeRealm();
 							signOut();
 						},
 					},
 					{ text: "Cancel", style: "cancel" },
 				]);
 			}}
-		/>
+		>
+			<Text style={[textStyle, { color: "tomato" }]}>
+				<Icon
+					size={35}
+					name="log-out-outline"
+					color="tomato"
+					backgroundColor="transparent"
+				/>
+				{"\t"}
+				Logout
+			</Text>
+		</TouchableOpacity>
 	);
 }
 

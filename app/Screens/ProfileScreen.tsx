@@ -525,12 +525,6 @@ export default function ProfileScreen() {
 								</View>
 
 								<View style={globalStyles.separator} />
-
-								<LogoutButton
-									navigation={navigation}
-									closeRealm={closePatientRealm}
-									signOut={signOut}
-								/>
 							</>
 						)}
 						<View style={globalStyles.separator} />

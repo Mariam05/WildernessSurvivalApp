@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient, Vital, Reading} from "../schemas";
+import { Patient, Vital, Reading } from "../schemas";
 import { useAuth } from "./AuthProvider";
 import defaultVitals from "../app/assets/defaultVitals";
 
@@ -53,25 +53,27 @@ const PatientsProvider = (props) => {
 			});
 		});
 		console.log("Opening Patient Provider Realm!");
-	}
+	};
 
-	const createPatient = (image: number, name: string, age: string, sex: string) => {
+	const createPatient = (
+		image: number,
+		name: string,
+		age: string,
+		sex: string
+	) => {
 		const realm = realmRef.current;
 		image = image && image >= 0 ? image : 0;
 		name =
 			name && name.length > 1
 				? name
-					.toLowerCase()
-					.split(" ")
-					.map((word) =>
-						word
-							? word.replace(
-								word[0],
-								word[0].toUpperCase()
-							)
-							: null
-					)
-					.join(" ")
+						.toLowerCase()
+						.split(" ")
+						.map((word) =>
+							word
+								? word.replace(word[0], word[0].toUpperCase())
+								: null
+						)
+						.join(" ")
 				: "New Patient";
 		age = age && age.length > 1 ? age : "?";
 		sex = sex && sex.length > 1 ? sex : "?";
@@ -81,23 +83,33 @@ const PatientsProvider = (props) => {
 				// Create a new patient in the same partition -- that is, using the same user id.
 				try {
 					realm.create(
-						"Patient", new Patient({
+						"Patient",
+						new Patient({
 							image: image || 0,
 							name: name || "New Patient",
 							age: age || "?",
 							sex: sex || "Other",
 							partition: user.id,
-							vitals: defaultVitals
+							vitals: defaultVitals,
 						})
 					);
 				} catch (error) {
-					console.log(error.message)
-					console.log("Failed to create record")
+					console.log(error.message);
+					console.log("Failed to create record");
 				}
 			});
 		} catch (error) {
-			console.error(error.message)
-			console.error("Failed to write:\n" + name + "\n" + age + "\n" + sex + "\n" + image);
+			console.error(error.message);
+			console.error(
+				"Failed to write:\n" +
+					name +
+					"\n" +
+					age +
+					"\n" +
+					sex +
+					"\n" +
+					image
+			);
 		}
 	};
 

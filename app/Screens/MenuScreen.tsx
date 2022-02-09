@@ -12,17 +12,17 @@ import {
 
 import { useAuth } from "../../providers/AuthProvider";
 import colours from "../assets/colours";
-import AppButton from "../assets/components/AppButton";
 import globalStyles from "../assets/stylesheet";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
+import LogoutButton from "../assets/components/LogoutButton";
 
 export default function MenuScreen() {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.blue);
 
 	const navigation = useNavigation();
 
-	const { user } = useAuth();
+	const { user, signOut } = useAuth();
 
 	const isAnon = user && user.providerType === "anon-user";
 
@@ -101,27 +101,6 @@ export default function MenuScreen() {
 							  user.customData.lastName}
 					</Text>
 					<Text style={menuStyles.subHeading}>ID: 0x{user.id}</Text>
-					{!isAnon ? (
-						<AppButton
-							title="Edit Profile"
-							onPress={() => navigation.navigate("Profile")}
-							style={undefined}
-							buttonTextStyle={[
-								menuStyles.subHeading,
-								{ color: "white", fontStyle: "normal" },
-							]}
-						/>
-					) : (
-						<AppButton
-							title="Login"
-							onPress={() => navigation.navigate("Login")}
-							style={undefined}
-							buttonTextStyle={[
-								menuStyles.subHeading,
-								{ color: "white", fontStyle: "normal" },
-							]}
-						/>
-					)}
 				</View>
 			</View>
 
@@ -130,6 +109,40 @@ export default function MenuScreen() {
 				style={{ width: "100%" }}
 				scrollEnabled={false}
 			>
+				{!isAnon ? (
+					<TouchableOpacity
+						style={menuStyles.optionItem}
+						onPress={() => navigation.navigate("Profile")}
+					>
+						<Text style={menuStyles.optionText}>
+							<Icon
+								size={35}
+								name="person-outline"
+								color="black"
+								backgroundColor="transparent"
+							/>
+							{"\t"}
+							Profile Settings
+						</Text>
+					</TouchableOpacity>
+				) : (
+					<TouchableOpacity
+						style={menuStyles.optionItem}
+						onPress={() => navigation.navigate("Login")}
+					>
+						<Text style={menuStyles.optionText}>
+							<Icon
+								size={35}
+								name="log-in-outline"
+								color="black"
+								backgroundColor="transparent"
+							/>
+							{"\t"}
+							Login
+						</Text>
+					</TouchableOpacity>
+				)}
+
 				<TouchableOpacity
 					style={menuStyles.optionItem}
 					onPress={() => console.log("App settings clicked")}
@@ -224,6 +237,16 @@ export default function MenuScreen() {
 						// TODO: Provide way for user to provide feedback?...likely a quick form to fill out and it should send an email or something
 					}
 				</TouchableOpacity>
+
+				{!isAnon ? (
+					<LogoutButton
+						navigation={navigation}
+						closeRealm={null}
+						signOut={signOut}
+						style={menuStyles.optionItem}
+						textStyle={menuStyles.optionText}
+					/>
+				) : null}
 			</ScrollView>
 		</SafeAreaView>
 	);
