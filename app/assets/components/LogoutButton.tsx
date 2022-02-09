@@ -21,7 +21,6 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 							navigation.popToTop();
 							closeRealm();
 							signOut();
-							anonSignIn();
 						},
 					},
 					{ text: "Cancel", style: "cancel" },
