@@ -12,6 +12,7 @@ import SignUpScreen from "./app/Screens/SignUpScreen";
 import ProfileScreen from "./app/Screens/ProfileScreen";
 import PatientScreen from "./app/Screens/PatientScreen";
 import MenuScreen from "./app/Screens/MenuScreen";
+import HomeScreen from "./app/Screens/HomeScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,8 +22,8 @@ export default function App() {
 			<NavigationContainer>
 				<Stack.Navigator>
 					<Stack.Screen
-						name="Login"
-						component={LoginScreen}
+						name="Home"
+						component={HomeScreen}
 						options={{
 							headerShown: false,
 							gestureEnabled: false,
@@ -34,6 +35,14 @@ export default function App() {
 						options={{
 							headerShown: false,
 							gestureEnabled: true,
+						}}
+					/>
+					<Stack.Screen
+						name="Login"
+						component={LoginScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: false,
 						}}
 					/>
 					<Stack.Screen

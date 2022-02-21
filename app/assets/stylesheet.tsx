@@ -2,6 +2,18 @@ import { Platform, StyleSheet } from "react-native";
 import colours from "./colours";
 
 const globalStyles = StyleSheet.create({
+	baseline: {
+		width: "100%",
+		height: 100,
+		flexDirection: "row",
+		justifyContent: "center",
+		position: "absolute",
+		resizeMode: "repeat",
+		bottom: Platform.OS === "ios" ? "5%" : 0,
+	},
+	baselineImage: {
+		margin: -15,
+	},
 	credentialInput: {
 		height: 50,
 		width: "85%",
@@ -26,6 +38,50 @@ const globalStyles = StyleSheet.create({
 		justifyContent: "center",
 		backgroundColor: colours.pinkBackground,
 	},
+	loginButton: {
+		flexDirection: "column",
+		height: 50,
+		width: "100%",
+		maxWidth: 350,
+		marginVertical: 5,
+		backgroundColor: colours.green,
+		borderWidth: 0,
+		borderRadius: 25,
+		alignContent: "center",
+		justifyContent: "center",
+		shadowColor: colours.primary,
+		shadowOpacity: 0.5,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 4,
+	},
+	loginButtonText: {
+		fontSize: 20,
+		color: colours.primary,
+		alignSelf: "center",
+	},
+	registerButton: {
+		flexDirection: "column",
+		height: 50,
+		width: "100%",
+		maxWidth: 350,
+		marginVertical: 5,
+		backgroundColor: colours.blue,
+		borderWidth: 0,
+		borderRadius: 25,
+		alignContent: "center",
+		justifyContent: "center",
+		shadowColor: colours.primary,
+		shadowOpacity: 0.5,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 4,
+	},
+	registerButtonText: {
+		fontSize: 20,
+		color: colours.primary,
+		alignSelf: "center",
+	},
 	scrollView: {
 		flex: 1,
 		top: Platform.OS === "ios" ? 0 : -10,
@@ -34,6 +90,19 @@ const globalStyles = StyleSheet.create({
 	},
 	separator: {
 		marginVertical: "5%",
+	},
+	subHeader: {
+		fontSize: 17,
+		fontWeight: "bold",
+		color: "grey",
+		alignSelf: "flex-start",
+	},
+	titleText: {
+		fontSize: 50,
+		fontWeight: "700",
+		textAlign: "center",
+		fontFamily: "Oxygen_700Bold",
+		top: 0,
 	},
 });
 

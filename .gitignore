@@ -10,7 +10,7 @@ web-build
 node_modules
 npm-debug.log
 yarn-error.log
-.lock
+*.lock
 
 # Ruby
 .direnv
@@ -202,3 +202,4 @@ dist/
 
 # @end expo-cli
 *.lock
+yarn.lock
