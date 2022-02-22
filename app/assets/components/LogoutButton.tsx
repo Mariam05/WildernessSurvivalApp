@@ -1,18 +1,19 @@
 import React from "react";
-import { Alert, StyleSheet } from "react-native";
-import { useAuth } from "../../../providers/AuthProvider";
+import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+
 import colours from "../colours";
-import AppButton from "./AppButton";
 
-export default function LogoutButton({ closeRealm, navigation, signOut }) {
-
-	const { anonSignIn } = useAuth();
-
+export default function LogoutButton({
+	closeRealm,
+	navigation,
+	signOut,
+	style,
+	textStyle,
+}) {
 	return (
-		<AppButton
-			style={styles.logoutButton}
-			title={"Logout"}
-			buttonTextStyle={styles.logoutButtonText}
+		<TouchableOpacity
+			style={style}
 			onPress={() => {
 				Alert.alert("Log Out?", null, [
 					{
@@ -20,25 +21,35 @@ export default function LogoutButton({ closeRealm, navigation, signOut }) {
 						style: "destructive",
 						onPress: () => {
 							navigation.popToTop();
-							closeRealm();
+							//closeRealm();
 							signOut();
-							anonSignIn();
 						},
 					},
 					{ text: "Cancel", style: "cancel" },
 				]);
 			}}
-		/>
+		>
+			<Text style={[textStyle, { color: "tomato" }]}>
+				<Icon
+					size={35}
+					name="log-out-outline"
+					color="tomato"
+					backgroundColor="transparent"
+				/>
+				{"\t"}
+				Logout
+			</Text>
+		</TouchableOpacity>
 	);
 }
 
 const styles = StyleSheet.create({
 	logoutButton: {
-        alignSelf: "center",
+		alignSelf: "center",
 		flexDirection: "column",
 		alignContent: "center",
 		justifyContent: "center",
-		height: "5%",
+		height: "10%",
 		width: "50%",
 		maxWidth: 350,
 		margin: 12,
@@ -49,11 +60,11 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.5,
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 3,
-        elevation: 4,
+		elevation: 4,
 	},
 	logoutButtonText: {
 		fontSize: 20,
 		fontWeight: "600",
-		alignSelf: "center"
+		alignSelf: "center",
 	},
-})
+});

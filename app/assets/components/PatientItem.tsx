@@ -1,20 +1,32 @@
 import React from "react";
-import {
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Moment from "moment";
 
 import colours from "../colours";
 import AppButton from "./AppButton";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 
-function PatientItem({ enabled, infoPress, onPress, name, sex, age, timestamp, style }) {
+function PatientItem({
+	enabled,
+	infoPress,
+	onPress,
+	name,
+	sex,
+	age,
+	timestamp,
+	style,
+}) {
 	return (
-		<TouchableOpacity style={[patientItemStyles.patientItem, style]} onPress={onPress} disabled={!enabled}>
-			<TouchableOpacity onPress={infoPress} style={patientItemStyles.infoButton} disabled={!enabled}>
+		<TouchableOpacity
+			style={[patientItemStyles.patientItem, style]}
+			onPress={onPress}
+			disabled={!enabled}
+		>
+			<TouchableOpacity
+				onPress={infoPress}
+				style={patientItemStyles.infoButton}
+				disabled={!enabled}
+			>
 				<Text style={patientItemStyles.infoButtonText}>i</Text>
 			</TouchableOpacity>
 			<View style={{ borderWidth: 0, flex: 1 }}>
@@ -23,13 +35,21 @@ function PatientItem({ enabled, infoPress, onPress, name, sex, age, timestamp, s
 						.toLowerCase()
 						.split(" ")
 						.map((word) =>
-							word != "" ? word.replace(word[0], word[0].toUpperCase()) : null
+							word != ""
+								? word.replace(word[0], word[0].toUpperCase())
+								: null
 						)
 						.join(" ")}
 				</Text>
-				<Text style={patientItemStyles.patientItemDetailsText}>Sex: {sex}</Text>
-				<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
-				<Text style={patientItemStyles.patientItemDetailsText}>{Moment(new Date(timestamp)).format('DD-MM-YYYY')}</Text>
+				<Text style={patientItemStyles.patientItemDetailsText}>
+					Sex: {sex}
+				</Text>
+				<Text style={patientItemStyles.patientItemDetailsText}>
+					Age: {age}
+				</Text>
+				<Text style={patientItemStyles.patientItemDetailsText}>
+					{Moment(new Date(timestamp)).format("DD-MM-YYYY")}
+				</Text>
 			</View>
 		</TouchableOpacity>
 	);

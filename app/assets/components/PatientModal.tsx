@@ -5,9 +5,9 @@ import RNModal from "react-native-modal";
 import colours from "../colours";
 
 type ModalProps = {
-	isVisible: boolean,
-	children: React.ReactNode,
-	[x: string]: any,
+	isVisible: boolean;
+	children: React.ReactNode;
+	[x: string]: any;
 };
 export const PatientModal = ({
 	isVisible = false,
@@ -50,7 +50,6 @@ PatientModal.Header = ModalHeader;
 PatientModal.Container = ModalContainer;
 PatientModal.Body = ModalBody;
 PatientModal.Footer = ModalFooter;
-
 
 const styles = StyleSheet.create({
 	modalBody: {

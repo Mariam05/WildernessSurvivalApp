@@ -3,22 +3,21 @@ import { StyleSheet } from "react-native";
 import AppButton from "./AppButton";
 import colours from "../colours";
 
-export default function AddButton({onPress}) {
-    return (
-        <AppButton
+export default function AddButton({ onPress }) {
+	return (
+		<AppButton
 			title="+"
 			style={styles.addButton}
 			buttonTextStyle={styles.addButtonText}
 			onPress={onPress}
 		/>
-
-    );
+	);
 }
 
 const styles = StyleSheet.create({
 	addButton: {
 		flexDirection: "column",
-		width: "20%", 
+		width: "20%",
 		aspectRatio: 1,
 		backgroundColor: colours.pinkBackground,
 		borderRadius: 100,
@@ -36,6 +35,6 @@ const styles = StyleSheet.create({
 	addButtonText: {
 		fontSize: 60,
 		fontWeight: "700",
-		top: "-5%"
+		top: "-5%",
 	},
 });
