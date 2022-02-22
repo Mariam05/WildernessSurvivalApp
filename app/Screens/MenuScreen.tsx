@@ -1,5 +1,6 @@
 import React from "react";
 import {
+	LayoutAnimation,
 	Platform,
 	SafeAreaView,
 	ScrollView,
@@ -16,15 +17,22 @@ import globalStyles from "../assets/stylesheet";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import LogoutButton from "../assets/components/LogoutButton";
+import { useState } from "react";
 
 export default function MenuScreen() {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.blue);
 
 	const navigation = useNavigation();
-
 	const { user, signOut } = useAuth();
 
+	const [resourcesExpanded, setResourcesExpanded] = useState(false);
+
 	const isAnon = user && user.providerType === "anon-user";
+
+	const onPressResources = () => {
+		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+		setResourcesExpanded(!resourcesExpanded);
+	};
 
 	return (
 		<SafeAreaView
@@ -56,6 +64,7 @@ export default function MenuScreen() {
 				</Icon>
 			</View>
 
+			{/* Profile Info */}
 			<View
 				style={{
 					flexDirection: "row",
@@ -164,7 +173,7 @@ export default function MenuScreen() {
 
 				<TouchableOpacity
 					style={menuStyles.optionItem}
-					onPress={() => console.log("Resources clicked")}
+					onPress={onPressResources}
 				>
 					<Text style={menuStyles.optionText}>
 						<Icon
@@ -176,10 +185,98 @@ export default function MenuScreen() {
 						{"\t"}
 						Resources
 					</Text>
-					{
-						// TODO: Implement the additional resources here?
-					}
 				</TouchableOpacity>
+
+				{resourcesExpanded && (
+					<>
+						{/*Checklist*/}
+						<TouchableOpacity
+							style={menuStyles.subOptionItem}
+							onPress={() => navigation.navigate("Checklists")}
+						>
+							<Text style={menuStyles.subOptionText}>
+								<Icon
+									size={20}
+									name="checkbox-outline"
+									color="black"
+									backgroundColor="transparent"
+								/>
+								{"\t"}
+								Checklists
+							</Text>
+						</TouchableOpacity>
+
+						{/*Quick Ref*/}
+						<TouchableOpacity
+							style={menuStyles.subOptionItem}
+							onPress={() =>
+								navigation.navigate("QuickReference")
+							}
+						>
+							<Text style={menuStyles.subOptionText}>
+								<Icon
+									size={20}
+									name="medical-outline"
+									color="black"
+									backgroundColor="transparent"
+								/>
+								{"\t"}
+								Quick Reference
+							</Text>
+						</TouchableOpacity>
+
+						{/*Quick Assess*/}
+						<TouchableOpacity
+							style={menuStyles.subOptionItem}
+							onPress={() => navigation.navigate("Assessments")}
+						>
+							<Text style={menuStyles.subOptionText}>
+								<Icon
+									size={20}
+									name="medkit-outline"
+									color="black"
+									backgroundColor="transparent"
+								/>
+								{"\t"}
+								Quick Assessments
+							</Text>
+						</TouchableOpacity>
+
+						{/*Anatomy*/}
+						<TouchableOpacity
+							style={menuStyles.subOptionItem}
+							onPress={() => navigation.navigate("Anatomy")}
+						>
+							<Text style={menuStyles.subOptionText}>
+								<Icon
+									size={20}
+									name="body-outline"
+									color="black"
+									backgroundColor="transparent"
+								/>
+								{"\t"}
+								Human Anatomy
+							</Text>
+						</TouchableOpacity>
+
+						{/*How to*/}
+						<TouchableOpacity
+							style={menuStyles.subOptionItem}
+							onPress={() => navigation.navigate("HowTo")}
+						>
+							<Text style={menuStyles.subOptionText}>
+								<Icon
+									size={20}
+									name="search-outline"
+									color="black"
+									backgroundColor="transparent"
+								/>
+								{"\t"}
+								How To...
+							</Text>
+						</TouchableOpacity>
+					</>
+				)}
 
 				<TouchableOpacity
 					style={menuStyles.optionItem}
@@ -279,6 +376,22 @@ const menuStyles = StyleSheet.create({
 		fontWeight: "500",
 		textAlign: "left",
 		fontStyle: "italic",
+	},
+	subOptionItem: {
+		alignSelf: "flex-end",
+		flexDirection: "row",
+		paddingVertical: 5,
+		marginVertical: 15,
+		marginEnd: "5%",
+		width: "85%",
+		justifyContent: "flex-start",
+		borderBottomColor: "grey",
+		borderBottomWidth: 1,
+	},
+	subOptionText: {
+		color: "black",
+		fontSize: 12,
+		fontWeight: "bold",
 	},
 	titleText: {
 		fontSize: 25,

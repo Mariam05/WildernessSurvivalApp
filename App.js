@@ -13,6 +13,11 @@ import ProfileScreen from "./app/Screens/ProfileScreen";
 import PatientScreen from "./app/Screens/PatientScreen";
 import MenuScreen from "./app/Screens/MenuScreen";
 import HomeScreen from "./app/Screens/HomeScreen";
+import QuickReferenceScreen from "./app/Screens/ResourceScreens/QuickReferenceScreen";
+import AssessmentScreen from "./app/Screens/ResourceScreens/AssessmentScreen";
+import AnatomyScreen from "./app/Screens/ResourceScreens/AnatomyScreen";
+import HowToScreen from "./app/Screens/ResourceScreens/HowToScreen";
+import ChecklistScreen from "./app/Screens/ResourceScreens/ChecklistScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -101,6 +106,46 @@ export default function App() {
 							);
 						}}
 					</Stack.Screen>
+					<Stack.Screen
+						name="QuickReference"
+						component={QuickReferenceScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
+					/>
+					<Stack.Screen
+						name="Assessments"
+						component={AssessmentScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
+					/>
+					<Stack.Screen
+						name="Anatomy"
+						component={AnatomyScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
+					/>
+					<Stack.Screen
+						name="HowTo"
+						component={HowToScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
+					/>
+					<Stack.Screen
+						name="Checklists"
+						component={ChecklistScreen}
+						options={{
+							headerShown: false,
+							gestureEnabled: true,
+						}}
+					/>
 				</Stack.Navigator>
 			</NavigationContainer>
 		</AuthProvider>
