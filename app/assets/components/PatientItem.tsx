@@ -3,6 +3,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Moment from "moment";
 
 import colours from "../colours";
+import AppButton from "./AppButton";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 
 function PatientItem({
 	enabled,
@@ -49,25 +51,19 @@ function PatientItem({
 					{Moment(new Date(timestamp)).format("DD-MM-YYYY")}
 				</Text>
 			</View>
-			<View>
-				<Text
-					style={{
-						fontSize: 50,
-						marginTop: "-5%",
-						paddingRight: 10,
-						textShadowColor: "#555",
-						textShadowOffset: { height: 2, width: 1 },
-						textShadowRadius: 4,
-					}}
-				>
-					+
-				</Text>
-			</View>
 		</TouchableOpacity>
 	);
 }
 
+
 const patientItemStyles = StyleSheet.create({
+	addButtonText: {
+		fontSize: 30,
+		fontWeight: "700",
+		alignSelf: "center",
+		top: "-7%",
+		color: colours.primary,
+	},
 	infoButton: {
 		alignContent: "center",
 		justifyContent: "center",
@@ -116,6 +112,21 @@ const patientItemStyles = StyleSheet.create({
 		fontSize: 20,
 		color: colours.primary,
 		alignSelf: "flex-start",
+	},
+	recordVitalsButton: {
+		alignContent: "center",
+		justifyContent: "center",
+		marginLeft: "auto",
+		marginRight: 0,
+		borderRadius: 100,
+		backgroundColor: 'palegoldenrod',
+		height: "100%",
+		aspectRatio: 1.5,
+		shadowColor: colours.primary,
+		shadowOpacity: 0.8,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 3,
+		elevation: 6,
 	},
 });
 

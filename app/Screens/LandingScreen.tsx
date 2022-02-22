@@ -21,13 +21,13 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import { usePatients } from "../../providers/PatientProvider";
 import AppButton from "../assets/components/AppButton";
+import PatientItem, { patientItemStyles } from "../assets/components/PatientItem";
 import { PatientModal } from "../assets/components/PatientModal";
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import { Patient } from "../../schemas";
-import PatientItem from "../assets/components/PatientItem";
 
 const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
 const sexes = ["Male", "Female", "Other"];
@@ -53,6 +53,13 @@ export default function LandingScreen({ navigation }) {
 		});
 	};
 
+	const onPressQuickVitals = (patient: Patient) => {
+		// console.log("quick record vitals. Patient id: " + patient._id);
+		navigation.push("RecordVitals", {
+			patientId: patient._id
+		});
+	};
+
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		if (isFocused) openPatientRealm();
@@ -70,10 +77,7 @@ export default function LandingScreen({ navigation }) {
 	} else {
 		return (
 			<SafeAreaView
-				style={[
-					globalStyles.container,
-					{ backgroundColor: colours.redBackground },
-				]}
+				style={[globalStyles.container, { backgroundColor: colours.redBackground }]}
 			>
 				<ProfileHeader
 					navigation={navigation}
@@ -103,9 +107,7 @@ export default function LandingScreen({ navigation }) {
 									style={null}
 									key={index}
 									infoPress={() => onPressPatient(patient)}
-									onPress={() =>
-										console.log("Start vital recording!")
-									}
+									onPress={() => onPressQuickVitals(patient)}
 								/>
 							) : null
 						)}
@@ -194,10 +196,7 @@ export default function LandingScreen({ navigation }) {
 									<View style={{ marginVertical: "3%" }} />
 									<TextInput
 										ref={lastNameRef}
-										style={[
-											globalStyles.credentialInput,
-											{ width: "100%", margin: 0 },
-										]}
+										style={[globalStyles.credentialInput, { width: "100%", margin: 0 }]}
 										clearButtonMode="while-editing"
 										returnKeyType="next"
 										textContentType="username"
@@ -208,26 +207,18 @@ export default function LandingScreen({ navigation }) {
 										onChangeText={setPatientLN}
 									/>
 									<View style={{ marginVertical: "3%" }} />
-									<Text
-										style={modalStyles.modalSubHeadingText}
-									>
-										Age
-									</Text>
+									<Text style={modalStyles.modalSubHeadingText}>Age</Text>
 									<SegmentedControl
 										values={ages}
 										onValueChange={setPatientAge}
 									/>
 									<View style={{ marginVertical: "3%" }} />
-									<Text
-										style={modalStyles.modalSubHeadingText}
-									>
-										Sex
-									</Text>
+									<Text style={modalStyles.modalSubHeadingText}>Sex</Text>
 									<SegmentedControl
 										values={sexes}
 										onValueChange={setPatientSex}
 									/>
-								</PatientModal.Body>
+								</PatientModal.Body >
 								<PatientModal.Footer>
 									<AppButton
 										title="Cancel"
@@ -266,11 +257,11 @@ export default function LandingScreen({ navigation }) {
 										}}
 									/>
 								</PatientModal.Footer>
-							</PatientModal.Container>
-						</ScrollView>
-					</KeyboardAvoidingView>
-				</PatientModal>
-			</SafeAreaView>
+							</PatientModal.Container >
+						</ScrollView >
+					</KeyboardAvoidingView >
+				</PatientModal >
+			</SafeAreaView >
 		);
 	}
 }

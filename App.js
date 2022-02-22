@@ -11,6 +11,7 @@ import { VitalsProvider } from "./providers/VitalProvider";
 import SignUpScreen from "./app/Screens/SignUpScreen";
 import ProfileScreen from "./app/Screens/ProfileScreen";
 import PatientScreen from "./app/Screens/PatientScreen";
+import RecordVitalsStack from "./app/Screens/RecordVitalsScreen";
 import MenuScreen from "./app/Screens/MenuScreen";
 import HomeScreen from "./app/Screens/HomeScreen";
 import QuickReferenceScreen from "./app/Screens/ResourceScreens/QuickReferenceScreen";
@@ -104,6 +105,20 @@ export default function App() {
 									/>
 								</VitalsProvider>
 							);
+						}}
+					</Stack.Screen>
+					<Stack.Screen
+						name="RecordVitals"
+						options={{ headerShown: false, gestureEnabled: false }}
+					>
+						{(props) => {
+						const { navigation, route } = props;
+						const { patientId } = route.params;
+						return (
+							<VitalsProvider patientId={patientId}>
+							<RecordVitalsStack route={route} navigation={navigation} />
+							</VitalsProvider>
+						);
 						}}
 					</Stack.Screen>
 					<Stack.Screen

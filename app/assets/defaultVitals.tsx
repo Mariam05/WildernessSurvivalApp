@@ -1,23 +1,57 @@
 import { Vital, Reading } from "../../schemas";
 
-const temperatureVital = new Vital({
+
+const avpuVital = new Vital({
     periodicity: 60,
-    name: "Heat Check",
+    name: "AVPU",
+    type: "Categorical",
+    description: "Awake Verbal Pain Unresponsive",
+    data: [],
+    categories: [],
+    timeElapsed: 0,
+})
+
+const skinVital = new Vital({
+    periodicity: 60,
+    name: "Skin",
+    type: "Categorical",
+    description: "warm, pink, blue, or white",
+    data: [],
+    categories: [],
+    timeElapsed: 0,
+})
+
+const pulseVital = new Vital({
+    periodicity: 60,
+    name: "Pulse",
     type: "Numerical",
-    description: "Temp Desc",
+    description: "Beats per min",
+    data: [],
+    categories: [],
+    timeElapsed: 0,
+})
+
+const respirationVital = new Vital({
+    periodicity: 60,
+    name: "Respiration",
+    type: "Numerical",
+    description: "breaths per minute",
     data: [new Reading({
         timestamp: "1640705088",
         value: 42,
-        url: ""
-    }),
-    new Reading({
-        timestamp: "1640708857",
-        value: 145,
-    }),
-    new Reading({
-        timestamp: "1640712857",
-        value: 21,
+        url: "",
     })],
+    categories: [],
+    timeElapsed: 0,
+})
+
+
+const temperatureVital = new Vital({
+    periodicity: 60,
+    name: "Temperature",
+    type: "Numerical",
+    description: "Temp Desc",
+    data: [],
     categories: [],
     timeElapsed: 10,
 })
@@ -55,5 +89,5 @@ const photosVital = new Vital({
 })
 
 
-const defaultVitals = [photosVital, generalVital, temperatureVital];
+const defaultVitals = [avpuVital, pulseVital, respirationVital, skinVital, photosVital, generalVital, temperatureVital];
 export default defaultVitals

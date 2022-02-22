@@ -4,7 +4,7 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	Alert,
 	Image,
@@ -45,6 +45,13 @@ export default function LoginScreen({ navigation }) {
 		Oxygen_400Regular,
 		Oxygen_700Bold,
 	});
+
+	useEffect(() => {
+		// If there is a user logged in, go to the Landing page.
+		if (user != null) {
+			navigation.navigate("Landing");
+		}
+	}, [user]);
 
 	const asyncSignInWarning = async () => {
 		return new Promise<boolean>((response) => {
@@ -178,7 +185,7 @@ export default function LoginScreen({ navigation }) {
 								buttonTextStyle={globalStyles.loginButtonText}
 								onPress={() => navigation.goBack()}
 							/>
-						</View>
+						</View >
 
 						<View style={{ flex: 1 }} />
 
@@ -195,7 +202,7 @@ export default function LoginScreen({ navigation }) {
 								onPress={() => navigation.navigate("Register")}
 							/>
 						</View>
-					</View>
+					</View >
 
 					<View style={globalStyles.separator} />
 					<View style={globalStyles.baseline}>
@@ -232,8 +239,8 @@ export default function LoginScreen({ navigation }) {
 							source={require("../assets/images/grass.png")}
 						/>
 					</View>
-				</SafeAreaView>
-			</TouchableWithoutFeedback>
+				</SafeAreaView >
+			</TouchableWithoutFeedback >
 		);
 	}
 }
