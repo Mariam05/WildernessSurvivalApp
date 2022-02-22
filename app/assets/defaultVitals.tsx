@@ -48,22 +48,10 @@ const respirationVital = new Vital({
 
 const temperatureVital = new Vital({
     periodicity: 60,
-    name: "Heat Check",
+    name: "Temperature",
     type: "Numerical",
     description: "Temp Desc",
-    data: [new Reading({
-        timestamp: "1640705088",
-        value: 42,
-        url: ""
-    }),
-    new Reading({
-        timestamp: "1640708857",
-        value: 145,
-    }),
-    new Reading({
-        timestamp: "1640712857",
-        value: 21,
-    })],
+    data: [],
     categories: [],
     timeElapsed: 10,
 })
