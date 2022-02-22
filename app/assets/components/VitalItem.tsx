@@ -7,34 +7,34 @@ import {
 	StyleSheet,
 	Text,
 	TouchableOpacity,
-    LayoutAnimation,
-    Platform,
+	LayoutAnimation,
+	Platform,
 	View
 } from "react-native";
 import { useState } from "react";
 
 const Chart = (data) => {
 
-    const mappedData = data.map(d => {
-        return {
-            timestamp: d.timestamp,
-            value: d.value,
-        }
-    })
+	const mappedData = data.map(d => {
+		return {
+			timestamp: d.timestamp,
+			value: d.value,
+		}
+	})
 
 	return (
 		<VictoryChart
 			theme={customTheme}
 			domainPadding={{ x: 0, y: 20 }}
-			padding={{top:5, bottom:35, left:50, right:50}}
+			padding={{ top: 5, bottom: 35, left: 50, right: 50 }}
 			height={180}
 		>
 			<VictoryLine
 				style={{
-					data: { stroke: "#c43a31"},
-					parent: { border: "1px solid #ccc", fill: "#000000"}
+					data: { stroke: "#c43a31" },
+					parent: { border: "1px solid #ccc", fill: "#000000" }
 				}}
-				x={(d) => new Date(parseInt(d.timestamp)*1000)}
+				x={(d) => new Date(parseInt(d.timestamp) * 1000)}
 				y="value"
 				data={mappedData}
 			/>
@@ -57,49 +57,49 @@ const RowWithImage = (entry) => {
 
 	return (
 		<TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
-				<View style={vitalItemStyles.timestampCell}>
-					<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+			<View style={vitalItemStyles.timestampCell}>
+				<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+			</View>
+			<View style={vitalItemStyles.valueCell}>
+				<View style={vitalItemStyles.valueCellText}>
+					<Text>
+						{entry.value}
+					</Text>
 				</View>
-				<View style={vitalItemStyles.valueCell}>
-					<View style={vitalItemStyles.valueCellText}>
-						<Text>
-							{entry.value}
-						</Text>
-					</View>
-					{expandedImage && (
+				{expandedImage && (
 					<View style={vitalItemStyles.valueCellImage}>
 						<Image
-							source={{uri:imageUrl}}
+							source={{ uri: imageUrl }}
 							style={vitalItemStyles.valueImage}>
 						</Image>
 					</View>)}
-				</View>
+			</View>
 		</TouchableOpacity>
 	)
 }
 
 
 const Row = (entry) => {
-	const date = new Date(entry.timestamp*1000);
+	const date = new Date(entry.timestamp * 1000);
 	const dateString = date.getHours() + ":" + date.getMinutes();
 
 	return (
 		<View style={vitalItemStyles.row}>
-				<View style={vitalItemStyles.timestampCell}>
-					<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
-				</View>
-				<View style={vitalItemStyles.valueCell}>
-					<Text style={vitalItemStyles.valueCellText}>
-						{entry.value}
-					</Text>
-				</View>
+			<View style={vitalItemStyles.timestampCell}>
+				<Text style={vitalItemStyles.timestampCellText}>{dateString}</Text>
+			</View>
+			<View style={vitalItemStyles.valueCell}>
+				<Text style={vitalItemStyles.valueCellText}>
+					{entry.value}
+				</Text>
+			</View>
 		</View>
 	)
 }
 
 
 const Table = (data) => {
-	const hasImage = data && data[0] && data[0].url!=null && data[0].url!=""
+	const hasImage = data && data[0] && data[0].url != null && data[0].url != ""
 
 	return (
 		<View style={vitalItemStyles.table}>
@@ -113,7 +113,7 @@ const Table = (data) => {
 }
 
 const Data = ({ type, data }) => {
-	if (type === "Numerical"){
+	if (type === "Numerical") {
 		return Chart(data);
 	}
 	return Table(data);
@@ -124,44 +124,45 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 	const isOverdue = timeElapsed > periodicity
 
 	return (
-		<Text style={[vitalItemStyles.timeElapsedText, {color: isOverdue ? colours.redText : colours.greenText}]}>
-			{ timeElapsed.toString() } min ago
+		<Text style={[vitalItemStyles.timeElapsedText, { color: isOverdue ? colours.redText : colours.greenText }]}>
+			{timeElapsed.toString()} min ago
 		</Text>
 	)
 }
 
 
- function VitalItem({ enabled, name, periodicity, type, description, data, timeElapsed, onPressInfo, onPressAdd }){
-    const [expanded, setExpanded] = useState(false);
-    const onPress = () => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setExpanded(!expanded);
-    };
-    return (
-        <View>
+function VitalItem({ enabled, name, periodicity, type, description, data, timeElapsed, onPressInfo, onPressAdd }) {
+	const [expanded, setExpanded] = useState(false);
+	const onPress = () => {
+		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+		setExpanded(!expanded);
+	};
+	console.log("vital item is : ", name);
+	return (
+		<View>
 			<TouchableOpacity
 				disabled={!enabled}
-                onPress={onPress}
-				style={[vitalItemStyles.vitalsHeader, {width: enabled ? "80%" : "90%"}]}>
+				onPress={onPress}
+				style={[vitalItemStyles.vitalsHeader, { width: enabled ? "80%" : "90%" }]}>
 				{
 					description != undefined && (
 						<AppButton
 							title="i"
-                        	style={vitalItemStyles.infoButton}
-                        	buttonTextStyle={vitalItemStyles.infoButtonText}
-                        	onPress={onPressInfo}
+							style={vitalItemStyles.infoButton}
+							buttonTextStyle={vitalItemStyles.infoButtonText}
+							onPress={onPressInfo}
 						/>
 					)
 				}
 
-                <View>
-                    <Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
+				<View>
+					<Text style={vitalItemStyles.vitalItemNameText}>{name}</Text>
 					{
 						timeElapsed != undefined && (
 							<TimeElapsed timeElapsed={timeElapsed} periodicity={periodicity} />
 						)
 					}
-                </View>
+				</View>
 
 				{
 					onPressAdd && (
@@ -173,20 +174,20 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 						/>
 					)
 				}
-            </TouchableOpacity>
+			</TouchableOpacity>
 
 			{
 				expanded && data && data.length > 0 && (
 					<Data type={type} data={data} />
 				)
-             }
-    </View>)
+			}
+		</View>)
 }
 
 export default VitalItem;
 
 export const vitalItemStyles = StyleSheet.create({
-    infoButton: {
+	infoButton: {
 		height: undefined,
 		width: "10%",
 		aspectRatio: 1,
@@ -203,33 +204,33 @@ export const vitalItemStyles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 4,
 		elevation: 7,
-    },
+	},
 	infoButtonText: {
 		alignSelf: "center",
 		height: "100%",
 		width: "100%",
-        fontSize: 25,
+		fontSize: 25,
 		fontWeight: "300",
 		textAlign: "center",
-    },
+	},
 	newReadingButton: {
 		alignSelf: "center",
 		justifyContent: "center",
 		position: "absolute",
-        right: 10,
-        backgroundColor: colours.purple,
+		right: 10,
+		backgroundColor: colours.purple,
 		height: "65%",
 		width: "15%",
-        borderRadius: 10,
-        borderColor: colours.primary,
-        borderWidth: 1,
-    },
-    newReadingButtonText: {
-        fontSize: 15,
-        fontWeight: "300",
+		borderRadius: 10,
+		borderColor: colours.primary,
+		borderWidth: 1,
+	},
+	newReadingButtonText: {
+		fontSize: 15,
+		fontWeight: "300",
 		alignSelf: "center",
-    },
-    row: {
+	},
+	row: {
 		flex: 1,
 		alignSelf: 'center',
 		width: "80%",
@@ -240,17 +241,17 @@ export const vitalItemStyles = StyleSheet.create({
 		borderBottomWidth: 0.5,//StyleSheet.hairlineWidth,
 		maxWidth: 300,
 	},
-    table: {
-        flex: 1,
-        alignItems: 'center',
+	table: {
+		flex: 1,
+		alignItems: 'center',
 		justifyContent: 'center',
 		marginTop: -5,
 		marginBottom: 10,
-    },
-    timeElapsedText: {
-        fontSize: 12,
+	},
+	timeElapsedText: {
+		fontSize: 12,
 		alignSelf: "flex-start"
-    },
+	},
 	timestampCell: {
 		width: "25%",
 		alignItems: "center",
@@ -265,7 +266,7 @@ export const vitalItemStyles = StyleSheet.create({
 		width: "75%",
 	},
 	valueCellText: {
-		
+
 	},
 	valueCellImage: {
 		marginVertical: 5,
@@ -285,7 +286,7 @@ export const vitalItemStyles = StyleSheet.create({
 		borderRadius: 10,
 		margin: 0
 	},
-    vitalsHeader: {
+	vitalsHeader: {
 		flexDirection: "row",
 		alignSelf: "center",
 		padding: 10,
@@ -305,10 +306,10 @@ export const vitalItemStyles = StyleSheet.create({
 		shadowOffset: { width: 1, height: 2 },
 		shadowRadius: 3,
 		elevation: 6,
-    },
-    vitalItemNameText: {
-        fontSize: 20,
-        color: colours.primary,
+	},
+	vitalItemNameText: {
+		fontSize: 20,
+		color: colours.primary,
 		alignSelf: "flex-start",
-    },
+	},
 });

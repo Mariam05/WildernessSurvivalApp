@@ -11,11 +11,7 @@ import colours from "../colours";
 import AppButton from "./AppButton";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 
-function PatientItem({ enabled, infoPress, onPress, name, sex, age, timestamp, style, navigation }) {
-	const onPressQuickVitals = () => {
-		console.log("quick record vitals");
-		navigation.push("RecordVitals");
-	};
+function PatientItem({ enabled, infoPress, onPress, name, sex, age, timestamp, style }) {
 	return (
 		<TouchableOpacity style={[patientItemStyles.patientItem, style]} onPress={onPress} disabled={!enabled}>
 			<TouchableOpacity onPress={infoPress} style={patientItemStyles.infoButton} disabled={!enabled}>
@@ -35,11 +31,6 @@ function PatientItem({ enabled, infoPress, onPress, name, sex, age, timestamp, s
 				<Text style={patientItemStyles.patientItemDetailsText}>Age: {age}</Text>
 				<Text style={patientItemStyles.patientItemDetailsText}>{Moment(new Date(timestamp)).format('DD-MM-YYYY')}</Text>
 			</View>
-			<AppButton
-				onPress={() => onPressQuickVitals()}
-				title="GO"
-				style={patientItemStyles.recordVitalsButton}
-				buttonTextStyle={patientItemStyles.addButtonText} />
 		</TouchableOpacity>
 	);
 }

@@ -83,9 +83,18 @@ export default function App() {
           </Stack.Screen>
           <Stack.Screen
             name="RecordVitals"
-            component={RecordVitalsStack}
             options={{ headerShown: false, gestureEnabled: false }}
-          ></Stack.Screen>
+          >
+            {(props) => {
+              const { navigation, route } = props;
+              const { patientId } = route.params;
+              return (
+                <VitalsProvider patientId={patientId}>
+                  <RecordVitalsStack route={route} navigation={navigation} />
+                </VitalsProvider>
+              );
+            }}
+          </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

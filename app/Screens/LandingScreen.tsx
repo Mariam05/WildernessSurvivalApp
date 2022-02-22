@@ -57,6 +57,13 @@ export default function LandingScreen({ navigation }) {
 		});
 	};
 
+	const onPressQuickVitals = (patient: Patient) => {
+		// console.log("quick record vitals. Patient id: " + patient._id);
+		navigation.push("RecordVitals", {
+			patientId: patient._id
+		});
+	};
+
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		if (isFocused)
@@ -102,8 +109,7 @@ export default function LandingScreen({ navigation }) {
 										timestamp={patient.timestamp}
 										style={null}
 										key={index}
-										onPress={() => onPressPatient(patient)}
-										navigation={navigation}
+										onPress={() => onPressQuickVitals(patient)}
 										infoPress={() => onPressPatient(patient)}
 									/> : null
 							)) : null
@@ -131,7 +137,6 @@ export default function LandingScreen({ navigation }) {
 										sex={PatientSex}
 										timestamp={Date.now()}
 										style={{ width: "90%" }}
-										navigation={navigation}
 									/>
 									<View style={{ marginVertical: "3%" }} />
 									<Text style={modalStyles.modalSubHeadingText}>Name</Text>

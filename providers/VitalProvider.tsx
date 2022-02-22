@@ -16,6 +16,7 @@ const VitalsProvider = ({ children, patientId }) => {
     const realmRef = useRef(null);
 
     useEffect(() => {
+        console.log("use effect in Vital provider");
         if (user == null) {
             console.error("Null user? Needs to log in!");
             return;
@@ -107,7 +108,32 @@ const VitalsProvider = ({ children, patientId }) => {
     };
 
     // Define the function for updating a vital
-    const updateVital = (vital, reading) => {
+    const updateVital = (vital_name, reading) => {
+
+        // console.log("patient to update is: ", patient)
+        const realm = realmRef.current;
+        const pat = patient as unknown as Patient;
+
+        if (pat == null) console.log("pat is null");
+        if (pat != null) {
+
+            // console.log("patient entries are " + pat.vitals);
+            for (let vital of pat.vitals) {
+                if (vital.name == vital_name) {
+                    realm.write(() => {
+                        vital.data.push(reading);
+                    });
+
+                    console.log("added new data to vital ", vital);
+
+                }
+            }
+            // console.log("patient is now: ", patient)
+        }
+
+    }
+
+    const bulkUpdateVitals = (vitals) => {
 
     }
 
@@ -138,6 +164,7 @@ const VitalsProvider = ({ children, patientId }) => {
             value={{
                 createVital,
                 closeRealm,
+                updateVital,
                 patient,
             }}
         >

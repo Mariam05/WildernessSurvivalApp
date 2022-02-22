@@ -30,7 +30,7 @@ export default function LoginScreen({ navigation }) {
 	Platform.OS === "ios" ? null : StatusBar.setBackgroundColor(colours.pinkBackground, true);
 
 	const passwordRef = React.createRef<TextInput>();
-	
+
 	const [loggingIn, setLoggingIn] = useState<boolean>(false);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
@@ -44,6 +44,13 @@ export default function LoginScreen({ navigation }) {
 		Oxygen_400Regular,
 		Oxygen_700Bold,
 	});
+
+	useEffect(() => {
+		// If there is a user logged in, go to the Landing page.
+		if (user != null) {
+			navigation.navigate("Landing");
+		}
+	}, [user]);
 
 	const asyncSignInWarning = async () => {
 		return new Promise<boolean>((response) => {
@@ -73,7 +80,7 @@ export default function LoginScreen({ navigation }) {
 			setLoggingIn(true)
 		} else {
 			console.log("Trying sign in with user: " + username);
-			try { 
+			try {
 				let response = null; // default they want to sign in
 				user ? response = await asyncSignInWarning() : response = true; // Warn user if they have already "Continued without an account"
 				if (response) {
@@ -112,12 +119,12 @@ export default function LoginScreen({ navigation }) {
 		return <AppLoading />;
 	} else {
 		return (
-			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}> 
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<SafeAreaView
-					style={[globalStyles.container, {minHeight: windowHeight}]}
+					style={[globalStyles.container, { minHeight: windowHeight }]}
 				>
 					<StatusBar hidden={false} animated={true} backgroundColor={colours.pinkBackground} barStyle={"dark-content"} />
-					
+
 					<Text style={loginStyles.titleText}>{titleText}</Text>
 					<View style={globalStyles.separator} />
 					{loggingIn ?
@@ -135,7 +142,7 @@ export default function LoginScreen({ navigation }) {
 								autoCorrect={false}
 								onSubmitEditing={() => { passwordRef.current.focus(); }}
 							/>
-					
+
 							<TextInput
 								ref={passwordRef}
 								style={globalStyles.credentialInput}
@@ -168,20 +175,20 @@ export default function LoginScreen({ navigation }) {
 					<View style={globalStyles.separator} />
 
 					<View style={{ width: "90%", flexDirection: "row" }}>
-						<View style={{flex: 10}}>
+						<View style={{ flex: 10 }}>
 							{!loggingIn ?
 								<Text style={loginStyles.subHeader}>Have an account?</Text>
 								: null}
-								<AppButton
-									title="Login"
-									style={loginStyles.loginButton}
-									buttonTextStyle={loginStyles.loginButtonText}
-									onPress={onPressSignIn}
-								/>
-							{loggingIn ? 
+							<AppButton
+								title="Login"
+								style={loginStyles.loginButton}
+								buttonTextStyle={loginStyles.loginButtonText}
+								onPress={onPressSignIn}
+							/>
+							{loggingIn ?
 								<AppButton
 									title="Cancel"
-									style={[loginStyles.loginButton, {backgroundColor: "tomato", marginTop: 15}]}
+									style={[loginStyles.loginButton, { backgroundColor: "tomato", marginTop: 15 }]}
 									buttonTextStyle={loginStyles.loginButtonText}
 									onPress={() => setLoggingIn(false)}
 								/> : null}
@@ -199,7 +206,7 @@ export default function LoginScreen({ navigation }) {
 								</View>
 							</> : null}
 					</View>
-					
+
 					<View style={globalStyles.separator} />
 					<View style={loginStyles.baseline}>
 						<Image
@@ -235,8 +242,8 @@ export default function LoginScreen({ navigation }) {
 							source={require("../assets/images/grass.png")}
 						/>
 					</View>
-					</SafeAreaView>
-				</TouchableWithoutFeedback>
+				</SafeAreaView>
+			</TouchableWithoutFeedback>
 		);
 	}
 }

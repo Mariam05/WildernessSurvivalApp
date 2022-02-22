@@ -5,16 +5,17 @@
  *  - have a 'restart' and/or 'cancel' button
  *  - add sounds to timer
  *  - add option to skip any reading
+ *  - change quick vitals to be activated when patient is pressed (remove 'GO')
  */
 
 import React, { useEffect, useState } from "react";
 import {
-  Button,
+  BackHandler,
   Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
-  Switch,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -26,6 +27,8 @@ import CountDown from 'react-native-countdown-component';
 import NumberPad from "../assets/components/NumberPad";
 import AppButton from "../assets/components/AppButton";
 import SwitchSelector from "react-native-switch-selector";
+import { useVitals, VitalsProvider } from "../../providers/VitalProvider";
+import { Reading } from "../../schemas";
 
 // images
 var avpu_awake = require("../assets/images/avpu_awake.png");
@@ -33,7 +36,10 @@ var avpu_verbal = require("../assets/images/avpu_verbal.png");
 var avpu_pain = require("../assets/images/avpu_pain.png");
 var avpu_unresponsive = require("../assets/images/avpu_unresponsive.png");
 
-const avpu_pics = [avpu_awake, avpu_verbal, avpu_pain, avpu_unresponsive];
+const avpu_pics = [{ image: avpu_awake, name: "Awake" },
+{ image: avpu_verbal, name: "Verbal" },
+{ image: avpu_pain, name: "Pain" },
+{ image: avpu_unresponsive, name: "Unresponsive" }];
 const prepareTime = 5;
 const intervalTime = 15;
 
@@ -44,6 +50,7 @@ function AvpuScreen({ navigation }) {
   nextVital = "Pulse";
   return (
     <SafeAreaView style={[vitalsStyles.container]}>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
       <Text style={vitalsStyles.title}> AVPU </Text>
       <ScrollView
         horizontal={false}
@@ -54,11 +61,11 @@ function AvpuScreen({ navigation }) {
           paddingTop: 30,
         }}
       >
-        {avpu_pics.map((image, index) => (
+        {avpu_pics.map((avpu, index) => (
           <TouchableOpacity
             onPress={() => {
               {
-                console.log("pressed");
+                if (updateAVPU) updateAVPU(avpu.name);
                 navigation.push("Prepare");
               }
             }}
@@ -69,7 +76,7 @@ function AvpuScreen({ navigation }) {
             >
               <Image
                 style={vitalsStyles.avpu_pic}
-                source={image}
+                source={avpu.image}
               />
             </View>
           </TouchableOpacity>
@@ -80,9 +87,20 @@ function AvpuScreen({ navigation }) {
 }
 
 function PrepareScreen({ route, navigation }) {
+  if (route.params) {
+    const { value } = route.params;
+    if (nextVital == "Respiration") {
+      console.log("updating pulse with value ", value);
+      if (updatePulse) updatePulse(value * intervalTime);
+    }
+  }
+
+
+  // console.log("avpu_index is: ", avpu_index)
   const backgroundColour = colours.orange;
   return (
     <SafeAreaView style={[vitalsStyles.container, vitalsStyles.countdown_container, { backgroundColor: backgroundColour }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={backgroundColour} />
       <CountDown
         until={prepareTime}
         size={70}
@@ -109,6 +127,7 @@ function CountdownScreen({ navigation }) {
       [vitalsStyles.container,
       vitalsStyles.countdown_container,
       { backgroundColor: backgroundColour }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={backgroundColour} />
 
       <CountDown
         until={intervalTime}
@@ -156,8 +175,15 @@ const options = [
 ];
 
 const optionsSize = options.length;
+
 // skin: warm, pink, blue, white
-function SkinScreen({ navigation }) {
+function SkinScreen({ route, navigation }) {
+  // update the value from the previous screen
+  // console.log("in skin, route is: ", route);
+  const { value } = route.params;
+  if (value && updateResp) updateResp(value * intervalTime);
+
+  // render skin options
   nextVital = "Temperature";
   return (
     <SafeAreaView style={[vitalsStyles.container]}>
@@ -169,8 +195,7 @@ function SkinScreen({ navigation }) {
           <AppButton
             title={skinOption.option}
             onPress={() => {
-              console.log(skinOption.option);
-              // something to save the choice
+              updateSkin(skinOption.option);
               navigation.push(nextVital);
             }}
             style={[vitalsStyles.skinButtons, { backgroundColor: skinOption.colour }]}
@@ -198,7 +223,6 @@ const tempOptionsSize = temp_options.length;
 // normal, warm, slightly feverish.
 function TempScreen({ navigation }) {
   const [showNumPad, setShowNumpad] = useState(0);
-  // const toggleSwitch = () => setShowNumpad(previousState => !previousState);
   return (
     <SafeAreaView style={[vitalsStyles.container]}>
       <Text style={vitalsStyles.title}> Temperature </Text>
@@ -230,8 +254,8 @@ function TempScreen({ navigation }) {
               <AppButton
                 title={tempOption.option}
                 onPress={() => {
-                  console.log(tempOption.option);
-                  // something to save the choice
+                  if (updateTemp) updateTemp(tempOption.option)
+                  if (updateData) updateData(true);
                   navigation.push("Landing");
                 }}
                 style={[vitalsStyles.skinButtons, { backgroundColor: tempOption.colour }]}
@@ -246,9 +270,71 @@ function TempScreen({ navigation }) {
   );
 }
 
+let updateAVPU, updatePulse, updateResp, updateSkin, updateTemp, updateData;
+
 const Stack = createNativeStackNavigator();
 
-export default function RecordVitalsStack() {
+export default function RecordVitalsStack({ route, navigation }) {
+
+  const { patient, updateVital } = useVitals();
+  // if (patient != null) console.log("useVitals patient: " + patient.name);
+  // if (patient == null) console.log("useVitals patient is null");
+
+  // back press stuff
+  const backActionHandler = () => {
+    navigation.navigate("Landing");
+    return true;
+  };
+
+
+  const [avpu_val, setAvpuVal] = useState()
+  const [pulse_val, setPulseVal] = useState()
+  const [resp_val, setRespVal] = useState()
+  const [skin_val, setSkinVal] = useState()
+  const [temp_val, setTempVal] = useState()
+  const [save_data, setData] = useState()
+
+  const vals = [{ name: "AVPU", value: avpu_val },
+  { name: "Pulse", value: pulse_val },
+  { name: "Respiration", value: resp_val },
+  { name: "Skin", value: skin_val }, { name: "Temperature", value: temp_val }]
+
+  useEffect(() => {
+
+    BackHandler.addEventListener("hardwareBackPress", backActionHandler);
+
+    /* Assign update to outside variable */
+    updateAVPU = setAvpuVal;
+    updatePulse = setPulseVal;
+    updateResp = setRespVal;
+    updateSkin = setSkinVal;
+    updateTemp = setTempVal;
+    updateData = setData;
+
+    if (save_data) {
+      vals.map((val) => {
+        if (val) {
+          const reading = new Reading({ timestamp: Date.now().toString(), value: val.value });
+          updateVital(val.name, reading);
+          console.log("saving data for " + val.name);
+        }
+      })
+    }
+
+    /* Unassign when component unmounts */
+    return () => {
+      updateAVPU = null;
+      updatePulse = null;
+      updateResp = null;
+      updateSkin = null;
+      updateTemp = null;
+      updateData = null;
+      BackHandler.removeEventListener("hardwareBackPress", backActionHandler);
+    }
+  })
+
+
+
   return (
     <Stack.Navigator>
       <Stack.Screen

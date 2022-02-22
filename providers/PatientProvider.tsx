@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Patient, Vital, Reading} from "../schemas";
+import { Patient, Vital, Reading } from "../schemas";
 import { useAuth } from "./AuthProvider";
 import defaultVitals from "../app/assets/defaultVitals";
 

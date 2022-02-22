@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, FlatList, Dimensions, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, StyleSheet, Text, FlatList, Dimensions, TouchableOpacity, SafeAreaView, StatusBar } from "react-native";
 import colours from "../colours";
 
 const numColumns = 3;
@@ -17,7 +17,7 @@ export default function NumberPad({ navigation, nextPage }) {
         }
         if (itemClicked.key == 'ENTER') {
             // save to db and navigate to other page.
-            navigation.push(nextPage);
+            navigation.push(nextPage, { value: value });
         }
         else if (itemClicked.key == 'DEL') {
             setValue(value.substring(0, value.length - 1));
@@ -50,6 +50,7 @@ export default function NumberPad({ navigation, nextPage }) {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colours.blue }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#CFE7EF" />
             <View style={styles.valueContainer}>
                 <Text style={styles.valueText}>{value}</Text>
             </View>
