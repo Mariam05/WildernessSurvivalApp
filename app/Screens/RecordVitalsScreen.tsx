@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import {
   BackHandler,
   Dimensions,
+  FlatList,
   Image,
   SafeAreaView,
   ScrollView,
@@ -24,7 +25,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Platform, StyleSheet } from "react-native";
 import colours from "../assets/colours";
 import CountDown from 'react-native-countdown-component';
-import NumberPad from "../assets/components/NumberPad";
+// import NumberPad from "../assets/components/NumberPad";
 import AppButton from "../assets/components/AppButton";
 import SwitchSelector from "react-native-switch-selector";
 import { useVitals, VitalsProvider } from "../../providers/VitalProvider";
@@ -44,6 +45,74 @@ const prepareTime = 5;
 const intervalTime = 15;
 
 var nextVital; // to store the next vital to prepare for. 
+
+const numColumns = 3;
+
+const NumberPad = ({ navigation, nextPage, updateFn, intervaled = false }) => {
+  const data = [
+    { key: '0' }, { key: '1' }, { key: '2' }, { key: '3' }, { key: '4' },
+    { key: '5' }, { key: '6' }, { key: '7' }, { key: '8' }, { key: 'DEL' },
+    { key: '9' }, { key: 'ENTER' },
+  ];
+
+  const [value, setValue] = useState("");
+
+  const determineValue = ({ itemClicked }) => {
+    if (itemClicked == null) {
+      return;
+    }
+    if (itemClicked.key == 'ENTER') {
+      // save to db and navigate to other page.
+      let val = parseInt(value)
+      if (intervaled) val = val * intervalTime;
+      updateFn(val)
+      navigation.push(nextPage, { value: value });
+    }
+    else if (itemClicked.key == 'DEL') {
+      setValue(value.substring(0, value.length - 1));
+    }
+    else {
+      setValue(value + itemClicked.key);
+    }
+  }
+
+  const renderItem = ({ item, index }) => {
+    if (item.key == 'ENTER' || item.key == 'DEL') {
+      return (
+        <TouchableOpacity
+          style={[numpadStyles.item, numpadStyles.itemSpecial]}
+          onPress={() => { determineValue({ itemClicked: item }); }}
+        >
+          <Text style={numpadStyles.itemText}>{item.key}</Text>
+        </TouchableOpacity>
+      );
+    }
+    return (
+      <TouchableOpacity
+        style={numpadStyles.item}
+        onPress={() => { determineValue({ itemClicked: item }); }}
+      >
+        <Text style={numpadStyles.itemText}>{item.key}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colours.blue }}>
+      <StatusBar barStyle="dark-content" backgroundColor="#CFE7EF" />
+      <View style={numpadStyles.valueContainer}>
+        <Text style={numpadStyles.valueText}>{value}</Text>
+      </View>
+      <FlatList
+        data={data}
+        style={numpadStyles.container}
+        renderItem={renderItem}
+        numColumns={numColumns}
+
+      />
+    </SafeAreaView>
+  );
+}
 
 // Awake Verbal Pain and Unresponsive.. how responsive are they?
 function AvpuScreen({ navigation }) {
@@ -87,14 +156,6 @@ function AvpuScreen({ navigation }) {
 }
 
 function PrepareScreen({ route, navigation }) {
-  if (route.params) {
-    const { value } = route.params;
-    if (nextVital == "Respiration") {
-      console.log("updating pulse with value ", value);
-      if (updatePulse) updatePulse(value * intervalTime);
-    }
-  }
-
 
   // console.log("avpu_index is: ", avpu_index)
   const backgroundColour = colours.orange;
@@ -150,18 +211,20 @@ function PulseScreen({ navigation }) {
   return (
     <NumberPad
       navigation={navigation}
-      nextPage="Prepare" />
+      nextPage="Prepare"
+      updateFn={updatePulse} />
   );
 }
 
 
-// respiration: the number of breaths a person takes per minute
+// respiration: the number of breaths a person takes per minute,
 function RespScreen({ navigation }) {
   nextVital = "Skin";
   return (
     <NumberPad
       navigation={navigation}
-      nextPage="Skin" />
+      nextPage="Skin"
+      updateFn={updatePulse} />
   );
 }
 
@@ -178,10 +241,6 @@ const optionsSize = options.length;
 
 // skin: warm, pink, blue, white
 function SkinScreen({ route, navigation }) {
-  // update the value from the previous screen
-  // console.log("in skin, route is: ", route);
-  const { value } = route.params;
-  if (value && updateResp) updateResp(value * intervalTime);
 
   // render skin options
   nextVital = "Temperature";
@@ -244,7 +303,7 @@ function TempScreen({ navigation }) {
       </View>
       {showNumPad ?
         (
-          < NumberPad navigation={navigation} nextPage={"tmp"} />
+          < NumberPad navigation={navigation} nextPage={"tmp"} updateFn={updateTemp} />
         ) :
         (<View>
           {temp_options.map((tempOption, index) => (
@@ -272,13 +331,9 @@ function TempScreen({ navigation }) {
 
 
 // Somethign for the numpad to redirect to
-function tmpScreen({ route, navigation }) {
+function tmpScreen() {
 
-  const { value } = route.params;
-  if (updateTemp) updateTemp(value);
   if (updateData) updateData(true);
-  console.log("in tmp")
-  // navigation.navigate("Landing");
   return (
     <View></View>
   );
@@ -292,8 +347,6 @@ const Stack = createNativeStackNavigator();
 export default function RecordVitalsStack({ route, navigation }) {
 
   const { patient, updateVital } = useVitals();
-  // if (patient != null) console.log("useVitals patient: " + patient.name);
-  // if (patient == null) console.log("useVitals patient is null");
 
   // back press stuff
   const backActionHandler = () => {
@@ -348,8 +401,6 @@ export default function RecordVitalsStack({ route, navigation }) {
       BackHandler.removeEventListener("hardwareBackPress", backActionHandler);
     }
   })
-
-
 
   return (
     <Stack.Navigator>
@@ -463,4 +514,40 @@ const vitalsStyles = StyleSheet.create({
     top: 0,
   }
 
+});
+
+const numpadStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginBottom: 20,
+    marginTop: 40,
+
+  },
+  item: {
+    backgroundColor: colours.yellowBackground,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    margin: 1,
+    height: 0.75 * (Dimensions.get('window').width) / numColumns, // approximate a square
+    borderWidth: 1,
+
+  },
+  itemSpecial: {
+    backgroundColor: colours.yellowDarker,
+  },
+  itemText: {
+    color: colours.primary,
+    fontSize: 25
+  },
+  valueContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+    height: 0.15 * (Dimensions.get('window').height),
+    backgroundColor: "#CFE7EF",
+  },
+  valueText: {
+    fontSize: 50,
+  }
 });
