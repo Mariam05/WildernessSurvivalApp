@@ -244,7 +244,7 @@ function TempScreen({ navigation }) {
       </View>
       {showNumPad ?
         (
-          < NumberPad navigation={navigation} nextPage={"Landing"} />
+          < NumberPad navigation={navigation} nextPage={"tmp"} />
         ) :
         (<View>
           {temp_options.map((tempOption, index) => (
@@ -269,6 +269,21 @@ function TempScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+
+
+// Somethign for the numpad to redirect to
+function tmpScreen({ route, navigation }) {
+
+  const { value } = route.params;
+  if (updateTemp) updateTemp(value);
+  if (updateData) updateData(true);
+  console.log("in tmp")
+  // navigation.navigate("Landing");
+  return (
+    <View></View>
+  );
+}
+
 
 let updateAVPU, updatePulse, updateResp, updateSkin, updateTemp, updateData;
 
@@ -319,6 +334,7 @@ export default function RecordVitalsStack({ route, navigation }) {
           console.log("saving data for " + val.name);
         }
       })
+      navigation.navigate("Landing");
     }
 
     /* Unassign when component unmounts */
@@ -370,6 +386,11 @@ export default function RecordVitalsStack({ route, navigation }) {
       <Stack.Screen
         name="Temperature"
         component={TempScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name="tmp"
+        component={tmpScreen}
         options={{ headerShown: false, gestureEnabled: false }}
       />
 
