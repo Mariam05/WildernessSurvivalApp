@@ -46,13 +46,6 @@ export default function LoginScreen({ navigation }) {
 		Oxygen_700Bold,
 	});
 
-	useEffect(() => {
-		// If there is a user logged in, go to the Landing page.
-		if (user != null) {
-			navigation.navigate("Landing");
-		}
-	}, [user]);
-
 	const asyncSignInWarning = async () => {
 		return new Promise<boolean>((response) => {
 			Alert.alert(
@@ -185,7 +178,7 @@ export default function LoginScreen({ navigation }) {
 								buttonTextStyle={globalStyles.loginButtonText}
 								onPress={() => navigation.goBack()}
 							/>
-						</View >
+						</View>
 
 						<View style={{ flex: 1 }} />
 
@@ -202,7 +195,7 @@ export default function LoginScreen({ navigation }) {
 								onPress={() => navigation.navigate("Register")}
 							/>
 						</View>
-					</View >
+					</View>
 
 					<View style={globalStyles.separator} />
 					<View style={globalStyles.baseline}>
@@ -239,8 +232,8 @@ export default function LoginScreen({ navigation }) {
 							source={require("../assets/images/grass.png")}
 						/>
 					</View>
-				</SafeAreaView >
-			</TouchableWithoutFeedback >
+				</SafeAreaView>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
