@@ -45,6 +45,37 @@ const intervalTime = 15;
 
 var nextVital; // to store the next vital to prepare for. 
 
+// sounds
+var Sound = require('react-native-sound');
+Sound.setCategory('Playback');
+const beep_file = require('../assets/sounds/censorship-beep.wav');
+const getReadyFile = require('../assets/sounds/getready.m4a'); // start 0.01
+const get_ready_time = 0.01;
+const getreadyresp_file = require('../assets/sounds/getreadyresp.m4a'); // start at 0.02
+const resp_start_time = 0.02
+const getreadypulse_file = require('../assets/sounds/getreadypulse.m4a'); // start at 0.03
+const pulse_start_time = 0.04
+
+function playSound(file, start = null) {
+  const callback = (error, sound) => {
+    if (error) {
+      console.log('failed to load the sound', error);
+      return;
+    }
+
+    if (start) sound.setCurrentTime(start);
+    sound.play(() => {
+      // Success counts as getting to the end
+      console.log('duration in seconds: ' + sound.getDuration() + ' number of channels: ' + sound.getNumberOfChannels());
+      // Release when it's done so we're not using up resources
+      sound.release();
+    });
+
+  };
+
+  const sound = new Sound(file, error => callback(error, sound));
+}
+
 // Awake Verbal Pain and Unresponsive.. how responsive are they?
 function AvpuScreen({ navigation }) {
   nextVital = "Pulse";
@@ -66,6 +97,7 @@ function AvpuScreen({ navigation }) {
             onPress={() => {
               {
                 if (updateAVPU) updateAVPU(avpu.name);
+                playSound(getReadyFile, 0.01);
                 navigation.push("Prepare");
               }
             }}
@@ -95,8 +127,8 @@ function PrepareScreen({ route, navigation }) {
     }
   }
 
+  playSound(getReadyFile, get_ready_time);
 
-  // console.log("avpu_index is: ", avpu_index)
   const backgroundColour = colours.orange;
   return (
     <SafeAreaView style={[vitalsStyles.container, vitalsStyles.countdown_container, { backgroundColor: backgroundColour }]}>
@@ -106,7 +138,8 @@ function PrepareScreen({ route, navigation }) {
         size={70}
         style={{ padding: 10 }}
         onFinish={() => {
-          navigation.push("Countdown")
+          playSound(beep_file);
+          navigation.push("Countdown");
         }}
         digitStyle={{ backgroundColor: backgroundColour }}
         digitTxtStyle={{ color: colours.primary, fontSize: 120 }}
@@ -133,7 +166,7 @@ function CountdownScreen({ navigation }) {
         until={intervalTime}
         size={70}
         style={{ padding: 10 }}
-        onFinish={() => { navigation.navigate(nextVital); }}
+        onFinish={() => { playSound(beep_file); navigation.navigate(nextVital); }}
         digitStyle={{ backgroundColor: backgroundColour }}
         digitTxtStyle={{ color: colours.primary, fontSize: 120 }}
         timeToShow={['S']}
