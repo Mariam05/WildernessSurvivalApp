@@ -33,6 +33,7 @@ import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import { Vital } from "../../schemas";
+import { createPDF } from "../pdf-generator";
 
 const vitalTypes = ["Numerical", "Categorical"];
 
@@ -128,7 +129,7 @@ export default function PatientScreen({ navigation, route }) {
 						title="PDF"
 						style={PatientScreenStyles.pdfButton}
 						buttonTextStyle={PatientScreenStyles.pdfButtonText}
-						onPress={() => console.log("Generate PDF")}
+						onPress={() => { console.log("Generate PDF"); createPDF() }}
 					/>
 				</View>
 
@@ -142,27 +143,27 @@ export default function PatientScreen({ navigation, route }) {
 					<View style={{ height: 10 }} />
 					{patient
 						? patient.vitals.map((vital: Vital, index: number) => (
-								<VitalItem
-									enabled={true}
-									name={vital.name}
-									periodicity={vital.periodicity}
-									type={vital.type}
-									data={vital.data}
-									description={vital.description}
-									timeElapsed={vital.timeElapsed}
-									onPressInfo={() =>
-										console.log(
-											vital.name + " info pressed"
-										)
-									}
-									onPressAdd={() =>
-										console.log(
-											vital.name + " add new reading"
-										)
-									}
-									key={index}
-								/>
-						  ))
+							<VitalItem
+								enabled={true}
+								name={vital.name}
+								periodicity={vital.periodicity}
+								type={vital.type}
+								data={vital.data}
+								description={vital.description}
+								timeElapsed={vital.timeElapsed}
+								onPressInfo={() =>
+									console.log(
+										vital.name + " info pressed"
+									)
+								}
+								onPressAdd={() =>
+									console.log(
+										vital.name + " add new reading"
+									)
+								}
+								key={index}
+							/>
+						))
 						: null}
 				</ScrollView>
 
