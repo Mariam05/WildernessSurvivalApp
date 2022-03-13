@@ -113,7 +113,7 @@ export default function MenuScreen() {
 								  user.customData.lastName}
 						</Text>
 						<Text style={menuStyles.subHeading}>
-							ID: 0x{user.id}
+							{isAnon ? "ID: 0x" + user.id : user.profile.email}
 						</Text>
 					</View>
 				</View>
