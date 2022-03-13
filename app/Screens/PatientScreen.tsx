@@ -4,7 +4,6 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
-import { ObjectId } from "bson";
 import React, { useState } from "react";
 import {
 	Image,
@@ -13,28 +12,23 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
-	KeyboardAvoidingView,
 	UIManager,
 	StatusBar,
+	Alert,
 } from "react-native";
-
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
-
-import { useVitals } from "../../providers/VitalProvider";
+import { MenuView } from "@react-native-menu/menu";
 
 import AddButton from "../assets/components/AddButton";
-import AppButton from "../assets/components/AppButton";
 import { VitalModal } from "../assets/components/VitalModal";
 import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
-
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import { Vital } from "../../schemas";
-
-const vitalTypes = ["Numerical", "Categorical"];
+import { PatientModal } from "../assets/components/PatientModal";
+import { usePatients } from "../../providers/PatientProvider";
+import { useVitals } from "../../providers/VitalProvider";
 
 export default function PatientScreen({ navigation, route }) {
 	// Enable animation for drop-down graph/table
@@ -44,37 +38,16 @@ export default function PatientScreen({ navigation, route }) {
 		}
 	}
 
-	const { patientId, patientName } = route.params;
-	const { patient, createVital, closeRealm } = useVitals();
+	const { patient, closeRealm } = useVitals();
+	const { deletePatient } = usePatients();
 
-	const [vitalName, setVitalName] = useState("");
-	const [vitalPeriodicity, setVitalPeriodicity] = useState<number>();
-	const [vitalType, setVitalType] = useState("Numerical");
-	const [vitalCategories, setVitalCategories] = useState([]);
-	const [newVitalCategory, setNewVitalCategory] = useState("");
-
-	const updateVitalCategory = (category, index) => {
-		setVitalCategories((arr) => {
-			arr[index] = category;
-			return arr;
-		});
-		setNewVitalCategory("");
+	const [isPatientModalVisible, setIsPatientModalVisible] = useState(false);
+	const handlePatientModal = () => {
+		setIsPatientModalVisible(() => !isPatientModalVisible);
 	};
-	const deleteVitalCategory = (index) => {
-		setVitalCategories((arr) => {
-			arr.splice(index, 1);
-			return arr;
-		});
-		setVitalCategories((arr) => [...arr]); //required to re render
-		setNewVitalCategory("");
-	};
-	const appendVitalCategory = (category) => {
-		setVitalCategories((arr) => [...arr, category]);
-		setNewVitalCategory("");
-	};
-
-	const [isModalVisible, setIsModalVisible] = useState(false);
-	const handleModal = () => setIsModalVisible(() => !isModalVisible);
+	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
+	const handleVitalModal = () =>
+		setIsVitalModalVisible(() => !isVitalModalVisible);
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -120,16 +93,85 @@ export default function PatientScreen({ navigation, route }) {
 						}}
 					>
 						<Text style={PatientScreenStyles.patientName}>
-							{patientName}
+							{patient ? patient.name : ""}
 						</Text>
 					</View>
+					<MenuView
+						title="Patient Options"
+						onPressAction={({ nativeEvent }) => {
+							if (nativeEvent.event == "edit") {
+								handlePatientModal();
+								return;
+							} else if (nativeEvent.event == "pdf") {
+								console.log("Exporting to pdf");
+								return;
+							} else if (nativeEvent.event == "deletePatient") {
+								Alert.alert(
+									"Delete " + patient.name + "?",
+									"Are you sure?",
+									[
+										{
+											text: "Delete",
+											style: "destructive",
+											onPress: () => {
+												console.log(
+													"Deleting " + patient.name
+												);
+												navigation.goBack();
+												deletePatient(patient);
+											},
+										},
+										{ text: "Cancel", style: "cancel" },
+									]
+								);
+								return;
+							}
 
-					<AppButton
-						title="PDF"
-						style={PatientScreenStyles.pdfButton}
-						buttonTextStyle={PatientScreenStyles.pdfButtonText}
-						onPress={() => console.log("Generate PDF")}
-					/>
+							console.warn(
+								"Event not recognized " +
+									JSON.stringify(nativeEvent)
+							);
+						}}
+						actions={[
+							{
+								id: "edit",
+								title: "Edit Patient",
+								titleColor: colours.primary,
+								image: Platform.select({
+									ios: "square.and.pencil",
+									android: "ic_menu_edit",
+								}),
+								imageColor: colours.primary,
+							},
+							{
+								id: "pdf",
+								title: "Export to PDF",
+								titleColor: colours.primary,
+								image: Platform.select({
+									ios: "square.and.arrow.up",
+									android: "ic_menu_share",
+								}),
+								imageColor: colours.primary,
+							},
+							{
+								id: "deletePatient",
+								title: "Delete Patient",
+								attributes: {
+									destructive: true,
+								},
+								image: Platform.select({
+									ios: "trash",
+									android: "ic_menu_delete",
+								}),
+							},
+						]}
+					>
+						<View style={PatientScreenStyles.infoButton}>
+							<Text style={PatientScreenStyles.pdfButtonText}>
+								i
+							</Text>
+						</View>
+					</MenuView>
 				</View>
 
 				<ScrollView
@@ -140,250 +182,41 @@ export default function PatientScreen({ navigation, route }) {
 					}}
 				>
 					<View style={{ height: 10 }} />
-					{patient
-						? patient.vitals.map((vital: Vital, index: number) => (
-								<VitalItem
-									enabled={true}
-									name={vital.name}
-									periodicity={vital.periodicity}
-									type={vital.type}
-									data={vital.data}
-									description={vital.description}
-									timeElapsed={vital.timeElapsed}
-									onPressInfo={() =>
-										console.log(
-											vital.name + " info pressed"
-										)
-									}
-									onPressAdd={() =>
-										console.log(
-											vital.name + " add new reading"
-										)
-									}
-									key={index}
-								/>
-						  ))
-						: null}
+					{patient &&
+						patient.vitals.map((vital: Vital, index: number) => (
+							<VitalItem
+								enabled={true}
+								name={vital.name}
+								periodicity={vital.periodicity}
+								type={vital.type}
+								data={vital.data}
+								description={vital.description}
+								timeElapsed={vital.timeElapsed}
+								onPressInfo={() =>
+									console.log(vital.name + " info pressed")
+								}
+								onPressAdd={() =>
+									console.log(vital.name + " add new reading")
+								}
+								key={index}
+							/>
+						))}
 				</ScrollView>
 
 				{/* Code for add new vital button */}
-				<AddButton onPress={handleModal} />
+				<AddButton onPress={handleVitalModal} />
 
 				{/* Code for add new vital info */}
-				<VitalModal isVisible={isModalVisible}>
-					<KeyboardAvoidingView
-						behavior={Platform.OS === "ios" ? "padding" : "height"}
-					>
-						<ScrollView
-							style={{ top: Platform.OS == "ios" ? "5%" : 0 }}
-							keyboardDismissMode="on-drag"
-							keyboardShouldPersistTaps="never"
-						>
-							<VitalModal.Container>
-								<VitalModal.Header />
-								<VitalModal.Body>
-									<View style={{ marginVertical: "3%" }} />
-									<VitalItem
-										enabled={false}
-										name={vitalName}
-										periodicity={vitalPeriodicity}
-										type={vitalType}
-										description={""}
-										data={[]}
-										timeElapsed={null}
-										onPressAdd={null}
-										onPressInfo={null}
-									/>
+				<VitalModal
+					isVisible={isVitalModalVisible}
+					handleVitalModal={handleVitalModal}
+				/>
 
-									<View style={{ marginVertical: "3%" }} />
-
-									<TextInput
-										style={[
-											globalStyles.credentialInput,
-											{ width: "100%", margin: 0 },
-										]}
-										clearButtonMode="while-editing"
-										returnKeyType="next"
-										textContentType="username"
-										placeholder="Vital Name"
-										autoCapitalize="words"
-										autoCorrect={false}
-										value={vitalName}
-										onChangeText={setVitalName}
-									/>
-									<View style={{ marginVertical: "3%" }} />
-									<TextInput
-										style={[
-											globalStyles.credentialInput,
-											{ width: "100%", margin: 0 },
-										]}
-										clearButtonMode="while-editing"
-										returnKeyType="next"
-										textContentType="username"
-										placeholder="Periodicity (minutes)"
-										autoCorrect={false}
-										keyboardType="numeric"
-										value={
-											vitalPeriodicity
-												? vitalPeriodicity.toString()
-												: null
-										}
-										onChangeText={(val) =>
-											setVitalPeriodicity(parseInt(val))
-										}
-									/>
-									<View style={{ marginVertical: "3%" }} />
-									<Text
-										style={modalStyles.modalSubHeadingText}
-									>
-										Type
-									</Text>
-									<SegmentedControl
-										values={vitalTypes}
-										onValueChange={setVitalType}
-									/>
-
-									<View style={{ marginVertical: "1%" }} />
-									{vitalType == "Categorical" && (
-										<View>
-											{vitalCategories.map(
-												(category, index) => (
-													<View>
-														<View>
-															<TextInput
-																style={[
-																	globalStyles.credentialInput,
-																	{
-																		width: "100%",
-																		margin: 0,
-																	},
-																]}
-																clearButtonMode="never"
-																returnKeyType="none"
-																textContentType="username"
-																placeholder="category"
-																autoCapitalize="words"
-																autoCorrect={
-																	true
-																}
-																value={category}
-																onChangeText={(
-																	val
-																) =>
-																	updateVitalCategory(
-																		val,
-																		index
-																	)
-																}
-															/>
-															<AppButton
-																title="x"
-																style={
-																	PatientScreenStyles.vitalCategoryButton
-																}
-																buttonTextStyle={
-																	PatientScreenStyles.vitalCategoryButtonText
-																}
-																onPress={() =>
-																	deleteVitalCategory(
-																		index
-																	)
-																}
-															/>
-														</View>
-														<View
-															style={{
-																marginVertical:
-																	"1%",
-															}}
-														/>
-													</View>
-												)
-											)}
-											<View>
-												<TextInput
-													style={[
-														globalStyles.credentialInput,
-														{
-															width: "100%",
-															margin: 0,
-														},
-													]}
-													clearButtonMode="while-editing"
-													returnKeyType="next"
-													textContentType="username"
-													placeholder={
-														"Category " +
-														(vitalCategories.length +
-															1)
-													}
-													autoCapitalize="words"
-													autoCorrect={false}
-													value={newVitalCategory}
-													onChangeText={
-														setNewVitalCategory
-													}
-												/>
-												<AppButton
-													title="+"
-													style={
-														PatientScreenStyles.vitalCategoryButton
-													}
-													buttonTextStyle={
-														PatientScreenStyles.vitalCategoryButtonText
-													}
-													onPress={() =>
-														appendVitalCategory(
-															newVitalCategory
-														)
-													}
-												/>
-											</View>
-										</View>
-									)}
-								</VitalModal.Body>
-								<VitalModal.Footer>
-									<AppButton
-										title="Cancel"
-										style={modalStyles.modalCancelButton}
-										buttonTextStyle={
-											modalStyles.modalButtonText
-										}
-										onPress={() => {
-											setVitalName("");
-											setVitalPeriodicity(0);
-											setVitalType("");
-											setVitalCategories([]);
-											handleModal();
-										}}
-									/>
-									<AppButton
-										title="Submit"
-										style={modalStyles.modalSubmitButton}
-										buttonTextStyle={
-											modalStyles.modalButtonText
-										}
-										onPress={() => {
-											createVital(
-												new ObjectId(patientId),
-												vitalName,
-												vitalPeriodicity,
-												vitalType,
-												"",
-												vitalCategories
-											);
-											setVitalName("");
-											setVitalPeriodicity(0);
-											setVitalType(null);
-											setVitalCategories([]);
-											handleModal();
-										}}
-									/>
-								</VitalModal.Footer>
-							</VitalModal.Container>
-						</ScrollView>
-					</KeyboardAvoidingView>
-				</VitalModal>
+				{/* Code for editing patient info */}
+				<PatientModal
+					isVisible={isPatientModalVisible}
+					handlePatientModal={handlePatientModal}
+				/>
 			</SafeAreaView>
 		);
 	}
@@ -420,13 +253,15 @@ const PatientScreenStyles = StyleSheet.create({
 		fontSize: 25,
 		fontWeight: "700",
 	},
-	pdfButton: {
+	infoButton: {
 		alignSelf: "center",
 		justifyContent: "center",
-		marginRight: 10,
-		width: 60,
+		marginRight: 20,
+		width: 40,
+		height: undefined,
+		aspectRatio: 1,
 		backgroundColor: colours.lightBlueBackground,
-		borderRadius: 15,
+		borderRadius: 50,
 		color: colours.primary,
 		borderColor: colours.primary,
 		borderWidth: 1,
@@ -442,61 +277,5 @@ const PatientScreenStyles = StyleSheet.create({
 		width: "100%",
 		backgroundColor: colours.background,
 		marginBottom: Platform.OS === "ios" ? "-10%" : 0,
-	},
-	vitalCategoryButton: {
-		position: "absolute",
-		height: "100%",
-		width: undefined,
-		aspectRatio: 1,
-		borderRadius: 100,
-		backgroundColor: "white",
-		justifyContent: "center",
-		alignItems: "center",
-		right: 0,
-		top: "0%",
-		elevation: 6,
-	},
-	vitalCategoryButtonText: {
-		alignSelf: "center",
-		fontSize: 30,
-		fontWeight: "normal",
-		top: "-5%",
-		left: "2%",
-	},
-});
-
-const modalStyles = StyleSheet.create({
-	modalButtonText: {
-		fontSize: 20,
-		color: colours.primary,
-		alignSelf: "center",
-	},
-	modalCancelButton: {
-		flexDirection: "column",
-		height: 50,
-		width: "40%",
-		maxWidth: 300,
-		margin: 10,
-		backgroundColor: colours.blue,
-		borderWidth: 0,
-		borderRadius: 25,
-		alignContent: "center",
-		justifyContent: "center",
-	},
-	modalSubHeadingText: {
-		fontSize: 17,
-		fontWeight: "500",
-	},
-	modalSubmitButton: {
-		flexDirection: "column",
-		height: 50,
-		width: "40%",
-		maxWidth: 300,
-		margin: 10,
-		backgroundColor: colours.green,
-		borderWidth: 0,
-		borderRadius: 25,
-		alignContent: "center",
-		justifyContent: "center",
 	},
 });

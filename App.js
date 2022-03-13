@@ -5,7 +5,6 @@ import LandingScreen from "./app/Screens/LandingScreen";
 import LoginScreen from "./app/Screens/LoginScreen";
 import { AuthProvider } from "./providers/AuthProvider";
 import { PatientsProvider } from "./providers/PatientProvider";
-
 import { VitalsProvider } from "./providers/VitalProvider";
 
 import SignUpScreen from "./app/Screens/SignUpScreen";
@@ -98,12 +97,14 @@ export default function App() {
 							const { navigation, route } = props;
 							const { patientId } = route.params;
 							return (
-								<VitalsProvider patientId={patientId}>
-									<PatientScreen
-										route={route}
-										navigation={navigation}
-									/>
-								</VitalsProvider>
+								<PatientsProvider>
+									<VitalsProvider patientId={patientId}>
+										<PatientScreen
+											route={route}
+											navigation={navigation}
+										/>
+									</VitalsProvider>
+								</PatientsProvider>
 							);
 						}}
 					</Stack.Screen>
@@ -112,13 +113,16 @@ export default function App() {
 						options={{ headerShown: false, gestureEnabled: false }}
 					>
 						{(props) => {
-						const { navigation, route } = props;
-						const { patientId } = route.params;
-						return (
-							<VitalsProvider patientId={patientId}>
-							<RecordVitalsStack route={route} navigation={navigation} />
-							</VitalsProvider>
-						);
+							const { navigation, route } = props;
+							const { patientId } = route.params;
+							return (
+								<VitalsProvider patientId={patientId}>
+									<RecordVitalsStack
+										route={route}
+										navigation={navigation}
+									/>
+								</VitalsProvider>
+							);
 						}}
 					</Stack.Screen>
 					<Stack.Screen
