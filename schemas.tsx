@@ -1,6 +1,6 @@
 import { ObjectId } from "bson";
 
-interface VitalProps{
+interface VitalProps {
 	name: string;
 	periodicity?: number;
 	type: string;
@@ -8,7 +8,6 @@ interface VitalProps{
 	timeElapsed?: number;
 	data: Reading[];
 	categories?: string[];
-
 }
 
 interface ReadingProps {
@@ -36,7 +35,7 @@ class Reading {
 			url: "string?",
 		},
 		embedded: true,
-	}
+	};
 }
 
 class Vital {
@@ -77,17 +76,23 @@ class Patient {
 	_partition: string = "-1";
 	_id?: ObjectId = new ObjectId();
 	timestamp?: number = Date.now();
-	image?: number = 0;
 	name?: string = "New Patient";
 	age?: string = "?";
 	sex?: string = "Other";
 	vitals: Vital[] = [];
 
-	constructor({ image, name, age, sex, partition, vitals, id = new ObjectId(), timestamp = Date.now() }) {
+	constructor({
+		name,
+		age,
+		sex,
+		partition,
+		vitals,
+		id = new ObjectId(),
+		timestamp = Date.now(),
+	}) {
 		this._partition = partition;
 		this._id = id;
 		this.timestamp = timestamp;
-		this.image = image;
 		this.name = name;
 		this.age = age;
 		this.sex = sex;
@@ -104,10 +109,10 @@ class Patient {
 			name: "string?",
 			age: "string?",
 			sex: "string?",
-			vitals: "Vital[]"
+			vitals: "Vital[]",
 		},
 		primaryKey: "_id",
-		required: ["_partition"]
+		required: ["_partition"],
 	};
 }
 

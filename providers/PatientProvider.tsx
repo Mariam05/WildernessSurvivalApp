@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
+import { ObjectId } from "bson";
 import { Patient, Vital, Reading } from "../schemas";
 import { useAuth } from "./AuthProvider";
 import defaultVitals from "../app/assets/defaultVitals";
@@ -55,14 +56,55 @@ const PatientsProvider = (props) => {
 		console.log("Opening Patient Provider Realm!");
 	};
 
-	const createPatient = (
-		image: number,
-		name: string,
-		age: string,
-		sex: string
+	const createPatient = (name: string, age: string, sex: string) => {
+		const realm = realmRef.current;
+		name =
+			name && name.length > 1
+				? name
+						.toLowerCase()
+						.split(" ")
+						.map((word) =>
+							word
+								? word.replace(word[0], word[0].toUpperCase())
+								: null
+						)
+						.join(" ")
+				: "New Patient";
+		age = age && age.length > 1 ? age : "?";
+		sex = sex && sex.length > 1 ? sex : "?";
+		let patient = new Patient({
+			name: name || "New Patient",
+			age: age || "?",
+			sex: sex || "Other",
+			partition: user.id,
+			vitals: defaultVitals,
+		});
+		try {
+			realm.write(() => {
+				// Create a new patient in the same partition -- that is, using the same user id.
+				try {
+					realm.create("Patient", patient);
+				} catch (error) {
+					console.log(error.message);
+					console.log("Failed to create record");
+				}
+			});
+		} catch (error) {
+			console.error(error.message);
+			console.error(
+				"Failed to write:\n" + name + "\n" + age + "\n" + sex
+			);
+		}
+		return patient;
+	};
+
+	const updatePatient = (
+		id: String,
+		name: String,
+		age: String,
+		sex: String
 	) => {
 		const realm = realmRef.current;
-		image = image && image >= 0 ? image : 0;
 		name =
 			name && name.length > 1
 				? name
@@ -79,36 +121,20 @@ const PatientsProvider = (props) => {
 		sex = sex && sex.length > 1 ? sex : "?";
 
 		try {
+			const patient = realm.objectForPrimaryKey("Patient", id);
+
 			realm.write(() => {
-				// Create a new patient in the same partition -- that is, using the same user id.
-				try {
-					realm.create(
-						"Patient",
-						new Patient({
-							image: image || 0,
-							name: name || "New Patient",
-							age: age || "?",
-							sex: sex || "Other",
-							partition: user.id,
-							vitals: defaultVitals,
-						})
-					);
-				} catch (error) {
-					console.log(error.message);
-					console.log("Failed to create record");
-				}
+				patient.name = name;
+				patient.age = age;
+				patient.sex = sex;
+				patient.timestamp = Date.now();
+
+				console.log(`Successfully updated the patient.`);
 			});
 		} catch (error) {
 			console.error(error.message);
 			console.error(
-				"Failed to write:\n" +
-					name +
-					"\n" +
-					age +
-					"\n" +
-					sex +
-					"\n" +
-					image
+				"Failed to update:\n" + name + "\n" + age + "\n" + sex
 			);
 		}
 	};
@@ -140,6 +166,7 @@ const PatientsProvider = (props) => {
 		<PatientsContext.Provider
 			value={{
 				createPatient,
+				updatePatient,
 				deletePatient,
 				openPatientRealm,
 				closePatientRealm,
