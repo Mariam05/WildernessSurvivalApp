@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
 	LayoutAnimation,
 	Platform,
@@ -14,7 +14,7 @@ import {
 import { useAuth } from "../../providers/AuthProvider";
 import colours from "../assets/colours";
 import globalStyles from "../assets/stylesheet";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import LogoutButton from "../assets/components/LogoutButton";
 import { useState } from "react";
@@ -33,6 +33,11 @@ export default function MenuScreen() {
 		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 		setResourcesExpanded(!resourcesExpanded);
 	};
+
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		if (isFocused) user.refreshCustomData();
+	}, [isFocused]);
 
 	if (user == null) {
 		return <View />;
@@ -92,7 +97,7 @@ export default function MenuScreen() {
 						}}
 					>
 						<Text style={[menuStyles.titleText, { fontSize: 35 }]}>
-							{isAnon
+							{isAnon || !user.customData
 								? "A"
 								: user.customData.firstName[0] +
 								  user.customData.lastName[0]}
@@ -106,7 +111,7 @@ export default function MenuScreen() {
 						}}
 					>
 						<Text style={menuStyles.titleText}>
-							{isAnon
+							{isAnon || !user.customData
 								? "Anonymous"
 								: user.customData.firstName +
 								  " " +

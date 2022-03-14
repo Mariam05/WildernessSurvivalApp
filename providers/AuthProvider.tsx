@@ -128,12 +128,9 @@ const AuthProvider = ({ children }) => {
 		firstName: string,
 		lastName: string
 	) => {
-		firstName = firstName
-			.toLowerCase()
-			.replace(firstName[0], firstName[0].toUpperCase());
-		lastName = lastName
-			.toLowerCase()
-			.replace(lastName[0], lastName[0].toUpperCase());
+		firstName =
+			firstName.toUpperCase()[0] + firstName.toLowerCase().slice(1);
+		lastName = lastName.toUpperCase()[0] + lastName.toLowerCase().slice(1);
 		if (newUser) {
 			const mongodb = newUser.mongoClient("mongodb-atlas");
 			const custom_data_collection = mongodb
@@ -141,6 +138,7 @@ const AuthProvider = ({ children }) => {
 				.collection("User");
 			const customData = {
 				_partition: newUser.id,
+				image: 0,
 				firstName: firstName,
 				lastName: lastName,
 			};
@@ -154,7 +152,9 @@ const AuthProvider = ({ children }) => {
 				)
 				.then(() => user.refreshCustomData())
 				.catch((err) =>
-					console.error(`Failed to insert custom data: ${err}`)
+					console.error(
+						`Failed to insert custom data: ${err.message}`
+					)
 				);
 		} else {
 			console.log("NULL USER");

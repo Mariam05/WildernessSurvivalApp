@@ -94,6 +94,7 @@ const PatientsProvider = (props) => {
 			console.error(
 				"Failed to write:\n" + name + "\n" + age + "\n" + sex
 			);
+			return undefined;
 		}
 		return patient;
 	};
