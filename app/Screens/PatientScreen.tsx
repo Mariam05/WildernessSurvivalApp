@@ -54,11 +54,9 @@ export default function PatientScreen({ navigation, route }) {
 	const [newVitalCategory, setNewVitalCategory] = useState("");
 
 	const updateVitalCategory = (category, index) => {
-		setVitalCategories((arr) => {
-			arr[index] = category;
-			return arr;
-		});
-		setNewVitalCategory("");
+		let arr = [...vitalCategories];
+		arr[index] = category;
+		setVitalCategories(arr);
 	};
 	const deleteVitalCategory = (index) => {
 		setVitalCategories((arr) => {
@@ -66,7 +64,7 @@ export default function PatientScreen({ navigation, route }) {
 			return arr;
 		});
 		setVitalCategories((arr) => [...arr]); //required to re render
-		setNewVitalCategory("");
+		
 	};
 	const appendVitalCategory = (category) => {
 		setVitalCategories((arr) => [...arr, category]);
