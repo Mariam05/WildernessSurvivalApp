@@ -137,27 +137,30 @@ export default function LandingScreen({ navigation }) {
 				<AddButton
 					onPress={() => {
 						let newPatient = createPatient();
-						Alert.alert(
-							"Next Step",
-							"Would you like to record vitals or view details for this patient?",
-							[
-								{
-									text: "Record Vitals Now",
-									style: "default",
-									onPress: () =>
-										onPressQuickVitals(newPatient),
-								},
-								{
-									text: "Patient Details",
-									style: "default",
-									onPress: () => onPressPatient(newPatient),
-								},
-								{
-									text: "Dismiss",
-									style: "destructive",
-								},
-							]
-						);
+						if (newPatient) {
+							Alert.alert(
+								"Next Step",
+								"Would you like to record vitals or view details for this patient?",
+								[
+									{
+										text: "Record Vitals Now",
+										style: "default",
+										onPress: () =>
+											onPressQuickVitals(newPatient),
+									},
+									{
+										text: "Patient Details",
+										style: "default",
+										onPress: () =>
+											onPressPatient(newPatient),
+									},
+									{
+										text: "Dismiss",
+										style: "destructive",
+									},
+								]
+							);
+						}
 					}}
 				/>
 			</SafeAreaView>

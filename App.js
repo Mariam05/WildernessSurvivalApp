@@ -1,5 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { LogBox } from "react-native";
 
 import LandingScreen from "./app/Screens/LandingScreen";
 import LoginScreen from "./app/Screens/LoginScreen";
@@ -22,6 +23,7 @@ import ChecklistScreen from "./app/Screens/ResourceScreens/ChecklistScreen";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+	LogBox.ignoreAllLogs(); // removes log/error popups
 	return (
 		<AuthProvider>
 			<NavigationContainer>
