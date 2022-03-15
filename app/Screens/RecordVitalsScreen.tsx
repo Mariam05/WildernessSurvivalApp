@@ -214,7 +214,7 @@ function SkinScreen({ route, navigation }) {
   // update the value from the previous screen
   // console.log("in skin, route is: ", route);
   const { value } = route.params;
-  if (value && updateResp) updateResp(value * intervalTime);
+  if (value && updateResp) updateResp(value * (60 / intervalTime));
 
   // render skin options
   nextVital = "Temperature";
