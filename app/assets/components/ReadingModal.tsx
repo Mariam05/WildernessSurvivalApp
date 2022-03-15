@@ -55,7 +55,6 @@ export const ReadingModal = ({
 		currentTime.minute(Number(minute));
 
 		setTimestamp(currentTime);
-		console.log(currentTime);
 	}, [hour, minute, selectedAmPm]);
 
 	const [selectedCategory, setSelectedCategory] = useState("");
@@ -137,9 +136,6 @@ export const ReadingModal = ({
 										onSelect={(index, value) => {
 											setSelectedCategory(value);
 											setVitalValueErrorMessage("");
-											console.log(
-												`Selected Category: Index=> ${index}, Value=> ${value}`
-											);
 										}}
 										style={{
 											backgroundColor:
@@ -328,9 +324,6 @@ export const ReadingModal = ({
 									onSelect={(index, value) => {
 										setHour(value);
 										setTimeStampErrorMessage("");
-										console.log(
-											`Hour: Index=> ${index}, Value=> ${value}`
-										);
 									}}
 									style={{
 										flex: 15,
@@ -365,9 +358,6 @@ export const ReadingModal = ({
 									onSelect={(index, value) => {
 										setMinute(value);
 										setTimeStampErrorMessage("");
-										console.log(
-											`Minute: Index=> ${index}, Value=> ${value}`
-										);
 									}}
 									style={{
 										flex: 15,
@@ -397,9 +387,6 @@ export const ReadingModal = ({
 									onSelect={(index, value) => {
 										setSelectedAmPm(value);
 										setTimeStampErrorMessage("");
-										console.log(
-											`AM_PM: Index=> ${index}, Value=> ${value}`
-										);
 									}}
 									style={{
 										flex: 10,
