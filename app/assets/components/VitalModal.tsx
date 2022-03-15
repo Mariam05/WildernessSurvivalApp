@@ -36,9 +36,12 @@ export const VitalModal = ({
 
 	const [vitalName, setVitalName] = useState("");
 	const [vitalPeriodicity, setVitalPeriodicity] = useState<number>();
-	const [vitalType, setVitalType] = useState("Numerical");
+	const [vitalType, setVitalType] = useState(vitalTypes[0]);
 	const [vitalCategories, setVitalCategories] = useState([]);
 	const [newVitalCategory, setNewVitalCategory] = useState("");
+
+	const [vitalNameErrorMessage, setVitalNameErrorMessage] = useState("");
+	const [categoriesErrorMessage, setCategoriesErrorMessage] = useState("");
 
 	const updateVitalCategory = (category, index) => {
 		setVitalCategories((arr) => {
@@ -60,6 +63,40 @@ export const VitalModal = ({
 		setNewVitalCategory("");
 	};
 
+	const validateInput = (): boolean => {
+		let error = true;
+
+		if (vitalName === "") {
+			setVitalNameErrorMessage("Must enter a vital name");
+			error = false;
+		} else {
+			patient.vitals.forEach((vital) => {
+				if (vital.name.toLowerCase() === vitalName.toLowerCase()) {
+					setVitalNameErrorMessage("Must enter a unique vital name");
+					error = false;
+				}
+			});
+		}
+
+		if (vitalType === vitalTypes[1] && vitalCategories.length <= 1) {
+			setCategoriesErrorMessage("Must enter at least 2 categories");
+			error = false;
+		} else if (vitalType === vitalTypes[1]) {
+			vitalCategories.forEach((cat) => {
+				if (cat === "") {
+					setCategoriesErrorMessage(
+						"Every category must have a name"
+					);
+					error = false;
+				}
+			});
+			error = false;
+		} else {
+			setCategoriesErrorMessage("");
+		}
+		return error;
+	};
+
 	return (
 		<RNModal
 			isVisible={isVisible}
@@ -70,7 +107,7 @@ export const VitalModal = ({
 			{...props}
 		>
 			<KeyboardAvoidingView
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				behavior={Platform.OS === "ios" ? "position" : "height"}
 			>
 				<ScrollView
 					style={{ top: Platform.OS == "ios" ? "5%" : 0 }}
@@ -98,7 +135,13 @@ export const VitalModal = ({
 							<TextInput
 								style={[
 									globalStyles.credentialInput,
-									{ width: "100%", margin: 0 },
+									{
+										width: "100%",
+										margin: 0,
+										backgroundColor: vitalNameErrorMessage
+											? "tomato"
+											: "white",
+									},
 								]}
 								clearButtonMode="while-editing"
 								returnKeyType="next"
@@ -107,8 +150,16 @@ export const VitalModal = ({
 								autoCapitalize="words"
 								autoCorrect={false}
 								value={vitalName}
-								onChangeText={setVitalName}
+								onChangeText={(text) => {
+									setVitalNameErrorMessage("");
+									setVitalName(text);
+								}}
 							/>
+							{vitalNameErrorMessage.length > 0 && (
+								<Text style={modalStyles.errorMessage}>
+									{vitalNameErrorMessage}
+								</Text>
+							)}
 							<View style={{ marginVertical: "3%" }} />
 							<TextInput
 								style={[
@@ -134,7 +185,13 @@ export const VitalModal = ({
 							<Text style={modalStyles.modalSubHeadingText}>
 								Type
 							</Text>
+							{categoriesErrorMessage.length > 0 && (
+								<Text style={modalStyles.errorMessage}>
+									{categoriesErrorMessage}
+								</Text>
+							)}
 							<SegmentedControl
+								selectedIndex={vitalTypes.indexOf(vitalType)}
 								values={vitalTypes}
 								onValueChange={setVitalType}
 							/>
@@ -143,7 +200,7 @@ export const VitalModal = ({
 							{vitalType == "Categorical" && (
 								<View>
 									{vitalCategories.map((category, index) => (
-										<View>
+										<View key={index}>
 											<View>
 												<TextInput
 													style={[
@@ -236,9 +293,11 @@ export const VitalModal = ({
 								onPress={() => {
 									setVitalName("");
 									setVitalPeriodicity(0);
-									setVitalType("");
+									setVitalType(vitalTypes[0]);
 									setVitalCategories([]);
 									handleVitalModal();
+									setVitalNameErrorMessage("");
+									setCategoriesErrorMessage("");
 								}}
 							/>
 							<AppButton
@@ -246,6 +305,7 @@ export const VitalModal = ({
 								style={modalStyles.modalSubmitButton}
 								buttonTextStyle={modalStyles.modalButtonText}
 								onPress={() => {
+									if (!validateInput()) return;
 									createVital(
 										new ObjectId(patient._id),
 										vitalName,
@@ -259,6 +319,8 @@ export const VitalModal = ({
 									setVitalType(null);
 									setVitalCategories([]);
 									handleVitalModal();
+									setVitalNameErrorMessage("");
+									setCategoriesErrorMessage("");
 								}}
 							/>
 						</VitalModal.Footer>
@@ -323,6 +385,14 @@ const styles = StyleSheet.create({
 });
 
 const modalStyles = StyleSheet.create({
+	errorMessage: {
+		color: "red",
+		left: "5%",
+		width: "80%",
+		fontSize: 15,
+		fontWeight: "400",
+		marginTop: 0,
+	},
 	modalButtonText: {
 		fontSize: 20,
 		color: colours.primary,

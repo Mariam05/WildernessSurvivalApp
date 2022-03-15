@@ -6,7 +6,7 @@ const avpuVital = new Vital({
 	type: "Categorical",
 	description: "Awake Verbal Pain Unresponsive",
 	data: [],
-	categories: [],
+	categories: ["Awake", "Verbal", "Pain", "Unresponsive"],
 	timeElapsed: 0,
 });
 
@@ -16,7 +16,7 @@ const skinVital = new Vital({
 	type: "Categorical",
 	description: "warm, pink, blue, or white",
 	data: [],
-	categories: [],
+	categories: ["Warm", "Pink", "Blue", "White"],
 	timeElapsed: 0,
 });
 
