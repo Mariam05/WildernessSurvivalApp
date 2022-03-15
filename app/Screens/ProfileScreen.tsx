@@ -53,7 +53,7 @@ export default function ProfileScreen() {
 
 	const onPressSubmitEdit = async () => {
 		console.log("Done Editing!");
-		formatStrings();
+		await formatStrings();
 		validateInput();
 		await updateCustomUserData(firstName, lastName);
 		await user.refreshCustomData();
@@ -93,7 +93,7 @@ export default function ProfileScreen() {
 		);
 	};
 
-	const formatStrings = () => {
+	const formatStrings = async () => {
 		let formattedFN = firstName
 			.split(" ")
 			.map(function (word: string) {
@@ -113,6 +113,7 @@ export default function ProfileScreen() {
 			})
 			.join(" ");
 		setLastName(formattedLN);
+		console.log(`formatted last ${lastName}`);
 	};
 
 	const validateInput = (): boolean => {
@@ -224,8 +225,9 @@ export default function ProfileScreen() {
 										setFirstNameErrorMessage("");
 										setFirstName(text);
 									}}
+									onSelectionChange={formatStrings}
 									value={firstName}
-									autoCapitalize="none"
+									autoCapitalize="words"
 									autoCorrect={false}
 									autoCompleteType="name"
 									onSubmitEditing={() => {
@@ -258,8 +260,9 @@ export default function ProfileScreen() {
 										setLastNameErrorMessage("");
 										setLastName(text);
 									}}
+									onSelectionChange={formatStrings}
 									value={lastName}
-									autoCapitalize="none"
+									autoCapitalize="words"
 									autoCorrect={false}
 									autoCompleteType="name"
 									onSubmitEditing={() => {

@@ -3,8 +3,33 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Moment from "moment";
 
 import colours from "../colours";
-import AppButton from "./AppButton";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
+
+function timeSince(date) {
+	var seconds = Math.floor(Moment(new Date()).diff(date) / 1000);
+
+	var interval = seconds / 31536000;
+
+	if (interval > 1) {
+		return Math.floor(interval) + " years ago";
+	}
+	interval = seconds / 2592000;
+	if (interval > 1) {
+		return Math.floor(interval) + " months ago";
+	}
+	interval = seconds / 86400;
+	if (interval > 1) {
+		return Math.floor(interval) + " days ago";
+	}
+	interval = seconds / 3600;
+	if (interval > 1) {
+		return Math.floor(interval) + " hours ago";
+	}
+	interval = seconds / 60;
+	if (interval > 1) {
+		return Math.floor(interval) + " minutes ago";
+	}
+	return Math.floor(seconds) + " seconds ago";
+}
 
 function PatientItem({
 	enabled,
@@ -47,14 +72,18 @@ function PatientItem({
 				<Text style={patientItemStyles.patientItemDetailsText}>
 					Age: {age}
 				</Text>
-				<Text style={patientItemStyles.patientItemDetailsText}>
-					{Moment(new Date(timestamp)).format("DD-MM-YYYY")}
+				<Text
+					style={[
+						patientItemStyles.patientItemDetailsText,
+						{ color: "gray" },
+					]}
+				>
+					{timeSince(timestamp)}
 				</Text>
 			</View>
 		</TouchableOpacity>
 	);
 }
-
 
 const patientItemStyles = StyleSheet.create({
 	addButtonText: {
@@ -119,7 +148,7 @@ const patientItemStyles = StyleSheet.create({
 		marginLeft: "auto",
 		marginRight: 0,
 		borderRadius: 100,
-		backgroundColor: 'palegoldenrod',
+		backgroundColor: "palegoldenrod",
 		height: "100%",
 		aspectRatio: 1.5,
 		shadowColor: colours.primary,
