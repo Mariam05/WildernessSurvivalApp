@@ -22,6 +22,8 @@ import { MenuView } from "@react-native-menu/menu";
 
 import AddButton from "../assets/components/AddButton";
 import { VitalModal } from "../assets/components/VitalModal";
+import { PatientModal } from "../assets/components/PatientModal";
+import { ReadingModal } from "../assets/components/ReadingModal";
 import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
@@ -29,7 +31,6 @@ import { Vital } from "../../schemas";
 import { createPDF } from "../pdf-generator";
 
 const vitalTypes = ["Numerical", "Categorical"];
-import { PatientModal } from "../assets/components/PatientModal";
 import { usePatients } from "../../providers/PatientProvider";
 import { useVitals } from "../../providers/VitalProvider";
 
@@ -44,13 +45,19 @@ export default function PatientScreen({ navigation, route }) {
 	const { patient, closeRealm } = useVitals();
 	const { deletePatient } = usePatients();
 
+	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
+	const handleVitalModal = () => {
+		setIsVitalModalVisible(() => !isVitalModalVisible);
+	};
 	const [isPatientModalVisible, setIsPatientModalVisible] = useState(false);
 	const handlePatientModal = () => {
 		setIsPatientModalVisible(() => !isPatientModalVisible);
 	};
-	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
-	const handleVitalModal = () =>
-		setIsVitalModalVisible(() => !isVitalModalVisible);
+	const [isReadingModalVisible, setIsReadingModalVisible] = useState(false);
+	const handleReadingModal = () => {
+		setIsReadingModalVisible(() => !isReadingModalVisible);
+	};
+	const [selectedVital, setSelectedVital] = useState("");
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -199,9 +206,10 @@ export default function PatientScreen({ navigation, route }) {
 								onPressInfo={() =>
 									console.log(vital.name + " info pressed")
 								}
-								onPressAdd={() =>
-									console.log(vital.name + " add new reading")
-								}
+								onPressAdd={() => {
+									setSelectedVital(vital.name);
+									handleReadingModal();
+								}}
 								key={index}
 							/>
 						))}
@@ -220,6 +228,13 @@ export default function PatientScreen({ navigation, route }) {
 				<PatientModal
 					isVisible={isPatientModalVisible}
 					handlePatientModal={handlePatientModal}
+				/>
+
+				{/* Code for adding vital reading */}
+				<ReadingModal
+					isVisible={isReadingModalVisible}
+					handleReadingModal={handleReadingModal}
+					vitalName={selectedVital}
 				/>
 			</SafeAreaView>
 		);
