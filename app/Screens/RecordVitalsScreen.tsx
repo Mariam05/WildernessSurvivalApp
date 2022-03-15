@@ -123,7 +123,7 @@ function PrepareScreen({ route, navigation }) {
     const { value } = route.params;
     if (nextVital == "Respiration") {
       console.log("updating pulse with value ", value);
-      if (updatePulse) updatePulse(value * intervalTime);
+      if (updatePulse) updatePulse(value * (60 / intervalTime));
     }
   }
 
