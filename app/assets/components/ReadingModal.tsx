@@ -482,7 +482,6 @@ export const ReadingModal = ({
 													: enteredNote,
 										})
 									);
-									console.log(timestamp.format());
 								}}
 							/>
 						</ReadingModal.Footer>
