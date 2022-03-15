@@ -6,8 +6,19 @@ const avpuVital = new Vital({
     name: "AVPU",
     type: "Categorical",
     description: "Awake Verbal Pain Unresponsive",
-    data: [],
-    categories: [],
+    data: [new Reading({
+        timestamp: "1640705088",
+        value: "Awake",
+    }),
+    new Reading({
+        timestamp: "1640708857",
+        value: "Verbal",
+    }),
+    new Reading({
+        timestamp: "1640712857",
+        value: "Unresponsive",
+    })],
+    categories: ["Unresponsive", "Pain", "Verbal", "Awake"],
     timeElapsed: 0,
 })
 
@@ -17,7 +28,7 @@ const skinVital = new Vital({
     type: "Categorical",
     description: "warm, pink, blue, or white",
     data: [],
-    categories: [],
+    categories: ["Warm", "Pink", "Blue", "White"],
     timeElapsed: 0,
 })
 
@@ -40,6 +51,13 @@ const respirationVital = new Vital({
         timestamp: "1640705088",
         value: 42,
         url: "",
+    }), new Reading({
+        timestamp: "1640708857",
+        value: 57,
+        url: "",
+    }), new Reading({
+        timestamp: "1640712857",
+        value: 82,
     })],
     categories: [],
     timeElapsed: 0,

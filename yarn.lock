@@ -5602,7 +5602,7 @@
     "kleur" "^3.0.3"
     "sisteransi" "^1.0.5"
 
-"prop-types@^15.5.8":
+"prop-types@^15.5.10", "prop-types@^15.5.8":
   "integrity" "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg=="
   "resolved" "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   "version" "15.8.1"
@@ -5792,6 +5792,13 @@
   "version" "1.7.2"
   dependencies:
     "fast-base64-decode" "^1.0.0"
+
+"react-native-horizontal-timeline@^0.2.0":
+  "integrity" "sha512-3wTcGF80lDrGsHBnzDwBn93dZSYtFsq0i8zfEeD2zu767gaLJaRHtFbMiRaJHzVTQyPDX6/wAz6FTH0SyukkpQ=="
+  "resolved" "https://registry.npmjs.org/react-native-horizontal-timeline/-/react-native-horizontal-timeline-0.2.0.tgz"
+  "version" "0.2.0"
+  dependencies:
+    "prop-types" "^15.5.10"
 
 "react-native-modal@^13.0.0":
   "integrity" "sha512-k6r9T31mc7HIDFj1V53ceAAN1dwc8052c4JLtDVEmEQ19Bbq9yiLXoDsQuNb+hB8A+2tVOXmo5Gq4IQfb11upw=="

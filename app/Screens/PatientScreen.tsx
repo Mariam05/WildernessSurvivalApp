@@ -28,11 +28,12 @@ import { useVitals } from "../../providers/VitalProvider";
 import AddButton from "../assets/components/AddButton";
 import AppButton from "../assets/components/AppButton";
 import { VitalModal } from "../assets/components/VitalModal";
-import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
+import { VitalItem, Data, vitalItemStyles, CategoricalChartFullScreen} from "../assets/components/VitalItem";
 
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import { Vital } from "../../schemas";
+
 
 const vitalTypes = ["Numerical", "Categorical"];
 
@@ -71,8 +72,22 @@ export default function PatientScreen({ navigation, route }) {
 		setNewVitalCategory("");
 	};
 
-	const [isModalVisible, setIsModalVisible] = useState(false);
-	const handleModal = () => setIsModalVisible(() => !isModalVisible);
+
+
+	const [chartVitalData, setChartVitalData] = useState("");
+	const [chartVitalCategories, setChartVitalCategories] = useState("");
+
+	const [isChartModalVisible, setIsChartModalVisible] = useState(false);
+	const handleChartModal = ({ data, categories }) => {
+		setChartVitalCategories(categories);
+		setChartVitalData(data);
+		console.log("display full screen: " + chartVitalCategories);
+		return setIsChartModalVisible(() => !isChartModalVisible)
+	};
+
+
+	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
+	const handleVitalModal = () => setIsVitalModalVisible(() => !isVitalModalVisible);
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -141,10 +156,11 @@ export default function PatientScreen({ navigation, route }) {
 					{patient
 						? patient.vitals.map((vital: Vital, index: number) => (
 								<VitalItem
-									enabled={true}
+									click_enabled={true}
 									name={vital.name}
 									periodicity={vital.periodicity}
 									type={vital.type}
+									categories={vital.categories}
 									data={vital.data}
 									description={vital.description}
 									timeElapsed={vital.timeElapsed}
@@ -158,17 +174,34 @@ export default function PatientScreen({ navigation, route }) {
 											vital.name + " add new reading"
 										)
 									}
-									key={index}
+								key={index}
+								onChartLongPress={() => handleChartModal({ data: vital.data, categories:[...vital.categories] })}
 								/>
 						  ))
 						: null}
 				</ScrollView>
 
+
+				{/* Code for display chart full screen */}
+				<TouchableOpacity
+					style={{
+						elevation: 100,
+						height: 500,
+						width: 500,
+
+					}}
+					onLongPress={() => setIsChartModalVisible}
+				>
+					{isChartModalVisible &&
+						(<CategoricalChartFullScreen data={[...chartVitalData]} init_categories={[...chartVitalCategories]} />)}
+				</TouchableOpacity>
+
+
 				{/* Code for add new vital button */}
-				<AddButton onPress={handleModal} />
+				<AddButton onPress={handleVitalModal} />
 
 				{/* Code for add new vital info */}
-				<VitalModal isVisible={isModalVisible}>
+				<VitalModal isVisible={isVitalModalVisible}>
 					<KeyboardAvoidingView
 						behavior={Platform.OS === "ios" ? "padding" : "height"}
 					>
@@ -182,15 +215,17 @@ export default function PatientScreen({ navigation, route }) {
 								<VitalModal.Body>
 									<View style={{ marginVertical: "3%" }} />
 									<VitalItem
-										enabled={false}
+										click_enabled={false}
 										name={vitalName}
 										periodicity={vitalPeriodicity}
 										type={vitalType}
 										description={""}
 										data={[]}
+										categories={[]}
 										timeElapsed={null}
 										onPressAdd={null}
 										onPressInfo={null}
+										onChartLongPress={null}
 									/>
 
 									<View style={{ marginVertical: "3%" }} />
@@ -352,7 +387,7 @@ export default function PatientScreen({ navigation, route }) {
 											setVitalPeriodicity(0);
 											setVitalType("");
 											setVitalCategories([]);
-											handleModal();
+											handleVitalModal();
 										}}
 									/>
 									<AppButton
@@ -374,7 +409,7 @@ export default function PatientScreen({ navigation, route }) {
 											setVitalPeriodicity(0);
 											setVitalType(null);
 											setVitalCategories([]);
-											handleModal();
+											handleVitalModal();
 										}}
 									/>
 								</VitalModal.Footer>

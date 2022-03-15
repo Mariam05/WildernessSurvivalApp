@@ -3,7 +3,11 @@ import {
 	VictoryChart,
 	VictoryTheme,
 	VictoryAxis,
+	VictoryContainer
 } from "victory-native";
+
+import { HorizontalTimeline } from 'react-native-horizontal-timeline';
+
 import customTheme from "../CustomTheme";
 import colours from "../colours";
 import AppButton from "./AppButton";
@@ -14,38 +18,12 @@ import {
 	TouchableOpacity,
 	LayoutAnimation,
 	Platform,
-	View
+	View,
+	Dimensions
 } from "react-native";
 import { useState } from "react";
 
-const Chart = (data) => {
 
-	const mappedData = data.map(d => {
-		return {
-			timestamp: d.timestamp,
-			value: d.value,
-		}
-	})
-
-	return (
-		<VictoryChart
-			theme={customTheme}
-			domainPadding={{ x: 0, y: 20 }}
-			padding={{ top: 5, bottom: 35, left: 50, right: 50 }}
-			height={180}
-		>
-			<VictoryLine
-				style={{
-					data: { stroke: "#c43a31" },
-					parent: { border: "1px solid #ccc", fill: "#000000" }
-				}}
-				x={(d) => new Date(parseInt(d.timestamp) * 1000)}
-				y="value"
-				data={mappedData}
-			/>
-		</VictoryChart>
-	);
-};
 
 const RowWithImage = (entry) => {
 	const date = new Date(entry.timestamp * 1000);
@@ -100,6 +78,7 @@ const Row = (entry) => {
 	);
 };
 
+
 const Table = (data) => {
 	const hasImage = data && data[0] && data[0].url != null && data[0].url != ""
 
@@ -113,11 +92,226 @@ const Table = (data) => {
 	);
 };
 
-const Data = ({ type, data }) => {
+function formatAMPM(date) {
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	var ampm = hours >= 12 ? 'pm' : 'am';
+	hours = hours % 12;
+	hours = hours ? hours : 12; // the hour '0' should be '12'
+	minutes = minutes < 10 ? '0' + minutes : minutes;
+	var strTime = hours + ':' + minutes + ' ' + ampm;
+	return strTime;
+}
+
+
+const CategoricalChart = (data, init_categories) => {
+	let categories = ["", ...init_categories]
+	let category_indicies = [...Array(categories.length).keys()]
+	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
+
+	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
+
+	const timestamps = data.map(d => d.timestamp);
+
+	return (
+		<VictoryChart
+			theme={customTheme}
+			padding={{ top: 5, bottom: 35, left: longest_length*6+ 10, right: 50 }}
+			height={180}
+			domainPadding={{ x: 0, y: [-20, 20] }}
+			containerComponent={<VictoryContainer disableContainerEvents />}
+		>
+			{/* X Axis */}
+			<VictoryAxis 
+				standalone={true}
+				tickValues={timestamps}
+				tickFormat={(v) => `${formatAMPM(new Date(v))}` }
+				fixLabelOverlap={true}
+			/>
+	
+			{/* Y axis */}
+			<VictoryAxis dependentAxis
+				tickValues={category_indicies}
+				tickFormat={(i) => `${categories[i]}`}
+				standalone={false}
+				style={{
+					tickLabels: { angle: 0 }
+                }}
+			/>
+			{/* Line */}
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+				}}
+				x={(d) => new Date(d.timestamp)}
+				y={(d) => categories_dict[d.value]}
+				data={data}
+			/>
+		</VictoryChart>
+	);
+};
+
+const NumericalChart = (data) => {
+	return (
+		<VictoryChart
+			theme={customTheme}
+			domainPadding={{ x: 0, y: 10 }}
+			padding={{ top: 5, bottom: 35, left: 50, right: 50 }}
+			height={180}
+			containerComponent={<VictoryContainer disableContainerEvents />}
+		>
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+					
+				}}
+				x={(d) => new Date(d.timestamp)}
+				y="value"
+				data={data}
+			/>
+		</VictoryChart>
+	);
+};
+
+const CategoricalChartFullScreen = ({data, init_categories }) => {
+	console.log("render full screen");
+	console.log(data);
+	console.log(init_categories);
+
+	let categories = ["", ...init_categories]
+	let category_indicies = [...Array(categories.length).keys()]
+	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
+
+	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
+
+	const timestamps = data.map(d => d.timestamp);
+
+	return (
+		<VictoryChart
+			theme={customTheme}
+			padding={{ top: 5, bottom: 35, left: longest_length * 6 + 10, right: 50 }}
+			height={180}
+			domainPadding={{ x: 0, y: [-20, 20] }}
+			containerComponent={<VictoryContainer disableContainerEvents />}
+		>
+			{/* X Axis */}
+			<VictoryAxis
+				standalone={true}
+				tickValues={timestamps}
+				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
+				fixLabelOverlap={true}
+			/>
+
+			{/* Y axis */}
+			<VictoryAxis dependentAxis
+				tickValues={category_indicies}
+				tickFormat={(i) => `${categories[i]}`}
+				standalone={false}
+				style={{
+					tickLabels: { angle: 0 }
+				}}
+			/>
+			{/* Line */}
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+				}}
+				x={(d) => new Date(d.timestamp)}
+				y={(d) => categories_dict[d.value]}
+				data={data}
+			/>
+		</VictoryChart>
+	);
+	
+	
+};
+
+
+const CategoricalChartFullScreen1 = ({ data, init_categories }) => {
+	console.log("render full screen");
+	console.log(data);
+	console.log(init_categories);
+
+	let categories = ["", ...init_categories]
+	let category_indicies = [...Array(categories.length).keys()]
+	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
+
+	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
+
+	const timestamps = data.map(d => d.timestamp);
+
+	return (
+
+		<VictoryChart
+			horizontal={true}
+			theme={customTheme}
+			padding={{ bottom: 50, top: 50, left: 50, right: 50 }}
+			width={Dimensions.get('window').width}
+			height={Dimensions.get('window').height}
+			domainPadding={{ x: 50, y: [-50, 20] }}
+			containerComponent={<VictoryContainer disableContainerEvents />}
+		>
+			{/* X Axis */}
+			<VictoryAxis
+				standalone={true}
+				tickValues={timestamps}
+				tickFormat={(v) => { console.log(v); return `${formatAMPM(new Date(v))}` }}
+				fixLabelOverlap={true}
+				style={{
+					tickLabels: { angle: 90 }
+				}}
+				orientation="left"
+				offsetX={50}
+			/>
+
+			{/* Y axis */}
+			<VictoryAxis dependentAxis
+				tickValues={category_indicies}
+				tickFormat={(i) => `${categories[i]}`}
+				standalone={false}
+				style={{
+					tickLabels: { angle: 90 }
+				}}
+				orientation="top"
+
+			/>
+			{/* Line */}
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+				}}
+				x={(d) => { return new Date(d.timestamp) }}
+				y={(d) => categories_dict[d.value]}
+				data={data}
+			/>
+		</VictoryChart>
+
+	);
+
+
+};
+
+const Data = ({ type, data, categories}) => {
+	const timeCorrectedData = data.map(d => {
+		let timestamp = parseInt(d.timestamp) * (d.timestamp.length == 10 ? 1000 : 1);
+
+		return {
+			timestamp: timestamp,
+			value: d.value,
+		}
+	})
+
 	if (type === "Numerical") {
-		return Chart(data);
+		if (timeCorrectedData.length > 1)
+			return NumericalChart(timeCorrectedData);
+	} else if (type === "Categorical") {
+		if (timeCorrectedData.length > 1)
+			return CategoricalChart(timeCorrectedData, categories);
+	} else {
+		return Table(timeCorrectedData);
 	}
-	return Table(data);
+	return (null);
+	
 };
 
 const TimeElapsed = ({ timeElapsed, periodicity }) => {
@@ -136,16 +330,20 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 };
 
 function VitalItem({
-	enabled,
+	click_enabled,
 	name,
 	periodicity,
 	type,
 	description,
+	categories,
 	data,
 	timeElapsed,
 	onPressInfo,
 	onPressAdd,
+	onChartLongPress,
 }) {
+
+
 	const [expanded, setExpanded] = useState(false);
 	const onPress = () => {
 		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -154,11 +352,11 @@ function VitalItem({
 	return (
 		<View>
 			<TouchableOpacity
-				disabled={!enabled}
+				disabled={!click_enabled}
 				onPress={onPress}
 				style={[
 					vitalItemStyles.vitalsHeader,
-					{ width: enabled ? "80%" : "90%" },
+					{ width: click_enabled ? "80%" : "90%" },
 				]}
 			>
 				{description != undefined && (
@@ -191,17 +389,26 @@ function VitalItem({
 					/>
 				)}
 			</TouchableOpacity>
-
-			{expanded && data && data.length > 0 && (
-				<Data type={type} data={data} />
-			)}
+			
+			<TouchableOpacity
+				onLongPress={onChartLongPress}
+				style={vitalItemStyles.chart}
+			>
+				{expanded && data && data.length > 0 && (
+					<Data type={type} data={data} categories={categories}/>
+				)}
+			</TouchableOpacity >
 		</View>
 	);
 }
 
-export default VitalItem;
+export { VitalItem, Data, CategoricalChartFullScreen  };
 
 export const vitalItemStyles = StyleSheet.create({
+	chart: {
+	
+	},
+	regular: {},
 	infoButton: {
 		height: undefined,
 		width: "10%",
@@ -304,7 +511,7 @@ export const vitalItemStyles = StyleSheet.create({
 		alignSelf: "center",
 		padding: 10,
 		margin: 10,
-		marginBottom: 10,
+		marginBottom: 0,
 		paddingBottom: 0,
 		paddingLeft: "5%",
 		fontSize: 30,
