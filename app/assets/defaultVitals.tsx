@@ -90,4 +90,7 @@ const photosVital = new Vital({
 
 
 const defaultVitals = [avpuVital, pulseVital, respirationVital, skinVital, photosVital, generalVital, temperatureVital];
+const quickVitals = [avpuVital.name, pulseVital.name, respirationVital.name, skinVital.name, temperatureVital.name];
+
 export default defaultVitals
+export { quickVitals }

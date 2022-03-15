@@ -129,7 +129,7 @@ export default function PatientScreen({ navigation, route }) {
 						title="PDF"
 						style={PatientScreenStyles.pdfButton}
 						buttonTextStyle={PatientScreenStyles.pdfButtonText}
-						onPress={() => { console.log("Generate PDF"); createPDF() }}
+						onPress={() => { console.log("Generate PDF"); createPDF(patient) }}
 					/>
 				</View>
 
