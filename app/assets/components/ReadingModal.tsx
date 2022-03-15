@@ -60,6 +60,7 @@ export const ReadingModal = ({
 
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [enteredNumber, setEnteredNumber] = useState("");
+	const [enteredNote, setEnteredNote] = useState("");
 
 	const [vitalValueErrorMessage, setVitalValueErrorMessage] = useState("");
 	const [timestampErrorMessage, setTimeStampErrorMessage] = useState("");
@@ -80,7 +81,8 @@ export const ReadingModal = ({
 
 		if (
 			(vital.type === "Numerical" && enteredNumber === "") ||
-			(vital.type === "Categorical" && selectedCategory === "")
+			(vital.type === "Categorical" && selectedCategory === "") ||
+			(vital.type === "Special" && enteredNote === "")
 		) {
 			setVitalValueErrorMessage("Must enter a vital reading");
 			error = false;
@@ -109,7 +111,9 @@ export const ReadingModal = ({
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 			>
 				<ScrollView
-					style={{ top: Platform.OS == "ios" ? "5%" : 0 }}
+					style={{
+						top: Platform.OS == "ios" ? "5%" : 0,
+					}}
 					keyboardDismissMode="on-drag"
 					keyboardShouldPersistTaps="never"
 				>
@@ -206,7 +210,6 @@ export const ReadingModal = ({
 											onChangeText={(value) => {
 												setVitalValueErrorMessage("");
 												setEnteredNumber(value);
-												console.log(enteredNumber);
 											}}
 										/>
 										<Text
@@ -250,6 +253,56 @@ export const ReadingModal = ({
 												}
 											/>
 										</>
+									)}
+								</>
+							)}
+
+							{/* General Notes options */}
+							{vital && vital.type == "Special" && (
+								<>
+									<Text
+										style={modalStyles.modalSubHeadingText}
+									>
+										Note
+									</Text>
+									<View
+										style={{
+											flexDirection: "row",
+											alignItems: "center",
+											justifyContent: "center",
+										}}
+									>
+										<TextInput
+											keyboardType="default"
+											returnKeyType="next"
+											multiline={true}
+											autoCapitalize="sentences"
+											autoCorrect={true}
+											style={[
+												globalStyles.credentialInput,
+												{
+													width: "100%",
+													height: 200,
+													paddingTop: 15,
+													backgroundColor:
+														vitalValueErrorMessage
+															? "tomato"
+															: "white",
+												},
+											]}
+											value={
+												enteredNote ? enteredNote : ""
+											}
+											onChangeText={(value) => {
+												setVitalValueErrorMessage("");
+												setEnteredNote(value);
+											}}
+										/>
+									</View>
+									{vitalValueErrorMessage.length > 0 && (
+										<Text style={modalStyles.errorMessage}>
+											{vitalValueErrorMessage}
+										</Text>
 									)}
 								</>
 							)}
@@ -392,6 +445,7 @@ export const ReadingModal = ({
 									);
 									setSelectedCategory("");
 									setEnteredNumber("");
+									setEnteredNote("");
 									setVitalValueErrorMessage("");
 									setTimeStampErrorMessage("");
 								}}
@@ -410,7 +464,10 @@ export const ReadingModal = ({
 											value:
 												vital.type === "Numerical"
 													? enteredNumber
-													: selectedCategory,
+													: vital.type ==
+													  "Categorical"
+													? selectedCategory
+													: enteredNote,
 										})
 									);
 									if (!validateInput()) return;
@@ -422,6 +479,7 @@ export const ReadingModal = ({
 									);
 									setSelectedCategory("");
 									setEnteredNumber("");
+									setEnteredNote("");
 									setVitalValueErrorMessage("");
 								}}
 							/>
