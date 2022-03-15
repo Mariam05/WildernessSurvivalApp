@@ -75,6 +75,12 @@ export const ReadingModal = ({
 			: null;
 	}, [patient]);
 
+	useEffect(() => {
+		setHour(Moment().hour() % 12);
+		setMinute(minutes[Moment().minutes()]);
+		setSelectedAmPm(Moment().hour() < 12 ? "AM" : "PM");
+	}, [vitalName]);
+
 	const validateInput = (): boolean => {
 		let error = true;
 
@@ -319,7 +325,7 @@ export const ReadingModal = ({
 							>
 								<ModalDropdown
 									options={hours}
-									defaultValue={hour}
+									defaultValue={String(hour)}
 									defaultIndex={hours.indexOf(String(hour))}
 									onSelect={(index, value) => {
 										setHour(value);
