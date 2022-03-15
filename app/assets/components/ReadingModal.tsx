@@ -38,7 +38,9 @@ export const ReadingModal = ({
 	children,
 	...props
 }: ModalProps) => {
-	const [hour, setHour] = useState(Moment().hour() % 12);
+	const [hour, setHour] = useState(
+		Moment().hour() == 12 ? String(12) : String(Moment().hour() % 12)
+	);
 	const [minute, setMinute] = useState(minutes[Moment().minutes()]);
 	const [selectedAmPm, setSelectedAmPm] = useState(
 		Moment().hour() < 12 ? "AM" : "PM"
@@ -46,16 +48,6 @@ export const ReadingModal = ({
 	const [timestamp, setTimestamp] = useState(
 		Moment(`${hour} ${minute} ${selectedAmPm}`, `hh mm a`)
 	);
-
-	useEffect(() => {
-		let currentTime = Moment();
-		currentTime.hour(
-			selectedAmPm === "AM" ? Number(hour - 4) : Number(hour - 4) + 12
-		);
-		currentTime.minute(Number(minute));
-
-		setTimestamp(currentTime);
-	}, [hour, minute, selectedAmPm]);
 
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [enteredNumber, setEnteredNumber] = useState("");
@@ -70,16 +62,42 @@ export const ReadingModal = ({
 		: null;
 
 	useEffect(() => {
+		let currentTime = Moment();
+		currentTime.hour(
+			selectedAmPm === "AM"
+				? Number(hour) % 12
+				: Number(hour) == 12
+				? 12
+				: Number(hour) + 12
+		);
+		currentTime.minute(Number(minute));
+
+		setTimestamp(currentTime);
+		//console.log(currentTime.format());
+	}, [hour, minute, selectedAmPm]);
+
+	useEffect(() => {
 		vital = patient
 			? patient.vitals.find((v) => v.name === vitalName)
 			: null;
 	}, [patient]);
 
 	useEffect(() => {
-		setHour(Moment().hour() % 12);
+		setHour(
+			Moment().hour() == 12 ? String(12) : String(Moment().hour() % 12)
+		);
 		setMinute(minutes[Moment().minutes()]);
 		setSelectedAmPm(Moment().hour() < 12 ? "AM" : "PM");
-	}, [vitalName]);
+		return () => {
+			setHour(
+				Moment().hour() == 12
+					? String(12)
+					: String(Moment().hour() % 12)
+			);
+			setMinute(minutes[Moment().minutes()]);
+			setSelectedAmPm(Moment().hour() < 12 ? "AM" : "PM");
+		};
+	}, [isVisible]);
 
 	const validateInput = (): boolean => {
 		let error = true;
@@ -138,7 +156,7 @@ export const ReadingModal = ({
 										Options
 									</Text>
 									<ModalDropdown
-										options={vital.categories}
+										options={vital.categories} // this line causes an error for some reason
 										onSelect={(index, value) => {
 											setSelectedCategory(value);
 											setVitalValueErrorMessage("");
@@ -325,8 +343,8 @@ export const ReadingModal = ({
 							>
 								<ModalDropdown
 									options={hours}
-									defaultValue={String(hour)}
-									defaultIndex={hours.indexOf(String(hour))}
+									defaultValue={hour}
+									defaultIndex={hours.indexOf(hour)}
 									onSelect={(index, value) => {
 										setHour(value);
 										setTimeStampErrorMessage("");
@@ -431,11 +449,6 @@ export const ReadingModal = ({
 								buttonTextStyle={modalStyles.modalButtonText}
 								onPress={() => {
 									handleReadingModal();
-									setHour(Moment().hour() % 12);
-									setMinute(minutes[Moment().minute()]);
-									setSelectedAmPm(
-										Moment().hour() < 12 ? "AM" : "PM"
-									);
 									setSelectedCategory("");
 									setEnteredNumber("");
 									setEnteredNote("");
@@ -448,6 +461,12 @@ export const ReadingModal = ({
 								style={modalStyles.modalSubmitButton}
 								buttonTextStyle={modalStyles.modalButtonText}
 								onPress={() => {
+									if (!validateInput()) return;
+									handleReadingModal();
+									setSelectedCategory("");
+									setEnteredNumber("");
+									setEnteredNote("");
+									setVitalValueErrorMessage("");
 									updateVital(
 										vital.name,
 										new Reading({
@@ -463,17 +482,7 @@ export const ReadingModal = ({
 													: enteredNote,
 										})
 									);
-									if (!validateInput()) return;
-									handleReadingModal();
-									setHour(Moment().hour() % 12);
-									setMinute(minutes[Moment().minute()]);
-									setSelectedAmPm(
-										Moment().hour() < 12 ? "AM" : "PM"
-									);
-									setSelectedCategory("");
-									setEnteredNumber("");
-									setEnteredNote("");
-									setVitalValueErrorMessage("");
+									console.log(timestamp.format());
 								}}
 							/>
 						</ReadingModal.Footer>
