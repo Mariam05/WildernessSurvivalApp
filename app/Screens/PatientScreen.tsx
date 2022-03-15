@@ -19,6 +19,7 @@ import {
 	KeyboardAvoidingView,
 	UIManager,
 	StatusBar,
+	Dimensions,
 } from "react-native";
 
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
@@ -73,15 +74,15 @@ export default function PatientScreen({ navigation, route }) {
 	};
 
 
-
+	const [chartType, setChartType] = useState("");
 	const [chartVitalData, setChartVitalData] = useState("");
 	const [chartVitalCategories, setChartVitalCategories] = useState("");
 
 	const [isChartModalVisible, setIsChartModalVisible] = useState(false);
-	const handleChartModal = ({ data, categories }) => {
+	const handleChartModal = ({ type, data, categories }) => {
 		setChartVitalCategories(categories);
 		setChartVitalData(data);
-		console.log("display full screen: " + chartVitalCategories);
+		setChartType(type);
 		return setIsChartModalVisible(() => !isChartModalVisible)
 	};
 
@@ -175,7 +176,7 @@ export default function PatientScreen({ navigation, route }) {
 										)
 									}
 								key={index}
-								onChartLongPress={() => handleChartModal({ data: vital.data, categories:[...vital.categories] })}
+								onChartLongPress={() => handleChartModal({ type: vital.type, data: vital.data, categories:vital.categories })}
 								/>
 						  ))
 						: null}
@@ -183,22 +184,22 @@ export default function PatientScreen({ navigation, route }) {
 
 
 				{/* Code for display chart full screen */}
-				<TouchableOpacity
-					style={{
-						elevation: 100,
-						height: 500,
-						width: 500,
-
+				{isChartModalVisible &&
+					(<TouchableOpacity
+						style={{
+							elevation: 100,
+							height: Dimensions.get('window').height,
+							width: Dimensions.get('window').width,
 					}}
-					onLongPress={() => setIsChartModalVisible}
+					onPress={() => handleChartModal({ type: null, data: null, categories: null })}
 				>
-					{isChartModalVisible &&
-						(<CategoricalChartFullScreen data={[...chartVitalData]} init_categories={[...chartVitalCategories]} />)}
-				</TouchableOpacity>
+					<Data type={chartType} data={chartVitalData} categories={chartVitalCategories} fullscreen={true} />
+					</TouchableOpacity>
+				)}
 
 
 				{/* Code for add new vital button */}
-				<AddButton onPress={handleVitalModal} />
+				{!isChartModalVisible && (<AddButton onPress={handleVitalModal} />)}
 
 				{/* Code for add new vital info */}
 				<VitalModal isVisible={isVitalModalVisible}>

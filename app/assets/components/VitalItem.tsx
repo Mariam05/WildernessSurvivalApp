@@ -93,6 +93,7 @@ const Table = (data) => {
 };
 
 function formatAMPM(date) {
+
 	var hours = date.getHours();
 	var minutes = date.getMinutes();
 	var ampm = hours >= 12 ? 'pm' : 'am';
@@ -105,27 +106,27 @@ function formatAMPM(date) {
 
 
 const CategoricalChart = (data, init_categories) => {
-	let categories = ["", ...init_categories]
+	let categories = ["", ...init_categories, ""]
 	let category_indicies = [...Array(categories.length).keys()]
 	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
 
 	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
 
-	const timestamps = data.map(d => d.timestamp);
+
 
 	return (
 		<VictoryChart
 			theme={customTheme}
-			padding={{ top: 5, bottom: 35, left: longest_length*6+ 10, right: 50 }}
+			padding={{ top: 5, bottom: 35, left: longest_length*8+ 10, right: 50 }}
 			height={180}
-			domainPadding={{ x: 0, y: [-20, 20] }}
+			domainPadding={{ x: 0, y: [-30, -30] }}
 			containerComponent={<VictoryContainer disableContainerEvents />}
 		>
 			{/* X Axis */}
 			<VictoryAxis 
 				standalone={true}
-				tickValues={timestamps}
-				tickFormat={(v) => `${formatAMPM(new Date(v))}` }
+				
+				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
 				fixLabelOverlap={true}
 			/>
 	
@@ -136,7 +137,7 @@ const CategoricalChart = (data, init_categories) => {
 				standalone={false}
 				style={{
 					tickLabels: { angle: 0 }
-                }}
+				}}
 			/>
 			{/* Line */}
 			<VictoryLine
@@ -152,6 +153,47 @@ const CategoricalChart = (data, init_categories) => {
 };
 
 const NumericalChart = (data) => {
+
+
+
+	//let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
+
+	return (
+		<VictoryChart
+			theme={customTheme}
+			padding={{ top: 5, bottom: 35, left: 2 * 8 + 40, right: 50 }}
+			height={180}
+			domainPadding={{ x: 0, y: 10 }}
+			containerComponent={<VictoryContainer disableContainerEvents />}
+		>
+			{/* X Axis */}
+			<VictoryAxis
+				standalone={true}
+				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
+				fixLabelOverlap={true}
+			/>
+
+			{/* Y axis */}
+			<VictoryAxis dependentAxis
+				tickFormat={(i) => i}
+				standalone={false}
+				style={{
+					tickLabels: { angle: 0 }
+				}}
+			/>
+			{/* Line */}
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+				}}
+				x={(d) => new Date(d.timestamp)}
+				y="value"
+				data={data}
+			/>
+		</VictoryChart>
+	);
+
+	/*
 	return (
 		<VictoryChart
 			theme={customTheme}
@@ -170,46 +212,44 @@ const NumericalChart = (data) => {
 				data={data}
 			/>
 		</VictoryChart>
-	);
+	);*/
 };
 
-const CategoricalChartFullScreen = ({data, init_categories }) => {
-	console.log("render full screen");
-	console.log(data);
-	console.log(init_categories);
 
-	let categories = ["", ...init_categories]
-	let category_indicies = [...Array(categories.length).keys()]
-	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
-
-	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
+const NumericalChartFullScreen = (data) => {
 
 	const timestamps = data.map(d => d.timestamp);
 
 	return (
 		<VictoryChart
+			horizontal={true}
 			theme={customTheme}
-			padding={{ top: 5, bottom: 35, left: longest_length * 6 + 10, right: 50 }}
-			height={180}
-			domainPadding={{ x: 0, y: [-20, 20] }}
+			padding={{ top: 2 * 8 + 30, bottom: 40, left: 40, right: 40 }}
+			width={Dimensions.get('window').width}
+			height={Dimensions.get('window').height}
+			domainPadding={{ x: 0, y: 10 }}
 			containerComponent={<VictoryContainer disableContainerEvents />}
 		>
 			{/* X Axis */}
 			<VictoryAxis
 				standalone={true}
-				tickValues={timestamps}
 				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
 				fixLabelOverlap={true}
+				style={{
+					tickLabels: { angle: 90 }
+				}}
+				orientation="left" 
+				invertAxis={true}
 			/>
 
 			{/* Y axis */}
 			<VictoryAxis dependentAxis
-				tickValues={category_indicies}
-				tickFormat={(i) => `${categories[i]}`}
+				tickFormat={(i) => i}
 				standalone={false}
 				style={{
-					tickLabels: { angle: 0 }
+					tickLabels: { angle: 90 },
 				}}
+				orientation="top"
 			/>
 			{/* Line */}
 			<VictoryLine
@@ -217,20 +257,26 @@ const CategoricalChartFullScreen = ({data, init_categories }) => {
 					data: { stroke: "#c43a31" }
 				}}
 				x={(d) => new Date(d.timestamp)}
-				y={(d) => categories_dict[d.value]}
+				y="value"
 				data={data}
 			/>
 		</VictoryChart>
 	);
-	
-	
+
 };
 
 
-const CategoricalChartFullScreen1 = ({ data, init_categories }) => {
+const RenderChart = ({ type, data, categories, fullscreen }) => {
+	
+
+
+
+}
+
+
+
+const CategoricalChartFullScreen = ( data, init_categories ) => {
 	console.log("render full screen");
-	console.log(data);
-	console.log(init_categories);
 
 	let categories = ["", ...init_categories]
 	let category_indicies = [...Array(categories.length).keys()]
@@ -238,31 +284,17 @@ const CategoricalChartFullScreen1 = ({ data, init_categories }) => {
 
 	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
 
-	const timestamps = data.map(d => d.timestamp);
-
 	return (
 
 		<VictoryChart
 			horizontal={true}
 			theme={customTheme}
-			padding={{ bottom: 50, top: 50, left: 50, right: 50 }}
+			padding={{ top: longest_length * 8 + 30, bottom: 20, left: 20, right: 20 }}
 			width={Dimensions.get('window').width}
 			height={Dimensions.get('window').height}
-			domainPadding={{ x: 50, y: [-50, 20] }}
+			domainPadding={{ x: -1, y: [-20, 20] }}
 			containerComponent={<VictoryContainer disableContainerEvents />}
 		>
-			{/* X Axis */}
-			<VictoryAxis
-				standalone={true}
-				tickValues={timestamps}
-				tickFormat={(v) => { console.log(v); return `${formatAMPM(new Date(v))}` }}
-				fixLabelOverlap={true}
-				style={{
-					tickLabels: { angle: 90 }
-				}}
-				orientation="left"
-				offsetX={50}
-			/>
 
 			{/* Y axis */}
 			<VictoryAxis dependentAxis
@@ -270,17 +302,31 @@ const CategoricalChartFullScreen1 = ({ data, init_categories }) => {
 				tickFormat={(i) => `${categories[i]}`}
 				standalone={false}
 				style={{
-					tickLabels: { angle: 90 }
+					tickLabels: { angle: 90, fontSize: 15, padding: 50 },
 				}}
 				orientation="top"
-
+				
 			/>
+
+			{/* X Axis */}
+			<VictoryAxis
+				standalone={true}
+				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
+				fixLabelOverlap={true}
+				style={{
+					tickLabels: { angle: 90 }
+				}}
+				orientation="left"
+				offsetX={50}
+				invertAxis={true}
+			/>
+
 			{/* Line */}
 			<VictoryLine
 				style={{
 					data: { stroke: "#c43a31" }
 				}}
-				x={(d) => { return new Date(d.timestamp) }}
+				x={(d) => new Date(d.timestamp) }
 				y={(d) => categories_dict[d.value]}
 				data={data}
 			/>
@@ -291,7 +337,16 @@ const CategoricalChartFullScreen1 = ({ data, init_categories }) => {
 
 };
 
-const Data = ({ type, data, categories}) => {
+
+
+
+const Data = ({ type, data, categories, fullscreen }) => {
+	console.log("render");
+	console.log(data);
+
+	if (data == null)
+		return (null)
+
 	const timeCorrectedData = data.map(d => {
 		let timestamp = parseInt(d.timestamp) * (d.timestamp.length == 10 ? 1000 : 1);
 
@@ -302,11 +357,22 @@ const Data = ({ type, data, categories}) => {
 	})
 
 	if (type === "Numerical") {
-		if (timeCorrectedData.length > 1)
+		if (timeCorrectedData.length > 1) {
+			if (fullscreen) {
+				return NumericalChartFullScreen(timeCorrectedData);
+			}
 			return NumericalChart(timeCorrectedData);
+		}
 	} else if (type === "Categorical") {
-		if (timeCorrectedData.length > 1)
+		if (timeCorrectedData.length > 1) {
+			if (categories == null)
+				return (null);
+
+			if (fullscreen) {
+				return CategoricalChartFullScreen(timeCorrectedData, categories);
+			}
 			return CategoricalChart(timeCorrectedData, categories);
+		}
 	} else {
 		return Table(timeCorrectedData);
 	}
@@ -395,7 +461,7 @@ function VitalItem({
 				style={vitalItemStyles.chart}
 			>
 				{expanded && data && data.length > 0 && (
-					<Data type={type} data={data} categories={categories}/>
+					<Data type={type} data={data} categories={categories} fullscreen={false} />
 				)}
 			</TouchableOpacity >
 		</View>
