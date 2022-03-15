@@ -26,6 +26,9 @@ import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import { Vital } from "../../schemas";
+import { createPDF } from "../pdf-generator";
+
+const vitalTypes = ["Numerical", "Categorical"];
 import { PatientModal } from "../assets/components/PatientModal";
 import { usePatients } from "../../providers/PatientProvider";
 import { useVitals } from "../../providers/VitalProvider";
@@ -103,7 +106,8 @@ export default function PatientScreen({ navigation, route }) {
 								handlePatientModal();
 								return;
 							} else if (nativeEvent.event == "pdf") {
-								console.log("Exporting to pdf");
+								console.log("Generate PDF");
+								createPDF(patient);
 								return;
 							} else if (nativeEvent.event == "deletePatient") {
 								Alert.alert(
@@ -129,7 +133,7 @@ export default function PatientScreen({ navigation, route }) {
 
 							console.warn(
 								"Event not recognized " +
-									JSON.stringify(nativeEvent)
+								JSON.stringify(nativeEvent)
 							);
 						}}
 						actions={[
