@@ -3,7 +3,8 @@ import {
 	VictoryChart,
 	VictoryTheme,
 	VictoryAxis,
-	VictoryContainer
+	VictoryContainer,
+	VictoryLabel
 } from "victory-native";
 
 import { HorizontalTimeline } from 'react-native-horizontal-timeline';
@@ -19,7 +20,9 @@ import {
 	LayoutAnimation,
 	Platform,
 	View,
-	Dimensions
+	Dimensions,
+	ScrollView,
+	
 } from "react-native";
 import { useState } from "react";
 
@@ -112,8 +115,6 @@ const CategoricalChart = (data, init_categories) => {
 
 	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
 
-
-
 	return (
 		<VictoryChart
 			theme={customTheme}
@@ -192,34 +193,10 @@ const NumericalChart = (data) => {
 			/>
 		</VictoryChart>
 	);
-
-	/*
-	return (
-		<VictoryChart
-			theme={customTheme}
-			domainPadding={{ x: 0, y: 10 }}
-			padding={{ top: 5, bottom: 35, left: 50, right: 50 }}
-			height={180}
-			containerComponent={<VictoryContainer disableContainerEvents />}
-		>
-			<VictoryLine
-				style={{
-					data: { stroke: "#c43a31" }
-					
-				}}
-				x={(d) => new Date(d.timestamp)}
-				y="value"
-				data={data}
-			/>
-		</VictoryChart>
-	);*/
 };
 
 
 const NumericalChartFullScreen = (data) => {
-
-	const timestamps = data.map(d => d.timestamp);
-
 	return (
 		<VictoryChart
 			horizontal={true}
@@ -240,6 +217,7 @@ const NumericalChartFullScreen = (data) => {
 				}}
 				orientation="left" 
 				invertAxis={true}
+				tickLabelComponent={<VictoryLabel dx={25} />}
 			/>
 
 			{/* Y axis */}
@@ -250,6 +228,7 @@ const NumericalChartFullScreen = (data) => {
 					tickLabels: { angle: 90 },
 				}}
 				orientation="top"
+				tickLabelComponent={<VictoryLabel dy={5} textAnchor={"end"} />}
 			/>
 			{/* Line */}
 			<VictoryLine
@@ -262,7 +241,6 @@ const NumericalChartFullScreen = (data) => {
 			/>
 		</VictoryChart>
 	);
-
 };
 
 
@@ -285,14 +263,13 @@ const CategoricalChartFullScreen = ( data, init_categories ) => {
 	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
 
 	return (
-
 		<VictoryChart
 			horizontal={true}
 			theme={customTheme}
-			padding={{ top: longest_length * 8 + 30, bottom: 20, left: 20, right: 20 }}
+			padding={{ top: longest_length * 8 + 30, bottom: 20, left: 40, right: 20 }}
 			width={Dimensions.get('window').width}
 			height={Dimensions.get('window').height}
-			domainPadding={{ x: -1, y: [-20, 20] }}
+			domainPadding={{ x: -1, y: [-30, 30] }}
 			containerComponent={<VictoryContainer disableContainerEvents />}
 		>
 
@@ -302,8 +279,9 @@ const CategoricalChartFullScreen = ( data, init_categories ) => {
 				tickFormat={(i) => `${categories[i]}`}
 				standalone={false}
 				style={{
-					tickLabels: { angle: 90, fontSize: 15, padding: 50 },
+					tickLabels: { angle: 90, fontSize: 15 },
 				}}
+				tickLabelComponent={<VictoryLabel dy={5} textAnchor={"end"} />}
 				orientation="top"
 				
 			/>
@@ -314,10 +292,11 @@ const CategoricalChartFullScreen = ( data, init_categories ) => {
 				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
 				fixLabelOverlap={true}
 				style={{
-					tickLabels: { angle: 90 }
+					tickLabels: { angle: 90, paddingInline: 50 }
 				}}
+				tickLabelComponent={<VictoryLabel dx={25} />}
 				orientation="left"
-				offsetX={50}
+				
 				invertAxis={true}
 			/>
 
@@ -333,17 +312,82 @@ const CategoricalChartFullScreen = ( data, init_categories ) => {
 		</VictoryChart>
 
 	);
-
-
 };
 
 
 
 
-const Data = ({ type, data, categories, fullscreen }) => {
-	console.log("render");
-	console.log(data);
 
+const PhotoRow = (category, entries) => {
+	const [expanded, setExpanded] = useState(false);
+
+	const onPress = () => {
+		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+		setExpanded(!expanded);
+	};
+
+	return (
+		<View style={{ width: "100%"}}>
+			<TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
+				<Text style={{ fontSize: 18 }}> {category} </Text>
+			</TouchableOpacity>
+			<ScrollView horizontal={true} style={{ left: 20, marginRight: 20 }}>
+				{expanded &&
+					(entries.map((e) =>
+						<View style={{width: 150, height:150}}>
+							<Image
+								source={{ uri: e.url }}
+								style={{ width: "90%", height: "90%", borderColor: "black", borderWidth: 1 }}>
+							</Image>
+							<Text
+								style={vitalItemStyles.timestampCell}>
+								{formatAMPM(new Date(e.timestamp))}
+							</Text>
+						</View>
+					))
+				}
+			</ScrollView >
+		</View>
+	);
+};
+
+const PhotoTimeLine = (data : Array<any>) => {
+	const categories = {}
+	for (let reading of data) {
+		if (!categories.hasOwnProperty(reading.value)) {
+			categories[reading.value] = [reading];
+		} else {
+			categories[reading.value].push(reading);
+        }
+	}
+	console.log(categories);
+	return (
+		<View style={vitalItemStyles.table}>
+			{Object.keys(categories).map((category) => {
+				return PhotoRow(category, categories[category]);
+			})}
+		</View>
+	);
+}
+
+
+
+const Chart = (onChartLongPress, chart) => {
+	return (
+		<TouchableOpacity
+			onLongPress={onChartLongPress}
+			style={vitalItemStyles.chart}
+		>
+			{chart}
+		</TouchableOpacity>
+	)
+
+
+}
+
+
+
+const Data = ({ type, data, categories, fullscreen, onChartLongPress }) => {
 	if (data == null)
 		return (null)
 
@@ -351,6 +395,7 @@ const Data = ({ type, data, categories, fullscreen }) => {
 		let timestamp = parseInt(d.timestamp) * (d.timestamp.length == 10 ? 1000 : 1);
 
 		return {
+			url: d.url,
 			timestamp: timestamp,
 			value: d.value,
 		}
@@ -359,9 +404,9 @@ const Data = ({ type, data, categories, fullscreen }) => {
 	if (type === "Numerical") {
 		if (timeCorrectedData.length > 1) {
 			if (fullscreen) {
-				return NumericalChartFullScreen(timeCorrectedData);
+				return Chart(onChartLongPress, NumericalChartFullScreen(timeCorrectedData))
 			}
-			return NumericalChart(timeCorrectedData);
+			return Chart(onChartLongPress, NumericalChart(timeCorrectedData))
 		}
 	} else if (type === "Categorical") {
 		if (timeCorrectedData.length > 1) {
@@ -369,13 +414,15 @@ const Data = ({ type, data, categories, fullscreen }) => {
 				return (null);
 
 			if (fullscreen) {
-				return CategoricalChartFullScreen(timeCorrectedData, categories);
+				return Chart(onChartLongPress, CategoricalChartFullScreen(timeCorrectedData, categories))
 			}
-			return CategoricalChart(timeCorrectedData, categories);
+			return Chart(onChartLongPress, CategoricalChart(timeCorrectedData, categories))
 		}
+	} else if (type === "Photos") {
+		return PhotoTimeLine(timeCorrectedData);
 	} else {
 		return Table(timeCorrectedData);
-	}
+    }
 	return (null);
 	
 };
@@ -455,15 +502,10 @@ function VitalItem({
 					/>
 				)}
 			</TouchableOpacity>
-			
-			<TouchableOpacity
-				onLongPress={onChartLongPress}
-				style={vitalItemStyles.chart}
-			>
-				{expanded && data && data.length > 0 && (
-					<Data type={type} data={data} categories={categories} fullscreen={false} />
-				)}
-			</TouchableOpacity >
+
+			{expanded && data && data.length > 0 && (
+				<Data type={type} data={data} categories={categories} fullscreen={false} onChartLongPress={onChartLongPress} />
+			)}
 		</View>
 	);
 }
@@ -571,6 +613,8 @@ export const vitalItemStyles = StyleSheet.create({
 		resizeMode: "cover",
 		borderRadius: 10,
 		margin: 0,
+		height: 20,
+		width: 20,
 	},
 	vitalsHeader: {
 		flexDirection: "row",

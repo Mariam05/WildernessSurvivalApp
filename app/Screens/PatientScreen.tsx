@@ -185,17 +185,13 @@ export default function PatientScreen({ navigation, route }) {
 
 				{/* Code for display chart full screen */}
 				{isChartModalVisible &&
-					(<TouchableOpacity
-						style={{
-							elevation: 100,
-							height: Dimensions.get('window').height,
-							width: Dimensions.get('window').width,
-					}}
-					onPress={() => handleChartModal({ type: null, data: null, categories: null })}
-				>
-					<Data type={chartType} data={chartVitalData} categories={chartVitalCategories} fullscreen={true} />
-					</TouchableOpacity>
-				)}
+					<Data
+						type={chartType}
+						data={chartVitalData}
+						categories={chartVitalCategories}
+						fullscreen={true} onChartLongPress={() => handleChartModal({ type: null, data: null, categories: null })}
+					/>
+				}
 
 
 				{/* Code for add new vital button */}
