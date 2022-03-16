@@ -62,12 +62,13 @@ export default function SignUpScreen() {
 						style: "default",
 						onPress: () => {
 							try {
-								user.linkCredentials(
-									Realm.Credentials.emailPassword(
-										username,
-										password
-									)
-								);
+								user &&
+									user.linkCredentials(
+										Realm.Credentials.emailPassword(
+											username,
+											password
+										)
+									);
 							} catch (error) {
 								const errorMessage = `Failed to link: ${error.message}`;
 								console.error(errorMessage);
@@ -373,7 +374,7 @@ export default function SignUpScreen() {
 					title="Sign Up"
 					style={registrationStyles.signUpButton}
 					buttonTextStyle={registrationStyles.signUpButtonText}
-					onPress={onPressSignUp}
+					onPress={async () => await onPressSignUp()}
 				/>
 
 				<AppButton

@@ -150,7 +150,7 @@ const AuthProvider = ({ children }) => {
 						`Successfully inserted custom data with _id: ${result.insertedId}`
 					)
 				)
-				.then(() => user.refreshCustomData())
+				.then(() => user && user.refreshCustomData())
 				.catch((err) =>
 					console.error(
 						`Failed to insert custom data: ${err.message}`

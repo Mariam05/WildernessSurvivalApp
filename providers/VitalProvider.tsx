@@ -132,16 +132,21 @@ const VitalsProvider = ({ children, patientId }) => {
 
 		if (pat == null) console.log("pat is null");
 		if (pat != null) {
-			// console.log("patient entries are " + pat.vitals);
-			for (let vital of pat.vitals) {
-				if (vital.name == vital_name) {
-					realm.write(() => {
-						vital.data.push(reading);
-						pat.timestamp = Date.now(); // update the patients timestamp
-					});
+			try {
+				// console.log("patient entries are " + pat.vitals);
+				for (let vital of pat.vitals) {
+					if (vital.name == vital_name) {
+						realm.write(() => {
+							vital.data.push(reading);
+							pat.timestamp = Date.now(); // update the patients timestamp
+						});
 
-					console.log("added new data to vital ", vital);
+						console.log("added new data to vital ", vital);
+					}
 				}
+			} catch (error) {
+				console.error(error.message);
+				console.error("Failed to update patient with vitals");
 			}
 			// console.log("patient is now: ", patient)
 		}

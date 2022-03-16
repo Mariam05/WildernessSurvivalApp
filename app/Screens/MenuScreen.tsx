@@ -28,6 +28,7 @@ export default function MenuScreen() {
 	const [resourcesExpanded, setResourcesExpanded] = useState(false);
 
 	const isAnon = user && user.providerType === "anon-user";
+	isAnon ? null : user && user.refreshCustomData();
 
 	const onPressResources = () => {
 		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -36,8 +37,11 @@ export default function MenuScreen() {
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		if (isFocused) user.refreshCustomData();
-	}, [isFocused]);
+		user && user.refreshCustomData();
+		user && user.providerType === "anon-user";
+	}, [isFocused, user]);
+
+	if (user) user.refreshCustomData();
 
 	if (user == null) {
 		return <View />;
@@ -97,8 +101,10 @@ export default function MenuScreen() {
 						}}
 					>
 						<Text style={[menuStyles.titleText, { fontSize: 35 }]}>
-							{isAnon || !user.customData
+							{isAnon
 								? "A"
+								: !user.customData
+								? "NA"
 								: user.customData.firstName[0] +
 								  user.customData.lastName[0]}
 						</Text>
@@ -111,8 +117,10 @@ export default function MenuScreen() {
 						}}
 					>
 						<Text style={menuStyles.titleText}>
-							{isAnon || !user.customData
+							{isAnon
 								? "Anonymous"
+								: !user.customData
+								? "Not Found"
 								: user.customData.firstName +
 								  " " +
 								  user.customData.lastName}
