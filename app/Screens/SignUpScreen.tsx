@@ -288,7 +288,7 @@ export default function SignUpScreen() {
 							placeholder="Email"
 							onChangeText={(text) => {
 								setUsernameErrorMessage("");
-								setUsername(text);
+								setUsername(text.replaceAll(" ", ""));
 							}}
 							value={username}
 							autoCapitalize="none"
