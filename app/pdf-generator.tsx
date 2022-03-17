@@ -33,7 +33,7 @@ function timestamp_ordered(vitals_list: Vital[]) {
 
           var minutes = d.getMinutes();
 
-          if (minutes / 10 <= 1) {
+          if (minutes / 10 < 1) {
             datestring += "0" + minutes;
           } else {
             datestring += minutes;
