@@ -15,7 +15,7 @@
     "@react-native-segmented-control/segmented-control": "^2.4.0",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
-    "expo": "~44.0.0",
+    "expo": "^44.0.6",
     "expo-image-manipulator": "~10.2.0",
     "expo-print": "~11.1.0",
     "expo-sharing": "~10.1.0",
