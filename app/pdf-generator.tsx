@@ -3,8 +3,6 @@ import { shareAsync } from 'expo-sharing';
 import { Asset } from 'expo-asset';
 import { manipulateAsync } from 'expo-image-manipulator';
 import { Patient, Reading, Vital } from "../schemas";
-import React from 'react';
-import { View } from 'react-native';
 import defaultVitals, { quickVitals } from './assets/defaultVitals';
 
 /**
@@ -31,8 +29,15 @@ function timestamp_ordered(vitals_list: Vital[]) {
           // Format the date time
           var timestamp = Number(value.timestamp);
           var d = new Date(timestamp);
-          var datestring = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear() + " " +
-            d.getHours() + ":" + d.getMinutes();
+          var datestring = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear() + " " + d.getHours() + ":";
+
+          var minutes = d.getMinutes();
+
+          if (minutes / 10 <= 1) {
+            datestring += "0" + minutes;
+          } else {
+            datestring += minutes;
+          }
 
           // Add it to the dictionary
           if (datestring in default_dict) {
