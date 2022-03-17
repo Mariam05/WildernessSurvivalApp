@@ -4,8 +4,9 @@
     "\\app",
     "\\app\\assets",
     "\\app\\assets\\components",
-    "\\app\\Screens"
+    "\\app\\Screens",
+    "\\providers"
   ],
-  "SelectedNode": "\\app\\assets\\components\\VitalItem.tsx",
+  "SelectedNode": "\\schemas.tsx",
   "PreviewInSolutionExplorer": false
 }

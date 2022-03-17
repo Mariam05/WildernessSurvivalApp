@@ -4,10 +4,13 @@ import {
 	VictoryTheme,
 	VictoryAxis,
 	VictoryContainer,
-	VictoryLabel
+	VictoryLabel,
+	VictoryVoronoiContainer,
+	VictoryGroup,
+	VictoryTooltip
 } from "victory-native";
 
-import { HorizontalTimeline } from 'react-native-horizontal-timeline';
+import { Vital, Reading} from "../../../schemas";
 
 import customTheme from "../CustomTheme";
 import colours from "../colours";
@@ -25,7 +28,7 @@ import {
 	
 } from "react-native";
 import { useState } from "react";
-
+import FullChart from "./Chart"
 
 
 const RowWithImage = (entry) => {
@@ -154,9 +157,6 @@ const CategoricalChart = (data, init_categories) => {
 };
 
 const NumericalChart = (data) => {
-
-
-
 	//let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
 
 	return (
@@ -244,11 +244,174 @@ const NumericalChartFullScreen = (data) => {
 };
 
 
-const RenderChart = ({ type, data, categories, fullscreen }) => {
+const RenderChart = ({ data, fullscreen }) => {
+
+
+
+	if (data == null)
+		return null;
+
+
+	const colors = ["blue", "#c43a31", "purple"];
+
+
+	const filteredData = data.filter((v) => (v.type == "Numerical" || v.type == "Categorical") && v.data.length > 0);
+
+	//for some fkin reason, it doesn't display the first line, so i just copy it to the end lol
+	const firstCopied = JSON.parse(JSON.stringify(filteredData[0]));
+	filteredData.push(firstCopied);
+
+	const timeCorrectedData = filteredData.map((v) => {
+		let maxV = -99999999999, minV = 99999999999;
+		const vitalData = v.data.map((d) => {
+			let timestamp = parseInt(d.timestamp) * (d.timestamp.length == 10 ? 1000 : 1);
+
+			let value = (v.type == "Categorical") ? ((v.categories.indexOf(d.value)+1)*10) : d.value;
+			minV = Math.min(minV, value);
+			maxV = Math.max(maxV, value);
+
+			return {
+				x: new Date(timestamp),
+				y: value,
+			}
+		});
+
+		return {
+			data: vitalData,
+			minV: minV,
+			maxV: maxV,
+		}}
+	)
+
+
+	console.log(timeCorrectedData);
+
+	return (
+	< VictoryGroup
+		theme={customTheme}
+		padding={{ top: 5, bottom: 35, left: 2 * 8 + 40, right: 50 }
+		}
+		height={180}
+		containerComponent={<VictoryVoronoiContainer
+			mouseFollowTooltips
+			voronoiDimension="x"
+			labels={({ datum }) => `y: ${datum.y}`}
+		/>}
+		>
+		<VictoryAxis
+			standalone={false}
+			tickFormat={(v) => `${formatAMPM(new Date(v))}`}
+			fixLabelOverlap={true}
+			
+		/>
+
+		{timeCorrectedData.map((v, i) =>
+			<VictoryLine
+				style={{
+					data: { stroke: colors[i] }
+				}}
+				y={(d) => { return (d.y - v.minV) / v.maxV }}
+				data={v.data}
+				standalone={false}
+				key={i}
+			/>
+		)}
+
+	</VictoryGroup >)
+
+	/*
+	return (
+		<VictoryChart
+			height={fullscreen ? Dimensions.get('window').height : 200 }
+			width={Dimensions.get('window').width}
+			theme={customTheme}
+			containerComponent={
+				<VictoryVoronoiContainer
+					mouseFollowTooltips
+					voronoiDimension="x"
+					labels={({ datum }) => `y: ${datum.y}`}
+				/>
+			}
+			horizontal={fullscreen}
+		>
+			{// X Axis }
+			<VictoryAxis
+				standalone={true}
+				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
+				fixLabelOverlap={true}
+				style={{
+					tickLabels: { angle: fullscreen ? 90 : 0 }
+				}}
+				orientation={fullscreen ? "left" : "bottom"}
+				invertAxis={fullscreen}
+				tickLabelComponent={<VictoryLabel dx={fullscreen ? 25 : 0} />}
+			/>
+
+			< VictoryAxis dependentAxis
+				tickFormat={(i) => i}
+				standalone={false}
+				style={{
+					tickLabels: { angle: 0 }
+				}}
+			/>
+
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+				}}
+				x={(d) => new Date(d.timestamp)}
+				y={(d) => v.type == "Numerical" ? d.value : v.categories.indexOf(d.value)}
+				data={v.data}
+			/>
+
+		
+			</VictoryChart>
+	)
+		/*
+		< VictoryChart
+	theme = { customTheme }
+	padding = {{ top: 5, bottom: 35, left: 2 * 8 + 40, right: 50 }
+}
+height = { 180}
+domainPadding = {{ x: 0, y: 10 }}
+containerComponent = {< VictoryContainer disableContainerEvents />}
+		>
 	
+	< VictoryAxis
+standalone = { true}
+tickFormat = {(v) => `${formatAMPM(new Date(v))}`}
+fixLabelOverlap = { true}
+	/>
 
+	
+	< VictoryAxis dependentAxis
+tickFormat = {(i) => i}
+standalone = { false}
+style = {{
+	tickLabels: { angle: 0 }
+}}
+/>
 
-
+<VictoryLine
+	style={{
+		data: { stroke: "#c43a31" }
+	}}
+	x={(d) => new Date(d.timestamp)}
+	y="value"
+	data={data}
+/>
+		</VictoryChart >
+	/*
+	{filteredData.map((v: Vital) => (
+				<VictoryLine
+					style={{
+						data: { stroke: "#c43a31" }
+					}}
+					x={(d) => new Date(d.timestamp)}
+					y={(d) => v.type == "Numerical" ? d.value : v.categories.indexOf(d.value)}
+					data={v.data}
+				/>
+			))}*/
 }
 
 
@@ -510,9 +673,9 @@ function VitalItem({
 	);
 }
 
-export { VitalItem, Data, CategoricalChartFullScreen  };
+export { VitalItem, Data, RenderChart  };
 
-export const vitalItemStyles = StyleSheet.create({
+const vitalItemStyles = StyleSheet.create({
 	chart: {
 	
 	},

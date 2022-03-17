@@ -29,7 +29,7 @@ import { useVitals } from "../../providers/VitalProvider";
 import AddButton from "../assets/components/AddButton";
 import AppButton from "../assets/components/AppButton";
 import { VitalModal } from "../assets/components/VitalModal";
-import { VitalItem, Data, vitalItemStyles, CategoricalChartFullScreen} from "../assets/components/VitalItem";
+import { VitalItem, Data, RenderChart} from "../assets/components/VitalItem";
 
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
@@ -85,6 +85,13 @@ export default function PatientScreen({ navigation, route }) {
 		setChartType(type);
 		return setIsChartModalVisible(() => !isChartModalVisible)
 	};
+
+
+
+	const [alernateView, setAlternateView] = useState(true);
+	const toggleView = () => {
+		setAlternateView(() => !alernateView);
+    }
 
 
 	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
@@ -146,16 +153,24 @@ export default function PatientScreen({ navigation, route }) {
 					/>
 				</View>
 
-				<ScrollView
-					style={PatientScreenStyles.vitalsScrollView}
-					contentContainerStyle={{
-						alignSelf: "stretch",
-						paddingBottom: "30%",
-					}}
-				>
-					<View style={{ height: 10 }} />
-					{patient
-						? patient.vitals.map((vital: Vital, index: number) => (
+
+				{patient ?
+					(alernateView ?
+						<View
+							style={PatientScreenStyles.vitalsScrollView}
+						>
+							<RenderChart data={patient.vitals} fullscreen={false} />
+						</View>
+						:
+						<ScrollView
+							style={PatientScreenStyles.vitalsScrollView}
+							contentContainerStyle={{
+								alignSelf: "stretch",
+								paddingBottom: "30%",
+							}}
+						>
+							<View style={{ height: 10 }} />
+							{patient.vitals.map((vital: Vital, index: number) => (
 								<VitalItem
 									click_enabled={true}
 									name={vital.name}
@@ -175,13 +190,13 @@ export default function PatientScreen({ navigation, route }) {
 											vital.name + " add new reading"
 										)
 									}
-								key={index}
-								onChartLongPress={() => handleChartModal({ type: vital.type, data: vital.data, categories:vital.categories })}
+									key={index}
+									onChartLongPress={() => handleChartModal({ type: vital.type, data: vital.data, categories: vital.categories })}
 								/>
-						  ))
-						: null}
-				</ScrollView>
-
+							))}
+						</ScrollView>
+					) : null
+				}
 
 				{/* Code for display chart full screen */}
 				{isChartModalVisible &&
@@ -192,7 +207,6 @@ export default function PatientScreen({ navigation, route }) {
 						fullscreen={true} onChartLongPress={() => handleChartModal({ type: null, data: null, categories: null })}
 					/>
 				}
-
 
 				{/* Code for add new vital button */}
 				{!isChartModalVisible && (<AddButton onPress={handleVitalModal} />)}
