@@ -46,9 +46,11 @@ export default function PatientScreen({ navigation, route }) {
 		}
 	}
 
+	/* Getting patient info */
 	const { patientId, patientName } = route.params;
 	const { patient, createVital, closeRealm } = useVitals();
 
+	/* For creating new vital */
 	const [vitalName, setVitalName] = useState("");
 	const [vitalPeriodicity, setVitalPeriodicity] = useState<number>();
 	const [vitalType, setVitalType] = useState("Numerical");
@@ -66,14 +68,17 @@ export default function PatientScreen({ navigation, route }) {
 			return arr;
 		});
 		setVitalCategories((arr) => [...arr]); //required to re render
-		
 	};
+
 	const appendVitalCategory = (category) => {
 		setVitalCategories((arr) => [...arr, category]);
 		setNewVitalCategory("");
 	};
 
+	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
+	const handleVitalModal = () => setIsVitalModalVisible(() => !isVitalModalVisible);
 
+	/* For displaying full screen chart */
 	const [chartType, setChartType] = useState("");
 	const [chartVitalData, setChartVitalData] = useState("");
 	const [chartVitalCategories, setChartVitalCategories] = useState("");
@@ -86,16 +91,23 @@ export default function PatientScreen({ navigation, route }) {
 		return setIsChartModalVisible(() => !isChartModalVisible)
 	};
 
+	/* For displaying specific vitals on chart */
+	const [displayVitals, setDisplayVitals] = useState([]);
+	const toggleVital = (name) => {
+		setDisplayVitals((arr) => {
+			const array = arr.includes(name)
+				? arr.filter(i => i !== name) // remove item
+				: [...arr, name];
+			return array;
+		})
+	}
 
-
-	const [alernateView, setAlternateView] = useState(true);
+	console.log(displayVitals);
+	/* For toggling between the two views */
+	const [alernateView, setAlternateView] = useState(false);
 	const toggleView = () => {
 		setAlternateView(() => !alernateView);
     }
-
-
-	const [isVitalModalVisible, setIsVitalModalVisible] = useState(false);
-	const handleVitalModal = () => setIsVitalModalVisible(() => !isVitalModalVisible);
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -159,8 +171,46 @@ export default function PatientScreen({ navigation, route }) {
 						<View
 							style={PatientScreenStyles.vitalsScrollView}
 						>
-							<RenderChart data={patient.vitals} fullscreen={false} />
+							<View style={{ height: 10 }} />
+							<RenderChart initial_data={patient.vitals} fullscreen={false} displayVitals={displayVitals} />
+							<ScrollView
+								style={PatientScreenStyles.vitalsScrollView}
+								contentContainerStyle={{
+									alignSelf: "stretch",
+									paddingBottom: "30%",
+								}}
+							>
+								<View style={{ height: 10 }} />
+								{patient.vitals.map((vital: Vital, index: number) => (
+									<VitalItem
+										isToggled={displayVitals.includes(vital.name)}
+										name={vital.name}
+										periodicity={vital.periodicity}
+										type={vital.type}
+										categories={vital.categories}
+										data={vital.data}
+										description={vital.description}
+										timeElapsed={vital.timeElapsed}
+										index={index}
+										click_enabled={true}
+										onPress={vital.data.length > 0 && (vital.type == "Numerical" || vital.type=="Categorical") ? () => toggleVital(vital.name) : null}
+										onPressInfo={() =>
+											console.log(
+												vital.name + " info pressed"
+											)
+										}
+										onPressAdd={() =>
+											console.log(
+												vital.name + " add new reading"
+											)
+										}
+										key={index}
+										onChartLongPress={null}
+									/>
+								))}
+							</ScrollView>
 						</View>
+
 						:
 						<ScrollView
 							style={PatientScreenStyles.vitalsScrollView}
@@ -172,6 +222,7 @@ export default function PatientScreen({ navigation, route }) {
 							<View style={{ height: 10 }} />
 							{patient.vitals.map((vital: Vital, index: number) => (
 								<VitalItem
+									isToggled={false}
 									click_enabled={true}
 									name={vital.name}
 									periodicity={vital.periodicity}
@@ -180,6 +231,8 @@ export default function PatientScreen({ navigation, route }) {
 									data={vital.data}
 									description={vital.description}
 									timeElapsed={vital.timeElapsed}
+									onPress={null}
+									index={index}
 									onPressInfo={() =>
 										console.log(
 											vital.name + " info pressed"
@@ -226,14 +279,17 @@ export default function PatientScreen({ navigation, route }) {
 								<VitalModal.Body>
 									<View style={{ marginVertical: "3%" }} />
 									<VitalItem
+										isToggled={false}
 										click_enabled={false}
 										name={vitalName}
 										periodicity={vitalPeriodicity}
 										type={vitalType}
 										description={""}
 										data={[]}
+										index={0}
 										categories={[]}
 										timeElapsed={null}
+										onPress={null}
 										onPressAdd={null}
 										onPressInfo={null}
 										onChartLongPress={null}

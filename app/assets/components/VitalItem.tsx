@@ -7,7 +7,8 @@ import {
 	VictoryLabel,
 	VictoryVoronoiContainer,
 	VictoryGroup,
-	VictoryTooltip
+	VictoryTooltip,
+    Background
 } from "victory-native";
 
 import { Vital, Reading} from "../../../schemas";
@@ -28,7 +29,6 @@ import {
 	
 } from "react-native";
 import { useState } from "react";
-import FullChart from "./Chart"
 
 
 const RowWithImage = (entry) => {
@@ -244,29 +244,29 @@ const NumericalChartFullScreen = (data) => {
 };
 
 
-const RenderChart = ({ data, fullscreen }) => {
-
-
-
-	if (data == null)
+const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
+	if (initial_data == null)
 		return null;
 
+	const data = JSON.parse(JSON.stringify(initial_data))
+	let i = 0;
+	for (const vital of data) {
+		vital.color = colours.data_colors[i++];
 
-	const colors = ["blue", "#c43a31", "purple"];
+    }
 
+	const filteredData = data.filter((v) =>
+		(v.type == "Numerical" || v.type == "Categorical")
+		&& v.data.length > 0
+		&& (displayVitals.length == 0 || displayVitals.includes(v.name)));
 
-	const filteredData = data.filter((v) => (v.type == "Numerical" || v.type == "Categorical") && v.data.length > 0);
-
-	//for some fkin reason, it doesn't display the first line, so i just copy it to the end lol
-	const firstCopied = JSON.parse(JSON.stringify(filteredData[0]));
-	filteredData.push(firstCopied);
 
 	const timeCorrectedData = filteredData.map((v) => {
 		let maxV = -99999999999, minV = 99999999999;
 		const vitalData = v.data.map((d) => {
 			let timestamp = parseInt(d.timestamp) * (d.timestamp.length == 10 ? 1000 : 1);
 
-			let value = (v.type == "Categorical") ? ((v.categories.indexOf(d.value)+1)*10) : d.value;
+			let value = (v.type == "Categorical") ? v.categories.indexOf(d.value) : d.value;
 			minV = Math.min(minV, value);
 			maxV = Math.max(maxV, value);
 
@@ -275,19 +275,20 @@ const RenderChart = ({ data, fullscreen }) => {
 				y: value,
 			}
 		});
-
+	
 		return {
 			data: vitalData,
 			minV: minV,
 			maxV: maxV,
+			color: v.color
 		}}
 	)
 
 
-	console.log(timeCorrectedData);
+	const isCategorical = filteredData[0].type == "Categorical";
 
 	return (
-	< VictoryGroup
+	< VictoryChart
 		theme={customTheme}
 		padding={{ top: 5, bottom: 35, left: 2 * 8 + 40, right: 50 }
 		}
@@ -298,120 +299,38 @@ const RenderChart = ({ data, fullscreen }) => {
 			labels={({ datum }) => `y: ${datum.y}`}
 		/>}
 		>
+
+		{/* Y axis */}
+		{timeCorrectedData.length == 1 ?
+			<VictoryAxis dependentAxis
+			
+
+				tickFormat={(i) => i}
+				standalone={false}
+			/> : null
+		}
+			
+		{/* X axis */}
 		<VictoryAxis
 			standalone={false}
 			tickFormat={(v) => `${formatAMPM(new Date(v))}`}
-			fixLabelOverlap={true}
-			
+			fixLabelOverlap={true}	
 		/>
 
-		{timeCorrectedData.map((v, i) =>
-			<VictoryLine
+		{/* Lines */}
+		{timeCorrectedData.map((v, i) => {
+			return <VictoryLine
 				style={{
-					data: { stroke: colors[i] }
-				}}
-				y={(d) => { return (d.y - v.minV) / v.maxV }}
-				data={v.data}
-				standalone={false}
-				key={i}
-			/>
+						data: { stroke: v.color, strokeWidth: 3 }
+					}}
+				y={(d) => (timeCorrectedData.length == 1) ? d.y :((d.y - v.minV) / v.maxV)  }
+					data={v.data}
+					standalone={false}
+					key={i}
+				/>}
 		)}
 
-	</VictoryGroup >)
-
-	/*
-	return (
-		<VictoryChart
-			height={fullscreen ? Dimensions.get('window').height : 200 }
-			width={Dimensions.get('window').width}
-			theme={customTheme}
-			containerComponent={
-				<VictoryVoronoiContainer
-					mouseFollowTooltips
-					voronoiDimension="x"
-					labels={({ datum }) => `y: ${datum.y}`}
-				/>
-			}
-			horizontal={fullscreen}
-		>
-			{// X Axis }
-			<VictoryAxis
-				standalone={true}
-				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
-				fixLabelOverlap={true}
-				style={{
-					tickLabels: { angle: fullscreen ? 90 : 0 }
-				}}
-				orientation={fullscreen ? "left" : "bottom"}
-				invertAxis={fullscreen}
-				tickLabelComponent={<VictoryLabel dx={fullscreen ? 25 : 0} />}
-			/>
-
-			< VictoryAxis dependentAxis
-				tickFormat={(i) => i}
-				standalone={false}
-				style={{
-					tickLabels: { angle: 0 }
-				}}
-			/>
-
-			<VictoryLine
-				style={{
-					data: { stroke: "#c43a31" }
-				}}
-				x={(d) => new Date(d.timestamp)}
-				y={(d) => v.type == "Numerical" ? d.value : v.categories.indexOf(d.value)}
-				data={v.data}
-			/>
-
-		
-			</VictoryChart>
-	)
-		/*
-		< VictoryChart
-	theme = { customTheme }
-	padding = {{ top: 5, bottom: 35, left: 2 * 8 + 40, right: 50 }
-}
-height = { 180}
-domainPadding = {{ x: 0, y: 10 }}
-containerComponent = {< VictoryContainer disableContainerEvents />}
-		>
-	
-	< VictoryAxis
-standalone = { true}
-tickFormat = {(v) => `${formatAMPM(new Date(v))}`}
-fixLabelOverlap = { true}
-	/>
-
-	
-	< VictoryAxis dependentAxis
-tickFormat = {(i) => i}
-standalone = { false}
-style = {{
-	tickLabels: { angle: 0 }
-}}
-/>
-
-<VictoryLine
-	style={{
-		data: { stroke: "#c43a31" }
-	}}
-	x={(d) => new Date(d.timestamp)}
-	y="value"
-	data={data}
-/>
-		</VictoryChart >
-	/*
-	{filteredData.map((v: Vital) => (
-				<VictoryLine
-					style={{
-						data: { stroke: "#c43a31" }
-					}}
-					x={(d) => new Date(d.timestamp)}
-					y={(d) => v.type == "Numerical" ? d.value : v.categories.indexOf(d.value)}
-					data={v.data}
-				/>
-			))}*/
+	</VictoryChart >)
 }
 
 
@@ -466,7 +385,7 @@ const CategoricalChartFullScreen = ( data, init_categories ) => {
 			{/* Line */}
 			<VictoryLine
 				style={{
-					data: { stroke: "#c43a31" }
+					data: { stroke: "#c43a31"}
 				}}
 				x={(d) => new Date(d.timestamp) }
 				y={(d) => categories_dict[d.value]}
@@ -523,7 +442,7 @@ const PhotoTimeLine = (data : Array<any>) => {
 			categories[reading.value].push(reading);
         }
 	}
-	console.log(categories);
+
 	return (
 		<View style={vitalItemStyles.table}>
 			{Object.keys(categories).map((category) => {
@@ -605,6 +524,18 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 	);
 };
 
+
+const ColoredLine = ({ color }) => (
+	<Text
+		style={{
+			color,
+			backgroundColor: color,
+		}}
+	>
+		-------
+	</Text>
+);
+
 function VitalItem({
 	click_enabled,
 	name,
@@ -613,26 +544,37 @@ function VitalItem({
 	description,
 	categories,
 	data,
+	index,
 	timeElapsed,
+	onPress,
 	onPressInfo,
 	onPressAdd,
 	onChartLongPress,
+	isToggled,
 }) {
 
 
 	const [expanded, setExpanded] = useState(false);
-	const onPress = () => {
+	const onPressItem = () => {
 		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 		setExpanded(!expanded);
 	};
+
 	return (
 		<View>
 			<TouchableOpacity
 				disabled={!click_enabled}
-				onPress={onPress}
+				onPress={onPress ? onPress : onPressItem}
 				style={[
 					vitalItemStyles.vitalsHeader,
-					{ width: click_enabled ? "80%" : "90%" },
+					{
+						width: click_enabled ? "80%" : "90%",
+						borderColor: colours.data_colors[index],
+						borderWidth: onPress ? 3 : 0,
+						backgroundColor: isToggled ? colours.darkerBlueBackground : colours.lightBlueBackground
+					},
+	
+
 				]}
 			>
 				{description != undefined && (
