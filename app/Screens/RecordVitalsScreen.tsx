@@ -32,6 +32,9 @@ import globalStyles from "../assets/stylesheet";
 import { Patient, Reading } from "../../schemas";
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 
+// how long to wait before sending the user a notification to update vitals
+const notification_min = 1; // set to 1 min for now, for demo purposes
+
 // images
 var avpu_awake = require("../assets/images/avpu_awake.png");
 var avpu_verbal = require("../assets/images/avpu_verbal.png");
@@ -47,10 +50,13 @@ const avpu_pics = [
 const prepareTime = 5;
 const intervalTime = 15;
 
-// how long to wait before sending the user a notification to update vitals
-const notification_min = 1; // set to 1 min for now, for demo purposes
+
+// to determine what the next screen is given the current vital
+const next_vital = { "AVPU": "Prepare", "Pulse": "Respiration", "Respiration": "Skin" };
+const start_screen = { "Pulse": "Prepare", "Respiration": "Prepare", "Skin": "Skin" };
 
 var nextVital; // to store the next vital to prepare for.
+var nextScreen;
 
 // sounds
 var Sound = require("react-native-sound");
@@ -63,6 +69,7 @@ const resp_start_time = 0.02;
 const getreadypulse_file = require("../assets/sounds/getreadypulse.m4a"); // start at 0.03
 const pulse_start_time = 0.04;
 
+let curr_sound;
 function playSound(file, start = null) {
   const callback = (error, sound) => {
     if (error) {
@@ -71,6 +78,8 @@ function playSound(file, start = null) {
     }
 
     if (start) sound.setCurrentTime(start);
+
+    curr_sound = sound;
     sound.play(() => {
       // Success counts as getting to the end
       // Release when it's done so we're not using up resources
@@ -79,6 +88,13 @@ function playSound(file, start = null) {
   };
 
   const sound = new Sound(file, (error) => callback(error, sound));
+}
+
+function stopSound() {
+
+  if (curr_sound) {
+    curr_sound.stop(); curr_sound.release(); console.log("stopping sound");
+  }
 }
 
 // Awake Verbal Pain and Unresponsive.. how responsive are they?
@@ -92,18 +108,17 @@ function AvpuScreen({ navigation }) {
         horizontal={false}
         style={[{ backgroundColor: colours.blue }]}
         contentContainerStyle={{
-          alignSelf: "stretch",
-          paddingBottom: "30%",
           paddingTop: 30,
         }}
       >
+
         {avpu_pics.map((avpu, index) => (
           <TouchableOpacity
             onPress={() => {
               {
                 if (updateAVPU) updateAVPU(avpu.name);
                 playSound(getReadyFile, 0.01);
-                navigation.push("Prepare");
+                navigation.push("Prepare", { current_vital: nextVital });
               }
             }}
             key={index}
@@ -116,6 +131,14 @@ function AvpuScreen({ navigation }) {
             </View>
           </TouchableOpacity>
         ))}
+        <AppButton
+          onPress={() => {
+            navigation.push("Prepare");
+          }}
+          title="Skip AVPU"
+          style={[quickVitalsStyles.skipButton, { marginTop: -0.5, alignSelf: "center" }]}
+          buttonTextStyle={[quickVitalsStyles.skipButtonText]}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -124,7 +147,7 @@ function AvpuScreen({ navigation }) {
 function PrepareScreen({ route, navigation }) {
   if (route.params) {
     const { value } = route.params;
-    if (nextVital == "Respiration") {
+    if (value && nextVital == "Respiration") {
       if (updatePulse) updatePulse(value * (60 / intervalTime));
     }
   }
@@ -134,6 +157,8 @@ function PrepareScreen({ route, navigation }) {
   playSound(getReadyFile, get_ready_time);
 
   const backgroundColour = colours.orange;
+
+  const skipText = "Skip " + nextVital;
   return (
     <SafeAreaView
       style={[
@@ -166,10 +191,12 @@ function PrepareScreen({ route, navigation }) {
       </Text>
       <AppButton
         onPress={() => {
-          navigation.navigate("Countdown");
+          nextVital = next_vital[nextVital] // get the one after
+          nextScreen = start_screen[nextVital]
+          navigation.push(nextScreen);
           setSkipped(true);
         }}
-        title="Skip"
+        title={skipText}
         style={[quickVitalsStyles.skipButton]}
         buttonTextStyle={[quickVitalsStyles.skipButtonText]}
       />
@@ -213,10 +240,13 @@ function CountdownScreen({ navigation }) {
       </Text>
       <AppButton
         onPress={() => {
-          navigation.navigate(nextVital);
+          stopSound();
+          nextVital = next_vital[nextVital] // get the one after
+          nextScreen = start_screen[nextVital]
+          navigation.push(nextScreen);
           setSkipped(true);
         }}
-        title="Skip"
+        title={"Skip " + nextVital}
         style={[quickVitalsStyles.skipButton]}
         buttonTextStyle={[quickVitalsStyles.skipButtonText]}
       />
@@ -257,10 +287,14 @@ const optionsSize = options.length;
 
 // skin: warm, pink, blue, white
 function SkinScreen({ route, navigation }) {
+  stopSound();
   // update the value from the previous screen
   // console.log("in skin, route is: ", route);
-  const { value } = route.params;
-  if (value && updateResp) updateResp(value * (60 / intervalTime));
+  if (route.params) {
+    const { value } = route.params;
+    if (value && updateResp) updateResp(value * (60 / intervalTime));
+  }
+
 
   // render skin options
   nextVital = "Temperature";
@@ -301,6 +335,7 @@ const temp_options = [
   { option: "normal", colour: colours.green },
   { option: "slightly feverish", colour: colours.redBackground },
   { option: "very feverish", colour: colours.red },
+  { option: "skip", colour: colours.primary },
 ];
 
 const tempOptionsSize = temp_options.length;
@@ -468,8 +503,9 @@ export default function RecordVitalsStack({ route, navigation }) {
     updateData = setData;
 
     if (save_data) {
+      stopSound();
       vals.map((val) => {
-        if (val) {
+        if (val.value != null && val.value != "skip") {
           const reading = new Reading({
             timestamp: Date.now().toString(),
             value: val.value,
@@ -478,6 +514,7 @@ export default function RecordVitalsStack({ route, navigation }) {
           console.log("saving data for " + val.name);
         }
       });
+      scheduleNotification(patient);
       navigation.navigate("Landing");
     }
 
