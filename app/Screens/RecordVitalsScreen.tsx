@@ -28,7 +28,8 @@ import NumberPad from "../assets/components/NumberPad";
 import AppButton from "../assets/components/AppButton";
 import SwitchSelector from "react-native-switch-selector";
 import { useVitals, VitalsProvider } from "../../providers/VitalProvider";
-import { Reading } from "../../schemas";
+import { Patient, Reading } from "../../schemas";
+import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 
 // images
 var avpu_awake = require("../assets/images/avpu_awake.png");
@@ -42,6 +43,9 @@ const avpu_pics = [{ image: avpu_awake, name: "Awake" },
 { image: avpu_unresponsive, name: "Unresponsive" }];
 const prepareTime = 5;
 const intervalTime = 15;
+
+// how long to wait before sending the user a notification to update vitals
+const notification_min = 1; // set to 1 min for now, for demo purposes
 
 var nextVital; // to store the next vital to prepare for. 
 
@@ -66,7 +70,6 @@ function playSound(file, start = null) {
     if (start) sound.setCurrentTime(start);
     sound.play(() => {
       // Success counts as getting to the end
-      console.log('duration in seconds: ' + sound.getDuration() + ' number of channels: ' + sound.getNumberOfChannels());
       // Release when it's done so we're not using up resources
       sound.release();
     });
@@ -122,7 +125,6 @@ function PrepareScreen({ route, navigation }) {
   if (route.params) {
     const { value } = route.params;
     if (nextVital == "Respiration") {
-      console.log("updating pulse with value ", value);
       if (updatePulse) updatePulse(value * (60 / intervalTime));
     }
   }
@@ -305,7 +307,7 @@ function TempScreen({ navigation }) {
 
 
 // Somethign for the numpad to redirect to
-function tmpScreen({ route, navigation }) {
+function TmpScreen({ route, navigation }) {
 
   const { value } = route.params;
   if (updateTemp) updateTemp(value);
@@ -317,6 +319,50 @@ function tmpScreen({ route, navigation }) {
   );
 }
 
+/**
+ * This function schedules a notification to be sent
+ * once a certain amount of minutes has elapsed from the current time
+ * @param patient 
+ */
+async function scheduleNotification(patient: Patient) {
+
+  // Create a channel
+  const channelId = await notifee.createChannel({
+    id: 'vitals',
+    name: 'Vitals Reminder Channel',
+  });
+
+  // Required for iOS
+  await notifee.requestPermission();
+
+
+  const date = new Date(Date.now());
+  date.setMinutes(date.getMinutes() + notification_min);
+
+  // Create a time-based trigger
+  const trigger: TimestampTrigger = {
+    type: TriggerType.TIMESTAMP,
+    timestamp: date.getTime(), // fire at 11:10am (10 minutes before meeting)
+  };
+
+  // Display a notification.
+  // we use the patient ID as the notification ID.
+  // by doing so, if a user takes another vital reading before the notification is displayed, the scheduled time can be updated
+  await notifee.createTriggerNotification(
+    {
+      id: String(patient._id),
+      title: 'Time to Measure ' + patient.name + ' \'s Vitals',
+      body: 'It\'s been ' + notification_min + ' minutes since the last reading',
+      android: {
+        channelId,
+        color: colours.green,
+        largeIcon: require('../assets/images/grass.png'),
+        // smallIcon: // optional, defaults to 'ic_launcher'. only works for android. requires android studio to set up. blegh
+      },
+    },
+    trigger
+  );
+}
 
 let updateAVPU, updatePulse, updateResp, updateSkin, updateTemp, updateData;
 
@@ -325,8 +371,6 @@ const Stack = createNativeStackNavigator();
 export default function RecordVitalsStack({ route, navigation }) {
 
   const { patient, updateVital } = useVitals();
-  // if (patient != null) console.log("useVitals patient: " + patient.name);
-  // if (patient == null) console.log("useVitals patient is null");
 
   // back press stuff
   const backActionHandler = () => {
@@ -366,7 +410,8 @@ export default function RecordVitalsStack({ route, navigation }) {
           updateVital(val.name, reading);
           console.log("saving data for " + val.name);
         }
-      })
+      });
+      scheduleNotification(patient);
       navigation.navigate("Landing");
     }
 
@@ -423,7 +468,7 @@ export default function RecordVitalsStack({ route, navigation }) {
       />
       <Stack.Screen
         name="tmp"
-        component={tmpScreen}
+        component={TmpScreen}
         options={{ headerShown: false, gestureEnabled: false }}
       />
 
