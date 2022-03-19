@@ -95,7 +95,12 @@ export default function PatientScreen({ navigation, route }) {
 	const handleReadingModal = () => {
 		setIsReadingModalVisible(() => !isReadingModalVisible);
 	};
+
+
 	const [selectedVital, setSelectedVital] = useState("");
+
+	const [isVitalInformationModalVisible, setIsVitalInformationModalVisible] = useState(false);
+
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -174,7 +179,10 @@ export default function PatientScreen({ navigation, route }) {
 									]
 								);
 								return;
-							}
+							} else if (nativeEvent.event == "toggleView") {
+								toggleView();
+								return;
+                            }
 
 							console.warn(
 								"Event not recognized " +
@@ -182,6 +190,17 @@ export default function PatientScreen({ navigation, route }) {
 							);
 						}}
 						actions={[
+							{
+								id: "toggleView",
+								title: "Toggle View",
+								titleColor: colours.primary,
+								image: Platform.select({
+									ios: "tray",
+									android: "ic_menu_agenda",
+								}),
+								imageColor: colours.primary,
+
+							},
 							{
 								id: "edit",
 								title: "Edit Patient",
@@ -213,6 +232,7 @@ export default function PatientScreen({ navigation, route }) {
 									android: "ic_menu_delete",
 								}),
 							},
+							
 						]}
 					>
 						<View style={PatientScreenStyles.infoButton}>

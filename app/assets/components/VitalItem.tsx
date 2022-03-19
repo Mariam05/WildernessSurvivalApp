@@ -309,6 +309,7 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 			data: vitalData,
 			minV: minV,
 			maxV: maxV,
+			diff: maxV-minV,
 			color: v.color
 		}}
 	)
@@ -316,11 +317,17 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 
 	const isCategorical = filteredData[0].type == "Categorical";
 
+	let categories = ["", ...filteredData[0].categories]
+	let category_indicies = [...Array(categories.length).keys()]
+
+	let longest_length = (isCategorical && timeCorrectedData.length == 1 )?
+		categories.reduce((a, b) => a.length > b.length ? a : b).length : 2;
+
 	return (
 	< VictoryChart
 		theme={customTheme}
-		padding={{ top: 5, bottom: 35, left: 2 * 8 + 40, right: 50 }
-		}
+		padding={{ top: 20, bottom: 35, left: longest_length * 8 + 30, right: 50 }}
+		domainPadding={{ x: 0, y: [0, 0] }}
 		height={180}
 		containerComponent={<VictoryVoronoiContainer
 			mouseFollowTooltips
@@ -329,15 +336,22 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 		/>}
 		>
 
-		{/* Y axis */}
-		{timeCorrectedData.length == 1 ?
+		{/* Y axis categorical */}
+		{timeCorrectedData.length == 1 && isCategorical ?
 			<VictoryAxis dependentAxis
-			
+				tickValues={category_indicies}
+				tickFormat={(i) => `${categories[i]}`}
+				standalone={false}
+			/> : null
+			}
 
-				tickFormat={(i) => i}
+		{/* Y axis numerical */}
+		{timeCorrectedData.length == 1 && !isCategorical ?
+			<VictoryAxis dependentAxis
 				standalone={false}
 			/> : null
 		}
+
 			
 		{/* X axis */}
 		<VictoryAxis
@@ -348,15 +362,16 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 
 		{/* Lines */}
 		{timeCorrectedData.map((v, i) => {
-			return <VictoryLine
-				style={{
-						data: { stroke: v.color, strokeWidth: 3 }
-					}}
-				y={(d) => (timeCorrectedData.length == 1) ? d.y :((d.y - v.minV) / v.maxV)  }
-					data={v.data}
-					standalone={false}
-					key={i}
-				/>}
+			console.log(v);
+		return <VictoryLine
+			style={{
+					data: { stroke: v.color, strokeWidth: 3 }
+				}}
+				y={(d) =>  (timeCorrectedData.length == 1) ? d.y : ((d.y - v.minV) / v.diff) }
+				data={v.data}
+				standalone={false}
+				key={i}
+			/>}
 		)}
 
 	</VictoryChart >)
