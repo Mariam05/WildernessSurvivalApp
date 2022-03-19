@@ -18,6 +18,8 @@ import { Reading, Vital } from "../../../schemas";
 import colours from "../colours";
 import globalStyles from "../stylesheet";
 import AppButton from "./AppButton";
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type ModalProps = {
 	isVisible: boolean;
@@ -38,6 +40,8 @@ export const ReadingModal = ({
 	children,
 	...props
 }: ModalProps) => {
+	const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
 	const [hour, setHour] = useState(
 		Moment().hour() == 12 ? String(12) : String(Moment().hour() % 12)
 	);
@@ -61,14 +65,15 @@ export const ReadingModal = ({
 		? patient.vitals.find((v) => v.name === vitalName)
 		: null;
 
+	// console.log("vital.categories = ", vital.categories);
 	useEffect(() => {
 		let currentTime = Moment();
 		currentTime.hour(
 			selectedAmPm === "AM"
 				? Number(hour) % 12
 				: Number(hour) == 12
-				? 12
-				: Number(hour) + 12
+					? 12
+					: Number(hour) + 12
 		);
 		currentTime.minute(Number(minute));
 
@@ -155,6 +160,7 @@ export const ReadingModal = ({
 									>
 										Options
 									</Text>
+
 									<ModalDropdown
 										options={vital.categories} // this line causes an error for some reason
 										onSelect={(index, value) => {
@@ -241,10 +247,10 @@ export const ReadingModal = ({
 											{vital.name === "Pulse"
 												? "bpm"
 												: vital.name === "Respiration"
-												? "bpm"
-												: vital.name === "Temperature"
-												? "°C"
-												: ""}
+													? "bpm"
+													: vital.name === "Temperature"
+														? "°C"
+														: ""}
 										</Text>
 									</View>
 									{vitalValueErrorMessage.length > 0 && (
@@ -254,26 +260,30 @@ export const ReadingModal = ({
 									)}
 									{(vital.name === "Pulse" ||
 										vital.name === "Respiration") && (
-										<>
-											<View
-												style={{ marginVertical: "3%" }}
-											/>
-											<AppButton
-												onPress={() =>
-													console.log(
-														"Need to link this to a screen"
-													)
-												}
-												title="Use Recording Tool"
-												style={
-													modalStyles.readingToolButton
-												}
-												buttonTextStyle={
-													modalStyles.readingToolButtonText
-												}
-											/>
-										</>
-									)}
+											<>
+												<View
+													style={{ marginVertical: "3%" }}
+												/>
+												<AppButton
+													onPress={() => {
+														// take reading
+														navigation.push("SingleVital",
+															{
+																patientId: patient._id.toString(),
+																vital_name: vital.name
+															});
+													}
+													}
+													title="Use Recording Tool"
+													style={
+														modalStyles.readingToolButton
+													}
+													buttonTextStyle={
+														modalStyles.readingToolButtonText
+													}
+												/>
+											</>
+										)}
 								</>
 							)}
 
@@ -477,9 +487,9 @@ export const ReadingModal = ({
 												vital.type === "Numerical"
 													? enteredNumber
 													: vital.type ==
-													  "Categorical"
-													? selectedCategory
-													: enteredNote,
+														"Categorical"
+														? selectedCategory
+														: enteredNote,
 										})
 									);
 								}}
@@ -514,6 +524,8 @@ ReadingModal.Header = ModalHeader;
 ReadingModal.Container = ModalContainer;
 ReadingModal.Body = ModalBody;
 ReadingModal.Footer = ModalFooter;
+
+
 
 const styles = StyleSheet.create({
 	modalBody: {

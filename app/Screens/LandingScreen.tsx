@@ -39,7 +39,7 @@ export default function LandingScreen({ navigation }) {
 	const onPressQuickVitals = (patient: Patient) => {
 		// console.log("quick record vitals. Patient id: " + patient._id);
 		navigation.push("RecordVitals", {
-			patientId: patient._id,
+			patientId: patient._id.toString(),
 		});
 	};
 

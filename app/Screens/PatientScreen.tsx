@@ -132,7 +132,7 @@ export default function PatientScreen({ navigation, route }) {
 					<TouchableOpacity
 						style={PatientScreenStyles.backButton}
 						onPress={() => {
-							navigation.goBack();
+							navigation.navigate("Landing");
 							closeRealm();
 						}}
 
