@@ -278,7 +278,6 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 	let i = 0;
 	for (const vital of data) {
 		vital.color = colours.data_colors[i++];
-
     }
 
 	const filteredData = data.filter((v) =>
@@ -286,15 +285,25 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 		&& v.data.length > 0
 		&& (displayVitals.length == 0 || displayVitals.includes(v.name)));
 
+	const temperatureMapping = {
+		"very cold" : 95, "cold": 96, "normal":98.6, "slightly feverish": 100, "very feverish": 102
+    }
 
 	const timeCorrectedData = filteredData.map((v) => {
 		let maxV = -99999999999, minV = 99999999999;
 		const vitalData = v.data.map((d) => {
 			let timestamp = parseInt(d.timestamp) * (d.timestamp.length == 10 ? 1000 : 1);
 
-			let value = (v.type == "Categorical") ? v.categories.indexOf(d.value) : d.value;
+			let value;
+			if (v.name == "Temperature" && isNaN(d.value)) { //is category
+				value = temperatureMapping[d.value];
+			} else {
+				value = (v.type == "Categorical") ? v.categories.indexOf(d.value) : d.value;
+            }
+
 			minV = Math.min(minV, value);
 			maxV = Math.max(maxV, value);
+
 
 			return {
 				x: new Date(timestamp),

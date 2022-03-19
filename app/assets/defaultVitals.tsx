@@ -101,7 +101,7 @@ const temperatureVital = new Vital({
         timestamp: "1640719857000",
         value: 49,
     })],
-    categories: [],
+    categories: ["very cold", "cold", "normal", "slightly feverish", "very feverish",],
     timeElapsed: 10,
 });
 
