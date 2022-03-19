@@ -16,6 +16,15 @@ import AppButton from "./AppButton";
 const numColumns = 3;
 
 export default function NumberPad({ navigation, nextPage, title }) {
+
+	function retake() {
+		const routes = navigation.getState()?.routes;
+		console.log(routes);
+		// const prevRoute = routes[routes.length - 3].name; // prepare
+		const currRoute = routes[routes.length - 1].name; // the current route (either pulse or resp)
+		navigation.push("Prepare", { next_vital: currRoute });
+	}
+
 	const data = [
 		{ key: "1" },
 		{ key: "2" },
@@ -87,9 +96,7 @@ export default function NumberPad({ navigation, nextPage, title }) {
 				scrollEnabled={false}
 			/>
 			<AppButton
-				onPress={() => {
-					navigation.pop();
-				}}
+				onPress={() => retake()}
 				title="Retake"
 				style={[styles.retakeButton]}
 				buttonTextStyle={[styles.retakeButtonText]}

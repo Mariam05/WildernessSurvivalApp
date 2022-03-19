@@ -1,11 +1,7 @@
 /**
  * TO DO:
  * - Create a header with buttons:
- *  - have a 'pause'
- *  - have a 'restart' and/or 'cancel' button
- *  - add sounds to timer
- *  - add option to skip any reading
- *  - change quick vitals to be activated when patient is pressed (remove 'GO')
+ *  - have a 'restart'
  */
 
 import React, { useEffect, useState } from "react";
@@ -146,7 +142,9 @@ function AvpuScreen({ navigation }) {
 
 function PrepareScreen({ route, navigation }) {
   if (route.params) {
-    const { value } = route.params;
+    const { value, next_vital } = route.params;
+    if (next_vital) nextVital = next_vital;
+    console.log("next vital is " + nextVital);
     if (value && nextVital == "Respiration") {
       if (updatePulse) updatePulse(value * (60 / intervalTime));
     }
