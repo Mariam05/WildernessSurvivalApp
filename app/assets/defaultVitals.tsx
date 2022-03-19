@@ -4,7 +4,11 @@ const avpuVital = new Vital({
     periodicity: 60,
     name: "AVPU",
     type: "Categorical",
-    description: "Awake Verbal Pain Unresponsive",
+    description: "AVPU is a measure of the patients level of consciousness. The four levels are: \
+                \n1. Alert \nPatient is fully awake(though not necessarily orientated), will have spontaneously open eyes, and will respond to voice(thought may be confused).They will have bodily motor function.\
+                  \n2. Voice\nThe patient makes some sort of response when you talk to them.This could be through the eyes, which open when you speak to them, or by voice which may only be as little as a grunt.Or, it could be by moving a limb when prompted to do so by the rescuer. \
+                    \n3. Pain \nA patient may respond by using any of the three components when pain stimulus is used on them(Eyes, Voice, Movement).Recognised methods for causing pain are pinching the ear or pressing into the bed of a fingernail.A fully conscious patient will locate the pain and push it away, whereas a patient who is not alert and not responded to voice may only manifest involuntary flexion or extension of a limb.Performing pain stimulus should be used with caution as in extreme circumstances this could be considered assault.\
+                    \n4. Unresponsive \nThis outcome is noted if the patient does not give any Eye, Voice or Motor response to voice or pain.",
     data: [new Reading({
         timestamp: "1640705088000",
         value: "Awake",
@@ -25,7 +29,7 @@ const skinVital = new Vital({
     periodicity: 60,
     name: "Skin",
     type: "Categorical",
-    description: "warm, pink, blue, or white",
+    description: "The color of a patients skin may be used to assess the patients general physical condition. You may visually identify the palor of a patients skin.",
     data: [],
     categories: ["Warm", "Pink", "Blue", "White"],
     timeElapsed: 0,
@@ -35,7 +39,7 @@ const pulseVital = new Vital({
     periodicity: 60,
     name: "Pulse",
     type: "Numerical",
-    description: "Beats per min",
+    description: "Pulse is a measure of heart rate. You can take a pulse by placing your fingers on a patients artery on their wrist or neck.",
     data: [],
     categories: [],
     timeElapsed: 0,
@@ -45,7 +49,7 @@ const respirationVital = new Vital({
     periodicity: 60,
     name: "Respiration",
     type: "Numerical",
-    description: "breaths per minute",
+    description: "Respiration is a measure of the breathing rate of patient. You can count the number of inhalations and exhalations (together they count as one breath).",
     data: [new Reading({
         timestamp: "1640705088000",
         value: 42,
@@ -66,7 +70,7 @@ const temperatureVital = new Vital({
     periodicity: 60,
     name: "Temperature",
     type: "Numerical",
-    description: "Temp Desc",
+    description: "Temperature is a measure of the patients body heat. If you have access to a thermometer, then place in the patients armpit for 1 minute. Otherwise place your hand on the patients forehead and assess the difference. ",
     data: [new Reading({
         timestamp: "1640705088000",
         value: 42,
@@ -105,7 +109,7 @@ const generalVital = new Vital({
     periodicity: 60,
     name: "General",
     type: "Special",
-    description: "General notes",
+    description: "May include general notes about the patient or notable events during your care of the patient.",
     data: [new Reading({
         timestamp: "1640705088000",
         value: "Patient has exhibited signs of hypothermia.",
@@ -125,7 +129,7 @@ const photosVital = new Vital({
     periodicity: 60,
     name: "Photos",
     type: "Photos",
-    description: "Photo notes",
+    description: "May include photos in specific categories.",
     data: [new Reading({
         timestamp: "1640705088000",
         value: "Patient eyes",

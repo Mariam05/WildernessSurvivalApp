@@ -29,6 +29,7 @@ import { VitalItem, Data, RenderChart} from "../assets/components/VitalItem";
 
 import { PatientModal } from "../assets/components/PatientModal";
 import { ReadingModal } from "../assets/components/ReadingModal";
+import { VitalInfoModal } from "../assets/components/VitalInfoModal";
 
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
@@ -73,7 +74,6 @@ export default function PatientScreen({ navigation, route }) {
 		})
 	}
 
-	console.log(displayVitals);
 	/* For toggling between the two views */
 	const [alernateView, setAlternateView] = useState(false);
 	const toggleView = () => {
@@ -96,11 +96,16 @@ export default function PatientScreen({ navigation, route }) {
 		setIsReadingModalVisible(() => !isReadingModalVisible);
 	};
 
+	const [vitalDescription, setVitalDescription] = useState("");
+	const [isVitalInformationModalVisible, setIsVitalInformationModalVisible] = useState(false);
+	const handleVitalInfoModal = () => {
+		setIsVitalInformationModalVisible(() => !isVitalInformationModalVisible);
+    }
+
 
 	const [selectedVital, setSelectedVital] = useState("");
 
-	const [isVitalInformationModalVisible, setIsVitalInformationModalVisible] = useState(false);
-
+	
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -249,7 +254,10 @@ export default function PatientScreen({ navigation, route }) {
 							style={PatientScreenStyles.vitalsScrollView}
 						>
 							<View style={{ height: 10 }} />
+
 							<RenderChart initial_data={patient.vitals} fullscreen={false} displayVitals={displayVitals} />
+							<View style={{
+								height: 10, borderBottomColor: "black", borderBottomWidth: 3, width: "80%", left: "10%" }} />
 							<ScrollView
 								style={PatientScreenStyles.vitalsScrollView}
 								contentContainerStyle={{
@@ -271,11 +279,10 @@ export default function PatientScreen({ navigation, route }) {
 										index={index}
 										click_enabled={true}
 										onPress={vital.data.length > 0 && (vital.type == "Numerical" || vital.type=="Categorical") ? () => toggleVital(vital.name) : null}
-										onPressInfo={() =>
-											console.log(
-												vital.name + " info pressed"
-											)
-										}
+										onPressInfo={() => {
+											setVitalDescription(vital.description);
+											handleVitalInfoModal();
+										}}
 										onPressAdd={() =>
 											console.log(
 												vital.name + " add new reading"
@@ -310,11 +317,12 @@ export default function PatientScreen({ navigation, route }) {
 									timeElapsed={vital.timeElapsed}
 									onPress={null}
 									index={index}
-									onPressInfo={() =>
-										console.log(
-											vital.name + " info pressed"
-										)
-									}
+									onPressInfo={() => {
+										console.log("info pressed");
+										console.log(vital.description);
+										setVitalDescription(vital.description);
+										handleVitalInfoModal();
+									}}
 									onPressAdd={() =>
 										console.log(
 											vital.name + " add new reading"
@@ -342,7 +350,7 @@ export default function PatientScreen({ navigation, route }) {
 				{/* Code for add new vital button */}
 				<AddButton onPress={handleVitalModal} />
 
-				{/* Code for add new vital info */}
+				{/* Code for add new vital */}
 				<VitalModal
 					isVisible={isVitalModalVisible}
 					handleVitalModal={handleVitalModal}
@@ -353,6 +361,14 @@ export default function PatientScreen({ navigation, route }) {
 				<PatientModal
 					isVisible={isPatientModalVisible}
 					handlePatientModal={handlePatientModal}
+				/>
+
+
+				{/* Code for vital info */}
+				<VitalInfoModal
+					isVisible={isVitalInformationModalVisible}
+					handleVitalInfoModal={handleVitalInfoModal}
+					vitalDescription={vitalDescription}
 				/>
 
 

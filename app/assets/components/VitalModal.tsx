@@ -16,7 +16,7 @@ import { useVitals } from "../../../providers/VitalProvider";
 import colours from "../colours";
 import globalStyles from "../stylesheet";
 import AppButton from "./AppButton";
-import VitalItem from "./VitalItem";
+import { VitalItem } from "./VitalItem";
 
 type ModalProps = {
 	isVisible: boolean;
@@ -119,15 +119,20 @@ export const VitalModal = ({
 						<VitalModal.Body>
 							<View style={{ marginVertical: "3%" }} />
 							<VitalItem
-								enabled={false}
+								click_enabled={false}
 								name={vitalName}
 								periodicity={vitalPeriodicity}
 								type={vitalType}
 								description={""}
 								data={[]}
+								index={0}
+								categories={[]}
+								onPress={null}
 								timeElapsed={null}
 								onPressAdd={null}
 								onPressInfo={null}
+								onChartLongPress={null}
+								isToggled={null}
 							/>
 
 							<View style={{ marginVertical: "3%" }} />

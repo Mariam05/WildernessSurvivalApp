@@ -29,34 +29,6 @@ import {
 } from "react-native";
 import { useState } from "react";
 
-const Chart1 = (data) => {
-	const mappedData = data.map((d) => {
-		return {
-			timestamp: d.timestamp,
-			value: d.value,
-		};
-	});
-
-	return (
-		<VictoryChart
-			theme={customTheme}
-			domainPadding={{ x: 0, y: 20 }}
-			padding={{ top: 5, bottom: 35, left: 50, right: 50 }}
-			height={180}
-		>
-			<VictoryLine
-				style={{
-					data: { stroke: "#c43a31" },
-					parent: { border: "1px solid #ccc", fill: "#000000" },
-				}}
-				x={(d) => new Date(parseInt(d.timestamp) * 1000)}
-				y="value"
-				data={mappedData}
-			/>
-		</VictoryChart>
-	);
-};
-
 
 const RowWithImage = (entry) => {
 	const date = new Date(entry.timestamp * 1000);
@@ -128,14 +100,13 @@ const Table = (data) => {
 };
 
 function formatAMPM(date) {
-
-	var hours = date.getHours();
-	var minutes = date.getMinutes();
-	var ampm = hours >= 12 ? 'pm' : 'am';
+	let hours = date.getHours();
+	let  minutes = date.getMinutes();
+	let  ampm = hours >= 12 ? 'pm' : 'am';
 	hours = hours % 12;
-	hours = hours ? hours : 12; // the hour '0' should be '12'
+	hours = hours!=0 ? hours : 12; // the hour '0' should be '12'
 	minutes = minutes < 10 ? '0' + minutes : minutes;
-	var strTime = hours + ':' + minutes + ' ' + ampm;
+	let  strTime = hours + ':' + minutes + ' ' + ampm;
 	return strTime;
 }
 
@@ -326,14 +297,9 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 	return (
 	< VictoryChart
 		theme={customTheme}
-		padding={{ top: 20, bottom: 35, left: longest_length * 8 + 30, right: 50 }}
-		domainPadding={{ x: 0, y: [0, 0] }}
+			padding={{ top: 20, bottom: 35, left: longest_length * 8 + 30, right: 50 }}
+			domainPadding={{ x: 0, y: [(isCategorical? -30 : 10), 10] }}
 		height={180}
-		containerComponent={<VictoryVoronoiContainer
-			mouseFollowTooltips
-			voronoiDimension="x"
-			labels={({ datum }) => `y: ${datum.y}`}
-		/>}
 		>
 
 		{/* Y axis categorical */}
@@ -367,7 +333,7 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 			style={{
 					data: { stroke: v.color, strokeWidth: 3 }
 				}}
-				y={(d) =>  (timeCorrectedData.length == 1) ? d.y : ((d.y - v.minV) / v.diff) }
+				y={(d) =>  (timeCorrectedData.length == 1) ? (isCategorical ? d.y+1 : d.y) : ((d.y - v.minV) / v.diff) }
 				data={v.data}
 				standalone={false}
 				key={i}
@@ -569,17 +535,6 @@ const TimeElapsed = ({ timeElapsed, periodicity }) => {
 };
 
 
-const ColoredLine = ({ color }) => (
-	<Text
-		style={{
-			color,
-			backgroundColor: color,
-		}}
-	>
-		-------
-	</Text>
-);
-
 function VitalItem({
 	click_enabled,
 	name,
@@ -621,7 +576,7 @@ function VitalItem({
 
 				]}
 			>
-				{description != undefined && (
+				{description != undefined && description.length > 0 && (
 					<AppButton
 						title="i"
 						style={vitalItemStyles.infoButton}
