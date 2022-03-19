@@ -273,11 +273,11 @@ function RespScreen({ navigation }) {
 }
 
 const options = [
-  { option: "warm", colour: colours.redBackground },
-  { option: "pink", colour: colours.pinkBackground },
-  { option: "white", colour: colours.secondary },
-  { option: "blue", colour: colours.lightBlueBackground },
-  { option: "normal", colour: colours.green },
+  { option: "Warm", colour: colours.redBackground },
+  { option: "Pink", colour: colours.pinkBackground },
+  { option: "White", colour: colours.secondary },
+  { option: "Blue", colour: colours.lightBlueBackground },
+  { option: "Normal", colour: colours.green },
   { option: "skip", colour: colours.primary },
 ];
 

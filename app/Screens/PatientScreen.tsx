@@ -16,19 +16,26 @@ import {
 	View,
 	UIManager,
 	StatusBar,
+	Dimensions,
 	Alert,
 } from "react-native";
 import { MenuView } from "@react-native-menu/menu";
 
 import AddButton from "../assets/components/AddButton";
 import { VitalModal } from "../assets/components/VitalModal";
+
+import { VitalItem, Data, RenderChart} from "../assets/components/VitalItem";
+
+
 import { PatientModal } from "../assets/components/PatientModal";
 import { ReadingModal } from "../assets/components/ReadingModal";
-import VitalItem, { vitalItemStyles } from "../assets/components/VitalItem";
+import { VitalInfoModal } from "../assets/components/VitalInfoModal";
+
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import { Vital } from "../../schemas";
 import { createPDF } from "../pdf-generator";
+
 
 const vitalTypes = ["Numerical", "Categorical"];
 import { usePatients } from "../../providers/PatientProvider";
@@ -41,6 +48,37 @@ export default function PatientScreen({ navigation, route }) {
 			UIManager.setLayoutAnimationEnabledExperimental(true);
 		}
 	}
+
+
+	/* For displaying full screen chart */
+	const [chartType, setChartType] = useState("");
+	const [chartVitalData, setChartVitalData] = useState("");
+	const [chartVitalCategories, setChartVitalCategories] = useState("");
+
+	const [isChartModalVisible, setIsChartModalVisible] = useState(false);
+	const handleChartModal = ({ type, data, categories }) => {
+		setChartVitalCategories(categories);
+		setChartVitalData(data);
+		setChartType(type);
+		return setIsChartModalVisible(() => !isChartModalVisible)
+	};
+
+	/* For displaying specific vitals on chart */
+	const [displayVitals, setDisplayVitals] = useState([]);
+	const toggleVital = (name) => {
+		setDisplayVitals((arr) => {
+			const array = arr.includes(name)
+				? arr.filter(i => i !== name) // remove item
+				: [...arr, name];
+			return array;
+		})
+	}
+
+	/* For toggling between the two views */
+	const [alernateView, setAlternateView] = useState(false);
+	const toggleView = () => {
+		setAlternateView(() => !alernateView);
+    }
 
 	const { patient, closeRealm } = useVitals();
 	const { deletePatient } = usePatients();
@@ -57,7 +95,17 @@ export default function PatientScreen({ navigation, route }) {
 	const handleReadingModal = () => {
 		setIsReadingModalVisible(() => !isReadingModalVisible);
 	};
+
+	const [vitalDescription, setVitalDescription] = useState("");
+	const [isVitalInformationModalVisible, setIsVitalInformationModalVisible] = useState(false);
+	const handleVitalInfoModal = () => {
+		setIsVitalInformationModalVisible(() => !isVitalInformationModalVisible);
+    }
+
+
 	const [selectedVital, setSelectedVital] = useState("");
+
+	
 
 	let [fontsLoaded] = useFonts({
 		Oxygen_300Light,
@@ -80,13 +128,14 @@ export default function PatientScreen({ navigation, route }) {
 				]}
 			>
 				{/* Code for patient level header */}
-				<View style={PatientScreenStyles.headerPatient}>
+				{!isChartModalVisible && <View style={PatientScreenStyles.headerPatient}>
 					<TouchableOpacity
 						style={PatientScreenStyles.backButton}
 						onPress={() => {
 							navigation.navigate("Landing");
 							closeRealm();
 						}}
+
 					>
 						<Image
 							style={PatientScreenStyles.backButtonImage}
@@ -136,6 +185,9 @@ export default function PatientScreen({ navigation, route }) {
 									]
 								);
 								return;
+							} else if (nativeEvent.event == "toggleView") {
+								toggleView();
+								return;
 							}
 
 							console.warn(
@@ -144,6 +196,17 @@ export default function PatientScreen({ navigation, route }) {
 							);
 						}}
 						actions={[
+							{
+								id: "toggleView",
+								title: "Toggle View",
+								titleColor: colours.primary,
+								image: Platform.select({
+									ios: "tray",
+									android: "ic_menu_agenda",
+								}),
+								imageColor: colours.primary,
+
+							},
 							{
 								id: "edit",
 								title: "Edit Patient",
@@ -175,6 +238,7 @@ export default function PatientScreen({ navigation, route }) {
 									android: "ic_menu_delete",
 								}),
 							},
+
 						]}
 					>
 						<View style={PatientScreenStyles.infoButton}>
@@ -183,46 +247,112 @@ export default function PatientScreen({ navigation, route }) {
 							</Text>
 						</View>
 					</MenuView>
-				</View>
+				</View>}
 
-				<ScrollView
-					style={PatientScreenStyles.vitalsScrollView}
-					contentContainerStyle={{
-						alignSelf: "stretch",
-						paddingBottom: "30%",
-					}}
-				>
-					<View style={{ height: 10 }} />
-					{patient &&
-						patient.vitals.map((vital: Vital, index: number) => (
-							<VitalItem
-								enabled={true}
-								name={vital.name}
-								periodicity={vital.periodicity}
-								type={vital.type}
-								data={vital.data}
-								description={vital.description}
-								timeElapsed={vital.timeElapsed}
-								onPressInfo={() =>
-									console.log(vital.name + " info pressed")
-								}
-								onPressAdd={() => {
-									setSelectedVital(vital.name);
-									handleReadingModal();
+				{patient ?
+					(alernateView ?
+						<View
+							style={PatientScreenStyles.vitalsScrollView}
+						>
+							<View style={{ height: 10 }} />
+
+							<RenderChart initial_data={patient.vitals} fullscreen={false} displayVitals={displayVitals} />
+							<View style={{
+								height: 10, borderBottomColor: "black", borderBottomWidth: 3, width: "80%", left: "10%" }} />
+							<ScrollView
+								style={PatientScreenStyles.vitalsScrollView}
+								contentContainerStyle={{
+									alignSelf: "stretch",
+									paddingBottom: "30%",
 								}}
-								key={index}
-							/>
-						))}
-				</ScrollView>
+							>
+								<View style={{ height: 10 }} />
+								{patient.vitals.map((vital: Vital, index: number) => (
+									<VitalItem
+										isToggled={displayVitals.includes(vital.name)}
+										name={vital.name}
+										periodicity={vital.periodicity}
+										type={vital.type}
+										categories={vital.categories}
+										data={vital.data}
+										description={vital.description}
+										timeElapsed={vital.timeElapsed}
+										index={index}
+										click_enabled={true}
+										onPress={vital.data.length > 0 && (vital.type == "Numerical" || vital.type=="Categorical") ? () => toggleVital(vital.name) : null}
+										onPressInfo={() => {
+											setVitalDescription(vital.description);
+											handleVitalInfoModal();
+										}}
+										onPressAdd={() => {
+											setSelectedVital(vital.name);
+											handleReadingModal();
+										}}
+										key={index}
+										onChartLongPress={null}
+									/>
+								))}
+							</ScrollView>
+						</View>
+
+						:
+						<ScrollView
+							style={PatientScreenStyles.vitalsScrollView}
+							contentContainerStyle={{
+								alignSelf: "stretch",
+								paddingBottom: "30%",
+							}}
+						>
+							<View style={{ height: 10 }} />
+							{patient.vitals.map((vital: Vital, index: number) => (
+								<VitalItem
+									isToggled={false}
+									click_enabled={true}
+									name={vital.name}
+									periodicity={vital.periodicity}
+									type={vital.type}
+									categories={vital.categories}
+									data={vital.data}
+									description={vital.description}
+									timeElapsed={vital.timeElapsed}
+									onPress={null}
+									index={index}
+									onPressInfo={() => {
+										setVitalDescription(vital.description);
+										handleVitalInfoModal();
+									}}
+									onPressAdd={() => {
+										setSelectedVital(vital.name);
+										handleReadingModal();
+									}}
+									key={index}
+									onChartLongPress={() => handleChartModal({ type: vital.type, data: vital.data, categories: vital.categories })}
+								/>
+							))}
+						</ScrollView>
+					) : null
+				}
+
+				{/* Code for display chart full screen */}
+				{isChartModalVisible &&
+					<Data
+						type={chartType}
+						data={chartVitalData}
+						categories={chartVitalCategories}
+						fullscreen={true} onChartLongPress={() => handleChartModal({ type: null, data: null, categories: null })}
+					/>
+				}
+
 
 				{/* Code for add new vital button */}
 				<AddButton onPress={handleVitalModal} />
 
-				{/* Code for add new vital info */}
+				{/* Code for add new vital */}
 				<VitalModal
 					isVisible={isVitalModalVisible}
 					handleVitalModal={handleVitalModal}
 				/>
+
 
 				{/* Code for editing patient info */}
 				<PatientModal
@@ -230,12 +360,22 @@ export default function PatientScreen({ navigation, route }) {
 					handlePatientModal={handlePatientModal}
 				/>
 
+
+				{/* Code for vital info */}
+				<VitalInfoModal
+					isVisible={isVitalInformationModalVisible}
+					handleVitalInfoModal={handleVitalInfoModal}
+					vitalDescription={vitalDescription}
+				/>
+
+
 				{/* Code for adding vital reading */}
 				<ReadingModal
 					isVisible={isReadingModalVisible}
 					handleReadingModal={handleReadingModal}
 					vitalName={selectedVital}
 				/>
+
 			</SafeAreaView>
 		);
 	}

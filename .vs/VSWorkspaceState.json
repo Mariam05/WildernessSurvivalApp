@@ -3,8 +3,10 @@
     "",
     "\\app",
     "\\app\\assets",
-    "\\app\\Screens"
+    "\\app\\assets\\components",
+    "\\app\\Screens",
+    "\\providers"
   ],
-  "SelectedNode": "\\app\\Screens\\SignUpScreen.tsx",
+  "SelectedNode": "\\app\\assets\\components\\VitalInfoModal.tsx",
   "PreviewInSolutionExplorer": false
 }
