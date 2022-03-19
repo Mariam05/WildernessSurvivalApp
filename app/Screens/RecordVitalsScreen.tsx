@@ -577,6 +577,8 @@ export default function RecordVitalsStack({ route, navigation }) {
   );
 }
 
+export { playSound, scheduleNotification }
+
 const quickVitalsStyles = StyleSheet.create({
   container: {
     flex: 1,
