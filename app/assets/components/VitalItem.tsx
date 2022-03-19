@@ -30,42 +30,6 @@ import {
 import { useState } from "react";
 
 
-const RowWithImage = (entry) => {
-	const date = new Date(entry.timestamp * 1000);
-	const dateString = date.getHours() + ":" + date.getMinutes();
-
-	const [expandedImage, setExpandedImage] = useState(false);
-	const [imageUrl, setImageUrl] = useState("");
-
-	const onPress = () => {
-		setExpandedImage(!expandedImage);
-		setImageUrl(entry.url);
-	};
-
-	return (
-		<TouchableOpacity style={vitalItemStyles.row} onPress={onPress}>
-			<View style={vitalItemStyles.timestampCell}>
-				<Text style={vitalItemStyles.timestampCellText}>
-					{dateString}
-				</Text>
-			</View>
-			<View style={vitalItemStyles.valueCell}>
-				<View style={vitalItemStyles.valueCellText}>
-					<Text>{entry.value}</Text>
-				</View>
-				{expandedImage && (
-					<View style={vitalItemStyles.valueCellImage}>
-						<Image
-							source={{ uri: imageUrl }}
-							style={vitalItemStyles.valueImage}
-						></Image>
-					</View>
-				)}
-			</View>
-		</TouchableOpacity>
-	);
-};
-
 const Row = (entry) => {
 	const date = new Date(entry.timestamp * 1000);
 	const dateString = date.getHours() + ":" + date.getMinutes();
@@ -86,14 +50,11 @@ const Row = (entry) => {
 
 
 const Table = (data) => {
-	const hasImage =
-		data && data[0] && data[0].url != null && data[0].url != "";
-
 	return (
 		<View style={vitalItemStyles.table}>
 			{data.map((entry) => {
 				// This will  a row for each data element.
-				return hasImage ? RowWithImage(entry) : Row(entry);
+				return  Row(entry);
 			})}
 		</View>
 	);
@@ -115,6 +76,8 @@ const CategoricalChart = (data, init_categories) => {
 	let categories = ["", ...init_categories, ""]
 	let category_indicies = [...Array(categories.length).keys()]
 	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
+
+	console.log(data);
 
 	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
 
@@ -244,6 +207,69 @@ const NumericalChartFullScreen = (data) => {
 };
 
 
+
+const CategoricalChartFullScreen = (data, init_categories) => {
+	let categories = ["", ...init_categories]
+	let category_indicies = [...Array(categories.length).keys()]
+	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
+
+	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
+
+	return (
+		<VictoryChart
+			horizontal={true}
+			theme={customTheme}
+			padding={{ top: longest_length * 8 + 30, bottom: 20, left: 40, right: 20 }}
+			width={Dimensions.get('window').width}
+			height={Dimensions.get('window').height}
+			domainPadding={{ x: -1, y: [-30, 30] }}
+			containerComponent={<VictoryContainer disableContainerEvents />}
+		>
+
+			{/* Y axis */}
+			<VictoryAxis dependentAxis
+				tickValues={category_indicies}
+				tickFormat={(i) => `${categories[i]}`}
+				standalone={false}
+				style={{
+					tickLabels: { angle: 90, fontSize: 15 },
+				}}
+				tickLabelComponent={<VictoryLabel dy={5} textAnchor={"end"} />}
+				orientation="top"
+
+			/>
+
+			{/* X Axis */}
+			<VictoryAxis
+				standalone={true}
+				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
+				fixLabelOverlap={true}
+				style={{
+					tickLabels: { angle: 90, paddingInline: 50 }
+				}}
+				tickLabelComponent={<VictoryLabel dx={25} />}
+				orientation="left"
+
+				invertAxis={true}
+			/>
+
+			{/* Line */}
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" }
+				}}
+				x={(d) => new Date(d.timestamp)}
+				y={(d) => categories_dict[d.value]}
+				data={data}
+			/>
+		</VictoryChart>
+
+	);
+};
+
+
+
+
 const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 	if (initial_data == null)
 		return null;
@@ -342,69 +368,6 @@ const RenderChart = ({ initial_data, fullscreen, displayVitals }) => {
 
 	</VictoryChart >)
 }
-
-
-
-const CategoricalChartFullScreen = ( data, init_categories ) => {
-	console.log("render full screen");
-
-	let categories = ["", ...init_categories]
-	let category_indicies = [...Array(categories.length).keys()]
-	let categories_dict = Object.assign({}, ...categories.map((c, i) => ({ [c]: i })));
-
-	let longest_length = categories.reduce((a, b) => a.length > b.length ? a : b).length;
-
-	return (
-		<VictoryChart
-			horizontal={true}
-			theme={customTheme}
-			padding={{ top: longest_length * 8 + 30, bottom: 20, left: 40, right: 20 }}
-			width={Dimensions.get('window').width}
-			height={Dimensions.get('window').height}
-			domainPadding={{ x: -1, y: [-30, 30] }}
-			containerComponent={<VictoryContainer disableContainerEvents />}
-		>
-
-			{/* Y axis */}
-			<VictoryAxis dependentAxis
-				tickValues={category_indicies}
-				tickFormat={(i) => `${categories[i]}`}
-				standalone={false}
-				style={{
-					tickLabels: { angle: 90, fontSize: 15 },
-				}}
-				tickLabelComponent={<VictoryLabel dy={5} textAnchor={"end"} />}
-				orientation="top"
-				
-			/>
-
-			{/* X Axis */}
-			<VictoryAxis
-				standalone={true}
-				tickFormat={(v) => `${formatAMPM(new Date(v))}`}
-				fixLabelOverlap={true}
-				style={{
-					tickLabels: { angle: 90, paddingInline: 50 }
-				}}
-				tickLabelComponent={<VictoryLabel dx={25} />}
-				orientation="left"
-				
-				invertAxis={true}
-			/>
-
-			{/* Line */}
-			<VictoryLine
-				style={{
-					data: { stroke: "#c43a31"}
-				}}
-				x={(d) => new Date(d.timestamp) }
-				y={(d) => categories_dict[d.value]}
-				data={data}
-			/>
-		</VictoryChart>
-
-	);
-};
 
 
 

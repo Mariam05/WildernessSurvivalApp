@@ -204,6 +204,7 @@ export const VitalModal = ({
 							<View style={{ marginVertical: "1%" }} />
 							{vitalType == "Categorical" && (
 								<View>
+									<Text style={modalStyles.modalSubHeadingText}>Enter categories from "lowest" to "highest"</Text>
 									{vitalCategories.map((category, index) => (
 										<View key={index}>
 											<View>

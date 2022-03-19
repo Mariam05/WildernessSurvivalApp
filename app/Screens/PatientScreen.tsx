@@ -128,13 +128,14 @@ export default function PatientScreen({ navigation, route }) {
 				]}
 			>
 				{/* Code for patient level header */}
-				<View style={PatientScreenStyles.headerPatient}>
+				{!isChartModalVisible && <View style={PatientScreenStyles.headerPatient}>
 					<TouchableOpacity
 						style={PatientScreenStyles.backButton}
 						onPress={() => {
 							navigation.goBack();
 							closeRealm();
 						}}
+
 					>
 						<Image
 							style={PatientScreenStyles.backButtonImage}
@@ -187,7 +188,7 @@ export default function PatientScreen({ navigation, route }) {
 							} else if (nativeEvent.event == "toggleView") {
 								toggleView();
 								return;
-                            }
+							}
 
 							console.warn(
 								"Event not recognized " +
@@ -237,7 +238,7 @@ export default function PatientScreen({ navigation, route }) {
 									android: "ic_menu_delete",
 								}),
 							},
-							
+
 						]}
 					>
 						<View style={PatientScreenStyles.infoButton}>
@@ -246,7 +247,7 @@ export default function PatientScreen({ navigation, route }) {
 							</Text>
 						</View>
 					</MenuView>
-				</View>
+				</View>}
 
 				{patient ?
 					(alernateView ?
