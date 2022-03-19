@@ -283,11 +283,10 @@ export default function PatientScreen({ navigation, route }) {
 											setVitalDescription(vital.description);
 											handleVitalInfoModal();
 										}}
-										onPressAdd={() =>
-											console.log(
-												vital.name + " add new reading"
-											)
-										}
+										onPressAdd={() => {
+											setSelectedVital(vital.name);
+											handleReadingModal();
+										}}
 										key={index}
 										onChartLongPress={null}
 									/>
@@ -318,16 +317,13 @@ export default function PatientScreen({ navigation, route }) {
 									onPress={null}
 									index={index}
 									onPressInfo={() => {
-										console.log("info pressed");
-										console.log(vital.description);
 										setVitalDescription(vital.description);
 										handleVitalInfoModal();
 									}}
-									onPressAdd={() =>
-										console.log(
-											vital.name + " add new reading"
-										)
-									}
+									onPressAdd={() => {
+										setSelectedVital(vital.name);
+										handleReadingModal();
+									}}
 									key={index}
 									onChartLongPress={() => handleChartModal({ type: vital.type, data: vital.data, categories: vital.categories })}
 								/>

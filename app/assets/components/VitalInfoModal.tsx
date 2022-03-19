@@ -1,4 +1,3 @@
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import {
 	View,
 	StyleSheet,
