@@ -26,9 +26,36 @@ import {
 	View,
 	Dimensions,
 	ScrollView,
-	
 } from "react-native";
 import { useState } from "react";
+
+const Chart1 = (data) => {
+	const mappedData = data.map((d) => {
+		return {
+			timestamp: d.timestamp,
+			value: d.value,
+		};
+	});
+
+	return (
+		<VictoryChart
+			theme={customTheme}
+			domainPadding={{ x: 0, y: 20 }}
+			padding={{ top: 5, bottom: 35, left: 50, right: 50 }}
+			height={180}
+		>
+			<VictoryLine
+				style={{
+					data: { stroke: "#c43a31" },
+					parent: { border: "1px solid #ccc", fill: "#000000" },
+				}}
+				x={(d) => new Date(parseInt(d.timestamp) * 1000)}
+				y="value"
+				data={mappedData}
+			/>
+		</VictoryChart>
+	);
+};
 
 
 const RowWithImage = (entry) => {
@@ -58,9 +85,10 @@ const RowWithImage = (entry) => {
 					<View style={vitalItemStyles.valueCellImage}>
 						<Image
 							source={{ uri: imageUrl }}
-							style={vitalItemStyles.valueImage}>
-						</Image>
-					</View>)}
+							style={vitalItemStyles.valueImage}
+						></Image>
+					</View>
+				)}
 			</View>
 		</TouchableOpacity>
 	);
@@ -86,7 +114,8 @@ const Row = (entry) => {
 
 
 const Table = (data) => {
-	const hasImage = data && data[0] && data[0].url != null && data[0].url != ""
+	const hasImage =
+		data && data[0] && data[0].url != null && data[0].url != "";
 
 	return (
 		<View style={vitalItemStyles.table}>
@@ -678,14 +707,14 @@ const vitalItemStyles = StyleSheet.create({
 	},
 	table: {
 		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
+		alignItems: "center",
+		justifyContent: "center",
 		marginTop: -5,
 		marginBottom: 10,
 	},
 	timeElapsedText: {
 		fontSize: 12,
-		alignSelf: "flex-start"
+		alignSelf: "flex-start",
 	},
 	timestampCell: {
 		width: "25%",

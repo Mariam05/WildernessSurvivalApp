@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
 	LayoutAnimation,
 	Platform,
@@ -14,7 +14,7 @@ import {
 import { useAuth } from "../../providers/AuthProvider";
 import colours from "../assets/colours";
 import globalStyles from "../assets/stylesheet";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import LogoutButton from "../assets/components/LogoutButton";
 import { useState } from "react";
@@ -28,11 +28,20 @@ export default function MenuScreen() {
 	const [resourcesExpanded, setResourcesExpanded] = useState(false);
 
 	const isAnon = user && user.providerType === "anon-user";
+	isAnon ? null : user && user.refreshCustomData();
 
 	const onPressResources = () => {
 		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 		setResourcesExpanded(!resourcesExpanded);
 	};
+
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		user && user.refreshCustomData();
+		user && user.providerType === "anon-user";
+	}, [isFocused, user]);
+
+	if (user) user.refreshCustomData();
 
 	if (user == null) {
 		return <View />;
@@ -94,6 +103,8 @@ export default function MenuScreen() {
 						<Text style={[menuStyles.titleText, { fontSize: 35 }]}>
 							{isAnon
 								? "A"
+								: !user.customData
+								? "NA"
 								: user.customData.firstName[0] +
 								  user.customData.lastName[0]}
 						</Text>
@@ -108,12 +119,14 @@ export default function MenuScreen() {
 						<Text style={menuStyles.titleText}>
 							{isAnon
 								? "Anonymous"
+								: !user.customData
+								? "Not Found"
 								: user.customData.firstName +
 								  " " +
 								  user.customData.lastName}
 						</Text>
 						<Text style={menuStyles.subHeading}>
-							ID: 0x{user.id}
+							{isAnon ? "ID: 0x" + user.id : user.profile.email}
 						</Text>
 					</View>
 				</View>

@@ -1,10 +1,9 @@
 import { Platform, StatusBar, StyleSheet, View } from "react-native";
 
 import colours from "../colours";
-import { useAuth } from "../../../providers/AuthProvider";
-import { useIsFocused } from "@react-navigation/native";
-import { useEffect } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useAuth } from "../../../providers/AuthProvider";
+import { useEffect } from "react";
 
 export default function ProfileHeader({ statusbarColour, navigation }) {
 	Platform.OS === "ios"
@@ -12,11 +11,9 @@ export default function ProfileHeader({ statusbarColour, navigation }) {
 		: StatusBar.setBackgroundColor(statusbarColour, true);
 
 	const { user } = useAuth();
-
-	const isFocused = useIsFocused();
 	useEffect(() => {
-		user.refreshCustomData();
-	}, [isFocused]);
+		user && user.refreshCustomData();
+	}, [user.customData]);
 
 	return (
 		<View style={styles.header}>

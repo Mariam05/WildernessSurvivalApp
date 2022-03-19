@@ -61,7 +61,20 @@ export default function SignUpScreen() {
 						text: "Keep Data",
 						style: "default",
 						onPress: () => {
-							console.log("Merging accounts");
+							try {
+								user &&
+									user.linkCredentials(
+										Realm.Credentials.emailPassword(
+											username,
+											password
+										)
+									);
+							} catch (error) {
+								const errorMessage = `Failed to link: ${error.message}`;
+								console.error(errorMessage);
+								Alert.alert(errorMessage);
+								return;
+							}
 							response(true);
 						},
 					},
@@ -73,37 +86,25 @@ export default function SignUpScreen() {
 	const onPressSignUp = async () => {
 		if (validateInput()) {
 			console.log("Trying Sign Up with user: " + username);
-			let response = await asyncSignUpWarning();
 			try {
 				await signUp(username, password);
 			} catch (error) {
 				const errorMessage = `Failed to sign up: ${error.message}`;
 				console.error(errorMessage);
 				Alert.alert(errorMessage);
+				return;
 			}
-			try {
-				response
-					? await user.linkCredentials(
-							Realm.Credentials.emailPassword(username, password)
-					  )
-					: null;
-			} catch (error) {
-				const errorMessage = `Failed to link: ${error.message}`;
-				console.error(errorMessage);
-				Alert.alert(errorMessage);
-			}
+
+			await asyncSignUpWarning();
+
 			try {
 				const newUser = await emailSignIn(username, password);
-				await insertCustomUserData(
-					newUser,
-					profileImg,
-					firstName,
-					lastName
-				);
+				await insertCustomUserData(newUser, firstName, lastName);
 			} catch (error) {
 				const errorMessage = `Failed to sign in: ${error.message}`;
 				console.error(errorMessage);
 				Alert.alert(errorMessage);
+				return;
 			}
 			try {
 				navigation.navigate("Landing");
@@ -287,7 +288,7 @@ export default function SignUpScreen() {
 							placeholder="Email"
 							onChangeText={(text) => {
 								setUsernameErrorMessage("");
-								setUsername(text);
+								setUsername(text.replaceAll(" ", ""));
 							}}
 							value={username}
 							autoCapitalize="none"
@@ -373,7 +374,7 @@ export default function SignUpScreen() {
 					title="Sign Up"
 					style={registrationStyles.signUpButton}
 					buttonTextStyle={registrationStyles.signUpButtonText}
-					onPress={onPressSignUp}
+					onPress={async () => await onPressSignUp()}
 				/>
 
 				<AppButton

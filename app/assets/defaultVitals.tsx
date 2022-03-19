@@ -1,6 +1,5 @@
 import { Vital, Reading } from "../../schemas";
 
-
 const avpuVital = new Vital({
     periodicity: 60,
     name: "AVPU",
@@ -20,7 +19,7 @@ const avpuVital = new Vital({
     })],
     categories: ["Unresponsive", "Pain", "Verbal", "Awake"],
     timeElapsed: 0,
-})
+});
 
 const skinVital = new Vital({
     periodicity: 60,
@@ -30,7 +29,7 @@ const skinVital = new Vital({
     data: [],
     categories: ["Warm", "Pink", "Blue", "White"],
     timeElapsed: 0,
-})
+});
 
 const pulseVital = new Vital({
     periodicity: 60,
@@ -40,7 +39,7 @@ const pulseVital = new Vital({
     data: [],
     categories: [],
     timeElapsed: 0,
-})
+});
 
 const respirationVital = new Vital({
     periodicity: 60,
@@ -61,8 +60,7 @@ const respirationVital = new Vital({
     })],
     categories: [],
     timeElapsed: 0,
-})
-
+});
 
 const temperatureVital = new Vital({
     periodicity: 60,
@@ -101,7 +99,7 @@ const temperatureVital = new Vital({
     })],
     categories: [],
     timeElapsed: 10,
-})
+});
 
 const generalVital = new Vital({
     periodicity: 60,
@@ -121,6 +119,7 @@ const generalVital = new Vital({
         value: "Someone get help",
     })],
 })
+
 
 const photosVital = new Vital({
     periodicity: 60,
@@ -164,8 +163,19 @@ const photosVital = new Vital({
          url: "https://media.istockphoto.com/photos/male-clenched-fist-with-blood-veins-represents-the-strength-isolated-picture-id1266408697?k=20&m=1266408697&s=612x612&w=0&h=RN82YipMfPRN7j3UK2wLwq-ZkkXtpnOM2vw-leA7mw4=",
      })
     ],
-})
+});
 
 
-const defaultVitals = [avpuVital, pulseVital, respirationVital, skinVital, photosVital, generalVital, temperatureVital];
+const quickVitals = [avpuVital.name, pulseVital.name, respirationVital.name, skinVital.name, temperatureVital.name];
+const defaultVitals = [
+    avpuVital,
+    pulseVital,
+    respirationVital,
+    skinVital,
+    photosVital,
+    generalVital,
+    temperatureVital,
+];
+
 export default defaultVitals
+export { quickVitals }

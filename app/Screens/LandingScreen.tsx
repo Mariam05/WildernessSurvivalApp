@@ -4,47 +4,30 @@ import {
 	Oxygen_700Bold,
 	useFonts,
 } from "@expo-google-fonts/oxygen";
-import React, { createRef, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
+	Alert,
+	Platform,
 	SafeAreaView,
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
 	View,
-	KeyboardAvoidingView,
-	Platform,
 } from "react-native";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { useIsFocused } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import { usePatients } from "../../providers/PatientProvider";
-import AppButton from "../assets/components/AppButton";
-import PatientItem, { patientItemStyles } from "../assets/components/PatientItem";
-import { PatientModal } from "../assets/components/PatientModal";
+import PatientItem from "../assets/components/PatientItem";
 import globalStyles from "../assets/stylesheet";
 import colours from "../assets/colours";
 import ProfileHeader from "../assets/components/ProfileHeader";
 import AddButton from "../assets/components/AddButton";
 import { Patient } from "../../schemas";
 
-const ages = ["?", "<18", "18-30", "30-50", "50-70", "70+"];
-const sexes = ["Male", "Female", "Other"];
-
 export default function LandingScreen({ navigation }) {
-	const [PatientFN, setPatientFN] = useState("");
-	const [PatientLN, setPatientLN] = useState("");
-	const [PatientAge, setPatientAge] = useState("");
-	const [PatientSex, setPatientSex] = useState("");
-	const [PatientImg, setPatientImg] = useState(0);
-	const [isModalVisible, setIsModalVisible] = useState(false);
-
 	const { patients, createPatient, openPatientRealm, closePatientRealm } =
 		usePatients();
-
-	const handleModal = () => setIsModalVisible(() => !isModalVisible);
-	const lastNameRef = createRef<TextInput>();
 
 	const onPressPatient = (patient: Patient) => {
 		navigation.navigate("Patient", {
@@ -56,7 +39,7 @@ export default function LandingScreen({ navigation }) {
 	const onPressQuickVitals = (patient: Patient) => {
 		// console.log("quick record vitals. Patient id: " + patient._id);
 		navigation.push("RecordVitals", {
-			patientId: patient._id
+			patientId: patient._id,
 		});
 	};
 
@@ -77,7 +60,10 @@ export default function LandingScreen({ navigation }) {
 	} else {
 		return (
 			<SafeAreaView
-				style={[globalStyles.container, { backgroundColor: colours.redBackground }]}
+				style={[
+					globalStyles.container,
+					{ backgroundColor: colours.redBackground },
+				]}
 			>
 				<ProfileHeader
 					navigation={navigation}
@@ -120,7 +106,10 @@ export default function LandingScreen({ navigation }) {
 								backgroundColor: colours.yellowBackground,
 								alignItems: "center",
 								justifyContent: "flex-end",
-								paddingBottom: "7.5%",
+								paddingBottom: Platform.select({
+									ios: "7.5%",
+									android: "6.5%",
+								}),
 							},
 						]}
 					>
@@ -145,161 +134,38 @@ export default function LandingScreen({ navigation }) {
 						/>
 					</View>
 				)}
-				<AddButton onPress={handleModal} />
-
-				<PatientModal isVisible={isModalVisible}>
-					<KeyboardAvoidingView
-						behavior={Platform.OS === "ios" ? "padding" : "height"}
-					>
-						<ScrollView
-							style={{ top: Platform.OS == "ios" ? "5%" : 0 }}
-							keyboardDismissMode="on-drag"
-							keyboardShouldPersistTaps="never"
-						>
-							<PatientModal.Container>
-								<PatientModal.Header />
-								<PatientModal.Body>
-									<View style={{ marginVertical: "3%" }} />
-									<PatientItem
-										enabled={false}
-										onPress={null}
-										infoPress={null}
-										name={PatientFN + " " + PatientLN}
-										age={PatientAge}
-										sex={PatientSex}
-										timestamp={Date.now()}
-										style={{ width: "90%" }}
-									/>
-									<View style={{ marginVertical: "3%" }} />
-									<Text
-										style={modalStyles.modalSubHeadingText}
-									>
-										Name
-									</Text>
-									<TextInput
-										style={[
-											globalStyles.credentialInput,
-											{ width: "100%", margin: 0 },
-										]}
-										clearButtonMode="while-editing"
-										returnKeyType="next"
-										textContentType="username"
-										placeholder="First Name"
-										autoCapitalize="words"
-										autoCorrect={false}
-										value={PatientFN}
-										onChangeText={setPatientFN}
-										onSubmitEditing={() => {
-											lastNameRef.current.focus();
-										}}
-									/>
-									<View style={{ marginVertical: "3%" }} />
-									<TextInput
-										ref={lastNameRef}
-										style={[globalStyles.credentialInput, { width: "100%", margin: 0 }]}
-										clearButtonMode="while-editing"
-										returnKeyType="next"
-										textContentType="username"
-										placeholder="Last Name"
-										autoCapitalize="words"
-										autoCorrect={false}
-										value={PatientLN}
-										onChangeText={setPatientLN}
-									/>
-									<View style={{ marginVertical: "3%" }} />
-									<Text style={modalStyles.modalSubHeadingText}>Age</Text>
-									<SegmentedControl
-										values={ages}
-										onValueChange={setPatientAge}
-									/>
-									<View style={{ marginVertical: "3%" }} />
-									<Text style={modalStyles.modalSubHeadingText}>Sex</Text>
-									<SegmentedControl
-										values={sexes}
-										onValueChange={setPatientSex}
-									/>
-								</PatientModal.Body >
-								<PatientModal.Footer>
-									<AppButton
-										title="Cancel"
-										style={modalStyles.modalCancelButton}
-										buttonTextStyle={
-											modalStyles.modalButtonText
-										}
-										onPress={() => {
-											setPatientImg(0);
-											setPatientFN("");
-											setPatientLN("");
-											setPatientAge(null);
-											setPatientSex(null);
-											handleModal();
-										}}
-									/>
-									<AppButton
-										title="Submit"
-										style={modalStyles.modalSubmitButton}
-										buttonTextStyle={
-											modalStyles.modalButtonText
-										}
-										onPress={() => {
-											createPatient(
-												PatientImg,
-												PatientFN + " " + PatientLN,
-												PatientAge,
-												PatientSex
-											);
-											setPatientImg(0);
-											setPatientFN("");
-											setPatientLN("");
-											setPatientAge(null);
-											setPatientSex(null);
-											handleModal();
-										}}
-									/>
-								</PatientModal.Footer>
-							</PatientModal.Container >
-						</ScrollView >
-					</KeyboardAvoidingView >
-				</PatientModal >
-			</SafeAreaView >
+				<AddButton
+					onPress={() => {
+						let newPatient = createPatient();
+						if (newPatient) {
+							Alert.alert(
+								"Next Step",
+								"Would you like to record vitals or view details for this patient?",
+								[
+									{
+										text: "Record Vitals Now",
+										style: "default",
+										onPress: () =>
+											onPressQuickVitals(newPatient),
+									},
+									{
+										text: "Patient Details",
+										style: "default",
+										onPress: () =>
+											onPressPatient(newPatient),
+									},
+									{
+										text: "Dismiss",
+										style: "destructive",
+									},
+								]
+							);
+						}
+					}}
+				/>
+			</SafeAreaView>
 		);
 	}
 }
 
 const landingStyles = StyleSheet.create({});
-
-const modalStyles = StyleSheet.create({
-	modalButtonText: {
-		fontSize: 20,
-		color: colours.primary,
-		alignSelf: "center",
-	},
-	modalCancelButton: {
-		flexDirection: "column",
-		height: 50,
-		width: "40%",
-		maxWidth: 300,
-		margin: 10,
-		backgroundColor: "tomato",
-		borderWidth: 0,
-		borderRadius: 25,
-		alignContent: "center",
-		justifyContent: "center",
-	},
-	modalSubHeadingText: {
-		fontSize: 17,
-		fontWeight: "500",
-	},
-	modalSubmitButton: {
-		flexDirection: "column",
-		height: 50,
-		width: "40%",
-		maxWidth: 300,
-		margin: 10,
-		backgroundColor: colours.green,
-		borderWidth: 0,
-		borderRadius: 25,
-		alignContent: "center",
-		justifyContent: "center",
-	},
-});
