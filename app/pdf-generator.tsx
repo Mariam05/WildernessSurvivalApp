@@ -5,6 +5,22 @@ import { manipulateAsync } from 'expo-image-manipulator';
 import { Patient, Reading, Vital } from "../schemas";
 import defaultVitals, { quickVitals } from './assets/defaultVitals';
 
+
+function format_datetime(timestamp_str: String) {
+  var timestamp = Number(timestamp_str);
+  var d = new Date(timestamp);
+  var datestring = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear() + " " + d.getHours() + ":";
+
+  var minutes = d.getMinutes();
+
+  if (minutes / 10 < 1) {
+    datestring += "0" + minutes;
+  } else {
+    datestring += minutes;
+  }
+
+  return datestring;
+}
 /**
  * Takes in the vitals object list and returns an array with 2 elements:
  * the first is a dictionary of time-indexed vitals (to the nearest minute).
@@ -27,17 +43,7 @@ function timestamp_ordered(vitals_list: Vital[]) {
         if (value.value != null) {
 
           // Format the date time
-          var timestamp = Number(value.timestamp);
-          var d = new Date(timestamp);
-          var datestring = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear() + " " + d.getHours() + ":";
-
-          var minutes = d.getMinutes();
-
-          if (minutes / 10 < 1) {
-            datestring += "0" + minutes;
-          } else {
-            datestring += minutes;
-          }
+          var datestring = format_datetime(value.timestamp);
 
           // Add it to the dictionary
           if (datestring in default_dict) {
@@ -56,7 +62,7 @@ function timestamp_ordered(vitals_list: Vital[]) {
     }
   })
 
-  // console.log(default_dict)
+  console.log(other_vitals);
 
   return {
     "default_vitals": default_dict,
@@ -108,7 +114,45 @@ function getVitalRows(rows) {
   return str;
 }
 
+/**
+ * A function to print the custom vitals
+ * @param objects an array of vital objects
+ * @returns an html-formatted string
+ */
+function printOtherInfo(objects) {
 
+  let str = "";
+  for (let index in objects) {
+    let vital_obj = objects[index];
+
+    // check that data is not empty
+    if (vital_obj.data.length != 0) {
+      let vital_name = vital_obj.name;
+      str += "<br><br><div><table><caption>" + vital_name + "</caption>";
+      str += "<tr><th> Time </th> <th> Value </th> </tr>";
+
+      let reading_data = vital_obj.data;
+
+      // if the vital is an image
+      if (reading_data[0].url != "") {
+        for (let di in reading_data) {
+          let reading = reading_data[di];
+          str += " <tr><td>" + format_datetime(reading.timestamp) + "</td><td><img style=\"display:block;\" src=\""
+            + reading.url + "\" width=\"100\" height=\"100\" alt=\"" + reading.value + "\" > </img></td></tr>";
+        }
+
+      } else {
+        for (let di in reading_data) {
+          let reading = reading_data[di];
+          str += " <tr><td>" + format_datetime(reading.timestamp) + "</td><td>" + reading.value + " </td></tr>";
+        }
+
+      }
+    }
+    str += "</table></div>";
+  }
+  return str;
+}
 
 /**
  * Create the PDF containing a patient's data
@@ -116,7 +160,7 @@ function getVitalRows(rows) {
  */
 const createPDF = async (patient: Patient) => {
 
-  // Can be used to insert an image.
+  // Can be used to insert an image from the assets folder.
   // const asset = Asset.fromModule(require('./assets/images/choking1.png'));
   // const image = await manipulateAsync(
   //   asset.localUri ?? asset.uri,
@@ -124,7 +168,9 @@ const createPDF = async (patient: Patient) => {
   //   { base64: true }
   // );
 
-  var default_values = timestamp_ordered(patient.vitals).default_vitals;
+  var info = timestamp_ordered(patient.vitals);
+  var default_values = info.default_vitals;
+  var others = info.other_vitals;
   const html = `
     <html>
       <head>
@@ -132,6 +178,7 @@ const createPDF = async (patient: Patient) => {
         <style>
           table {
             width: 100%;
+            break-inside: avoid;
           }
           table, th, td {
             border: 1px solid black;
@@ -166,6 +213,9 @@ const createPDF = async (patient: Patient) => {
     }
     </tr>
       </table >
+
+      ${printOtherInfo(others)}
+
       </body >
     </html >
   `;
@@ -176,7 +226,6 @@ const createPDF = async (patient: Patient) => {
       html
     });
     await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
-    console.log("pdf uri is " + uri)
     return uri;
   } catch (err) {
     console.log("an error occured: " + err);
