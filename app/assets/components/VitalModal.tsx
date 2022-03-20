@@ -45,8 +45,9 @@ export const VitalModal = ({
 
 	const updateVitalCategory = (category, index) => {
 		setVitalCategories((arr) => {
-			arr[index] = category;
-			return arr;
+			let array = [...arr];
+			array[index] = category;
+			return array;
 		});
 		setNewVitalCategory("");
 	};
