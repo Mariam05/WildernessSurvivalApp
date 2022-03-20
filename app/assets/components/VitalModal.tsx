@@ -49,7 +49,6 @@ export const VitalModal = ({
 			array[index] = category;
 			return array;
 		});
-		setNewVitalCategory("");
 	};
 	const deleteVitalCategory = (index) => {
 		setVitalCategories((arr) => {
@@ -57,7 +56,6 @@ export const VitalModal = ({
 			return arr;
 		});
 		setVitalCategories((arr) => [...arr]); //required to re render
-		setNewVitalCategory("");
 	};
 	const appendVitalCategory = (category) => {
 		setVitalCategories((arr) => [...arr, category]);
@@ -220,7 +218,7 @@ export const VitalModal = ({
 													clearButtonMode="never"
 													returnKeyType="none"
 													textContentType="username"
-													placeholder="category"
+													placeholder="Category"
 													autoCapitalize="words"
 													autoCorrect={true}
 													value={category}
