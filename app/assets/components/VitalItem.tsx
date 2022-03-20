@@ -26,8 +26,11 @@ import {
 	View,
 	Dimensions,
 	ScrollView,
+	Animated,
+	Easing,
+	TouchableWithoutFeedback,
 } from "react-native";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 
 const Row = (entry) => {
@@ -440,7 +443,6 @@ const Chart = (onChartLongPress, chart) => {
 	return (
 		<TouchableOpacity
 			onLongPress={onChartLongPress}
-			style={vitalItemStyles.chart}
 		>
 			{chart}
 		</TouchableOpacity>
@@ -531,52 +533,83 @@ function VitalItem({
 		setExpanded(!expanded);
 	};
 
+	const animatedValue = useRef(new Animated.Value(0)).current
+
+	const rotate = animatedValue.interpolate({
+		inputRange: [0, 1, 2],
+		outputRange: ['0deg', '3deg', '-3deg'],
+	})
+
+	const startShake = () => {
+
+		Animated.sequence([
+			Animated.timing(animatedValue, {
+				toValue: 2,
+				duration: 250,
+				useNativeDriver: false,
+			}),
+			Animated.timing(animatedValue, {
+				toValue: 1,
+				duration: 250,
+				useNativeDriver: false,
+			}),
+			Animated.timing(animatedValue, {
+				toValue: 0,
+				duration: 250,
+				useNativeDriver: false,
+			}),
+		]).start()
+	}
+	console.log(name  + " " + (data.length > 1))
+
 	return (
+
 		<View>
 			<TouchableOpacity
 				disabled={!click_enabled}
-				onPress={onPress ? onPress : onPressItem}
-				style={[
-					vitalItemStyles.vitalsHeader,
-					{
-						width: click_enabled ? "80%" : "90%",
-						borderColor: colours.data_colors[index],
-						borderWidth: onPress ? 3 : 0,
-						backgroundColor: isToggled ? colours.darkerBlueBackground : colours.lightBlueBackground
-					},
-	
-
-				]}
+				onPress={data.length > 1 ? (onPress ? onPress : onPressItem) : startShake}
 			>
-				{description != undefined && description.length > 0 && (
-					<AppButton
-						title="i"
-						style={vitalItemStyles.infoButton}
-						buttonTextStyle={vitalItemStyles.infoButtonText}
-						onPress={onPressInfo}
-					/>
-				)}
-
-				<View>
-					<Text style={vitalItemStyles.vitalItemNameText}>
-						{name}
-					</Text>
-					{timeElapsed != undefined && (
-						<TimeElapsed
-							timeElapsed={timeElapsed}
-							periodicity={periodicity}
+					<Animated.View style={[
+						{ transform: [{ rotate }] },
+						vitalItemStyles.vitalsHeader,
+						{
+							width: click_enabled ? "80%" : "90%",
+							borderColor: colours.data_colors[index],
+							borderWidth: onPress ? 3 : 0,
+							backgroundColor: isToggled ? colours.darkerBlueBackground : colours.lightBlueBackground
+						},
+					]}
+					>
+					{description != undefined && description.length > 0 && (
+						<AppButton
+							title="i"
+							style={vitalItemStyles.infoButton}
+							buttonTextStyle={vitalItemStyles.infoButtonText}
+							onPress={onPressInfo}
 						/>
 					)}
-				</View>
 
-				{onPressAdd && (
-					<AppButton
-						title="Add"
-						style={vitalItemStyles.newReadingButton}
-						buttonTextStyle={vitalItemStyles.newReadingButtonText}
-						onPress={onPressAdd}
-					/>
+					<View>
+						<Text style={vitalItemStyles.vitalItemNameText}>
+							{name}
+						</Text>
+						{timeElapsed != undefined && (
+							<TimeElapsed
+								timeElapsed={timeElapsed}
+								periodicity={periodicity}
+							/>
+						)}
+					</View>
+
+					{onPressAdd && (
+						<AppButton
+							title="Add"
+							style={vitalItemStyles.newReadingButton}
+							buttonTextStyle={vitalItemStyles.newReadingButtonText}
+							onPress={onPressAdd}
+						/>
 				)}
+				</Animated.View>
 			</TouchableOpacity>
 
 			{expanded && data && data.length > 0 && (
@@ -589,9 +622,6 @@ function VitalItem({
 export { VitalItem, Data, RenderChart  };
 
 const vitalItemStyles = StyleSheet.create({
-	chart: {
-	
-	},
 	regular: {},
 	infoButton: {
 		height: undefined,
