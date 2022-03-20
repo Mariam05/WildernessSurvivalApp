@@ -63,33 +63,33 @@ export const VitalModal = ({
 	};
 
 	const validateInput = (): boolean => {
-		let error = true;
+		let error = false;
 
 		if (vitalName === "") {
 			setVitalNameErrorMessage("Must enter a vital name");
-			error = false;
+			error = true;
 		} else {
 			patient.vitals.forEach((vital) => {
 				if (vital.name.toLowerCase() === vitalName.toLowerCase()) {
 					setVitalNameErrorMessage("Must enter a unique vital name");
-					error = false;
+					error = true;
 				}
 			});
 		}
 
 		if (vitalType === vitalTypes[1] && vitalCategories.length <= 1) {
 			setCategoriesErrorMessage("Must enter at least 2 categories");
-			error = false;
+			error = true;
 		} else if (vitalType === vitalTypes[1]) {
 			vitalCategories.forEach((cat) => {
 				if (cat === "") {
 					setCategoriesErrorMessage(
 						"Every category must have a name"
 					);
-					error = false;
+					error = true;
 				}
 			});
-			error = false;
+			error = true;
 		} else {
 			setCategoriesErrorMessage("");
 		}
@@ -303,6 +303,7 @@ export const VitalModal = ({
 									handleVitalModal();
 									setVitalNameErrorMessage("");
 									setCategoriesErrorMessage("");
+									setNewVitalCategory("");
 								}}
 							/>
 							<AppButton
@@ -310,7 +311,9 @@ export const VitalModal = ({
 								style={modalStyles.modalSubmitButton}
 								buttonTextStyle={modalStyles.modalButtonText}
 								onPress={() => {
-									if (!validateInput()) return;
+									console.log("creating vital");
+
+									if (!validateInput()) { console.log("invalid input"); return };
 									createVital(
 										new ObjectId(patient._id),
 										vitalName,
@@ -326,6 +329,7 @@ export const VitalModal = ({
 									handleVitalModal();
 									setVitalNameErrorMessage("");
 									setCategoriesErrorMessage("");
+									setNewVitalCategory("");
 								}}
 							/>
 						</VitalModal.Footer>
