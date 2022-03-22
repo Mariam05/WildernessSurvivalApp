@@ -78,6 +78,7 @@ export const VitalModal = ({
 		}
 
 		if (vitalType === vitalTypes[1] && vitalCategories.length <= 1) {
+			console.log("Categories: " + vitalCategories);
 			setCategoriesErrorMessage("Must enter at least 2 categories");
 			error = true;
 		} else if (vitalType === vitalTypes[1]) {
@@ -89,7 +90,6 @@ export const VitalModal = ({
 					error = true;
 				}
 			});
-			error = true;
 		} else {
 			setCategoriesErrorMessage("");
 		}
@@ -203,7 +203,12 @@ export const VitalModal = ({
 							<View style={{ marginVertical: "1%" }} />
 							{vitalType == "Categorical" && (
 								<View>
-									<Text style={modalStyles.modalSubHeadingText}>Enter categories from "lowest" to "highest"</Text>
+									<Text
+										style={modalStyles.modalSubHeadingText}
+									>
+										Enter categories from "lowest" to
+										"highest"
+									</Text>
 									{vitalCategories.map((category, index) => (
 										<View key={index}>
 											<View>
@@ -237,11 +242,14 @@ export const VitalModal = ({
 													buttonTextStyle={
 														modalStyles.vitalCategoryButtonText
 													}
-													onPress={() =>
+													onPress={() => {
 														deleteVitalCategory(
 															index
-														)
-													}
+														);
+														setCategoriesErrorMessage(
+															""
+														);
+													}}
 												/>
 											</View>
 											<View
@@ -280,11 +288,12 @@ export const VitalModal = ({
 											buttonTextStyle={
 												modalStyles.vitalCategoryButtonText
 											}
-											onPress={() =>
+											onPress={() => {
 												appendVitalCategory(
 													newVitalCategory
-												)
-											}
+												);
+												setCategoriesErrorMessage("");
+											}}
 										/>
 									</View>
 								</View>
@@ -313,7 +322,10 @@ export const VitalModal = ({
 								onPress={() => {
 									console.log("creating vital");
 
-									if (!validateInput()) { console.log("invalid input"); return };
+									if (validateInput()) {
+										console.log("invalid input");
+										return;
+									}
 									createVital(
 										new ObjectId(patient._id),
 										vitalName,

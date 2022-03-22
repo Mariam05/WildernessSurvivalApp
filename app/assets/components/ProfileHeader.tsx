@@ -12,8 +12,8 @@ export default function ProfileHeader({ statusbarColour, navigation }) {
 
 	const { user } = useAuth();
 	useEffect(() => {
-		user && user.refreshCustomData();
-	}, [user.customData]);
+		user && user.customData && user.refreshCustomData();
+	}, [user]);
 
 	return (
 		<View style={styles.header}>
